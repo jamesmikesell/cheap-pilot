@@ -1,0 +1,91 @@
+<div *ngIf="!btConnected" class="connect-container">
+  <button mat-raised-button color="primary" (click)="initBluetooth()">Connect BT</button>
+</div>
+
+
+<div>
+  Motor Speed: {{controllerOrientation.currentMotorPower * 100 | number:'1.0-0'}}% <br>
+  Motor Direction: {{controllerOrientation.currentMotorPower > 0 ? "Right ---+" : " +--- Left" }} <br>
+  Heading Current: {{sensorOrientation.current | number:'1.0-0'}} <br>
+  Heading Avg: {{controllerOrientation.getAverageHeading() | number:'1.0-0'}} <br>
+  Heading Desired: {{sensorOrientation.desired | number:'1.0-0'}} <br>
+  Error: {{sensorOrientation.getError() | number:'1.0-0'}} <br>
+  Speed (kt): {{sensorGpsService.getSpeedKt() | number:'1.2-2'}} <br>
+</div>
+
+
+<div class="input-list">
+  <mat-form-field class="small-input">
+    <mat-label>Proportional</mat-label>
+    <input matInput type="number" [(ngModel)]="controllerOrientation.kP">
+  </mat-form-field>
+
+  <mat-form-field class="small-input">
+    <mat-label>Integral</mat-label>
+    <input matInput type="number" [(ngModel)]="controllerOrientation.kI">
+  </mat-form-field>
+
+  <mat-form-field class="small-input">
+    <mat-label>Derivative</mat-label>
+    <input matInput type="number" [(ngModel)]="controllerOrientation.kD">
+  </mat-form-field>
+</div>
+
+
+<div *ngIf="btConnected">
+  <mat-slide-toggle [ngModel]="controllerOrientation.enabled" (ngModelChange)="changeAutoPilot($event)">
+    Auto Pilot
+  </mat-slide-toggle>
+</div>
+
+
+
+
+<div class="center-controls">
+  <button mat-raised-button color="primary" (click)="maintainCurrentHeading()">Maintain Current Heading</button>
+</div>
+
+
+<div *ngIf="showGraphs" class="charts">
+  <app-chart [data]="chartData1"></app-chart>
+  <app-chart [data]="chartData2"></app-chart>
+  <app-chart [data]="chartData3"></app-chart>
+  <app-chart [data]="chartData4"></app-chart>
+</div>
+
+
+
+<div *ngIf="btConnected" class="center-controls manual-controls">
+  <button mat-raised-button color="primary" (click)="moveManually(-1)" [disabled]="controllerOrientation.enabled">
+    left
+  </button>
+  <button mat-raised-button color="primary" (click)="stopManually()">
+    stop
+  </button>
+  <button mat-raised-button color="primary" (click)="moveManually(1)" [disabled]="controllerOrientation.enabled">
+    right
+  </button>
+</div>
+
+
+
+<div class="data-controls">
+  <button mat-raised-button color="primary" (click)="downloadLog()">Download Log</button>
+  <mat-form-field>
+    <mat-label>Clear Log Safety</mat-label>
+    <input matInput type="text" [(ngModel)]="clearDataString">
+    <mat-hint>Type "clear" and hit button</mat-hint>
+  </mat-form-field>
+  <button mat-raised-button color="primary" (click)="clearData()" [disabled]="!canClear()">Clear Data</button>
+
+  <mat-slide-toggle [(ngModel)]="loggingEnabled">Save Logs Between Refreshes</mat-slide-toggle>
+
+  <mat-slide-toggle [(ngModel)]="showGraphs">
+    Show Graphs
+  </mat-slide-toggle>
+
+  <div *ngIf="btConnected">
+    <button mat-raised-button color="primary" (click)="autoTune()">Auto Tune</button>
+  </div>
+
+</div>
