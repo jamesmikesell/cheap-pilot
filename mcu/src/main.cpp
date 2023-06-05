@@ -36,18 +36,28 @@ class MyServerCallbacks : public BLEServerCallbacks
 
 class MyCallbacks : public BLECharacteristicCallbacks
 {
+  int previousDirection = 0;
+  int previousSpeed = 0;
+
   void onWrite(BLECharacteristic *pCharacteristic)
   {
     std::string value = pCharacteristic->getValue();
-    ledcWrite(PMW_LED, value[0]);
+    int speed = value[0];
+    int direction = value[1];
+    ledcWrite(PMW_LED, speed);
 
     int speedA = 0;
     int speedB = 0;
-    //Forward vs reverse
-    if (value[1] == 1)
-      speedA = value[0];
+    if (direction == 1)
+      speedA = speed;
     else
-      speedB = value[0];
+      speedB = speed;
+
+    if (previousDirection != direction && previousSpeed > 0)
+      sleep(200);
+
+    previousDirection = direction;
+    previousSpeed = speed;
 
     ledcWrite(PMW_A, speedA);
     ledcWrite(PMW_B, speedB);
