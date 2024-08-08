@@ -51,13 +51,13 @@
 
 
 <div *ngIf="btConnected" class="center-controls manual-controls">
-  <button mat-raised-button color="primary" (click)="moveManually(-1)">
+  <button mat-raised-button color="primary" (click)="moveManually(1)">
     &lt;--
   </button>
   <button mat-raised-button color="primary" (click)="stopManually()">
     stop
   </button>
-  <button mat-raised-button color="primary" (click)="moveManually(1)">
+  <button mat-raised-button color="primary" (click)="moveManually(-1)">
     --&gt;
   </button>
 </div>
@@ -94,13 +94,13 @@
 
 
 <div *ngIf="btConnected" class="center-controls manual-controls">
-  <button mat-raised-button color="primary" (click)="motor(-1)">
+  <button mat-raised-button color="primary" (click)="motor(1)">
     &lt;-- Motor
   </button>
   <button mat-raised-button color="primary" (click)="motor(0)">
     stop
   </button>
-  <button mat-raised-button color="primary" (click)="motor(1)">
+  <button mat-raised-button color="primary" (click)="motor(-1)">
     Motor --&gt;
   </button>
 </div>

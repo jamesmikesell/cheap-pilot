@@ -14,7 +14,7 @@ export class SensorOrientationService implements OrientationSensor {
   }
 
   private orientationChanged(event: DeviceOrientationEvent): void {
-    this.heading.next(new HeadingAndTime(event.timeStamp, event.alpha));
+    this.heading.next(new HeadingAndTime(event.timeStamp, 360 - event.alpha));
   }
 
 }
