@@ -30,7 +30,6 @@ export class ControllerRotationRateService implements Controller<number> {
     let speedKts = UnitConverter.mpsToKts(this.getCurrentSpeedMps());
     return this.configService.config.maxTurnRateDegreesPerSecondPerKt * speedKts
   }
-  lastErrorFiltered: number;
 
   get desired(): number { return this._desired }
 
@@ -111,6 +110,9 @@ export class ControllerRotationRateService implements Controller<number> {
 
       let timeDeltaSeconds = (heading.time - this.previousHeading.time) / 1000;
       let rawRotationRate = this.getGetRotationAmount(heading.heading, this.previousHeading.heading) / timeDeltaSeconds;
+
+      if (!this.enabled && !this.tuner)
+        this._desired = rawRotationRate; //this prevents a buildup of error if the controller isn't enabled
 
       let filteredRotationRate = this.filter.process(rawRotationRate, heading.time);
       let command: number;

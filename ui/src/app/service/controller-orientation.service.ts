@@ -97,6 +97,9 @@ export class ControllerOrientationService implements Controller<number> {
 
 
   private updateReceived(heading: HeadingAndTime): void {
+    if (!this._enabled && !this.tuner)
+      this._desired = heading.heading; //this prevents a buildup of error if the controller isn't enabled
+
     this.updateAverageHeading(heading.heading);
     let errorRaw = this.getError(heading.heading);
 
@@ -132,7 +135,7 @@ export class ControllerOrientationService implements Controller<number> {
   }
 
 
-  getAverageHeading(): number {
+  private getAverageHeading(): number {
     let avg = HeadingStats.circularMean(this.headingHistory);
 
     if (avg < 0)
