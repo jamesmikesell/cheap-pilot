@@ -40,7 +40,7 @@ export class CoordinateUtils {
 
     // Calculate perpendicular distance from the line to the current point
     const perpendicularDistance = distance * Math.sin(bearingDifference);
-    return perpendicularDistance; 
+    return perpendicularDistance;
   }
 
 
@@ -89,6 +89,27 @@ export class CoordinateUtils {
     const distance = CoordinateUtils.EARTH_RADIUS_METERS * c;
     return distance;
   }
+
+
+  static calculateBearing(start: LatLon, end: LatLon): number {
+    const lat1Rad = this.toRadians(start.latitude);
+    const lat2Rad = this.toRadians(end.latitude);
+    const deltaLonRad = this.toRadians(end.longitude - start.longitude);
+
+    const y = Math.sin(deltaLonRad) * Math.cos(lat2Rad);
+    const x = Math.cos(lat1Rad) * Math.sin(lat2Rad) -
+      Math.sin(lat1Rad) * Math.cos(lat2Rad) * Math.cos(deltaLonRad);
+
+    let bearing = this.toDegrees(Math.atan2(y, x));
+
+    return this.normalizeHeading(bearing);
+  }
+
+
+  static normalizeHeading(heading: number): number {
+    return (heading + 360) % 360
+  }
+
 
 }
 

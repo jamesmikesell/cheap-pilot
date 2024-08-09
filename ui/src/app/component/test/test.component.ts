@@ -4,6 +4,7 @@ import { ConfigService } from 'src/app/service/config.service';
 import { Controller } from 'src/app/service/controller';
 import { ConnectableDevice } from 'src/app/service/controller-bt-motor.service';
 import { ControllerOrientationService } from 'src/app/service/controller-orientation.service';
+import { ControllerPathService } from 'src/app/service/controller-path.service';
 import { ControllerRotationRateService } from 'src/app/service/controller-rotation-rate.service';
 import { DataLogService } from 'src/app/service/data-log.service';
 import { DeviceSelectService } from 'src/app/service/device-select.service';
@@ -29,6 +30,7 @@ export class TestComponent implements OnInit {
   blackoutScreen = false;
   UnitConverter = UnitConverter;
   speedKts = 0;
+  gpsHeading: number;
 
   private motorControllerService: Controller<number> & ConnectableDevice;
 
@@ -40,6 +42,7 @@ export class TestComponent implements OnInit {
     deviceSelectService: DeviceSelectService,
     private dataLog: DataLogService,
     public configService: ConfigService,
+    public controllerPath: ControllerPathService,
   ) {
     this.motorControllerService = deviceSelectService.motorController;
     this.sensorOrientation = deviceSelectService.orientationSensor;
@@ -96,6 +99,7 @@ export class TestComponent implements OnInit {
     )
 
     this.speedKts = UnitConverter.mpsToKts(locationData.speedMps);
+    this.gpsHeading = locationData.heading;
 
     this.dataLog.logLocation(logData);
   }

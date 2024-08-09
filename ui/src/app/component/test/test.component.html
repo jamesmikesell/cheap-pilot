@@ -12,15 +12,21 @@
 
 
 <div>
-  Heading Current: {{sensorOrientation.heading.value.heading | number:'1.0-0'}} <br>
-  Heading Desired: {{controllerOrientation.desired | number:'1.0-0'}} <br>
-  Controllers: Rotation: {{controllerRotationRate.enabled ? "on" : "off"}} Orientation: {{controllerOrientation.enabled
-  ? "on" : "off"}} <br>
+  Heading Current (compass / gps):
+  {{sensorOrientation.heading.value.heading | number:'1.0-0'}} / {{gpsHeading | number:'1.0-0'}}
+  <br>
+  Heading Desired (compass / gps):
+  {{controllerOrientation.desired | number:'1.0-0'}} / {{controllerPath.desiredHeadingToDestination| number:'1.0-0'}}
+  <br>
+  Controllers: Rotation: {{controllerRotationRate.enabled ? "on" : "off"}}
+  Orientation: {{controllerOrientation.enabled ? "on" : "off"}} 
+  Path: {{controllerPath.enabled ? "on" : "off"}} 
+  <br>
   Speed (kt): {{speedKts | number:'1.2-2'}} <br>
 </div>
 
 
-
+<app-map></app-map>
 
 
 

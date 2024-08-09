@@ -14,18 +14,21 @@ import { UnitConverter } from "../service/unit-converter";
 })
 export class MockBoatSensorAndTillerController {
 
+  private compassErrorOffset = 23; // magnetic sensor heading will seldom exactly match real gps heading, adding an offset to model that
+
   private moveQueue: SensorWithNoise[] = [
-    new SensorWithNoise(INITIAL_HEADING, INITIAL_HEADING, 0),
-    new SensorWithNoise(INITIAL_HEADING, INITIAL_HEADING, 1)
+    new SensorWithNoise(0, 0, 0),
+    new SensorWithNoise(0, 0, 1)
   ];
   private tillerGainDegreesPerSecond = 0;
   private nextTillerDegreesPerSecond = 0;
   private previousTime: number;
-  private heading = new BehaviorSubject<HeadingAndTime>(new HeadingAndTime(0, INITIAL_HEADING));
+  private heading = new BehaviorSubject<HeadingAndTime>(new HeadingAndTime(0, this.compassErrorOffset));
   private tillerAngle = -0.1;
   private connected = new BehaviorSubject<boolean>(true);
   private locationData = new BehaviorSubject<GpsSensorData>(undefined);
-  private startLocation: LatLon = { latitude: 40, longitude: -80 };
+  private startLocation: LatLon = { latitude: 40.00, longitude: -80.00 };
+
 
   constructor(
     private configService: ConfigService,
@@ -53,39 +56,11 @@ export class MockBoatSensorAndTillerController {
 
         let currentHeading = this.moveQueue[this.moveQueue.length - 1].real;
         currentHeading -= this.tillerAngle * (dt / 1000) * this.configService.config.simulationSpeedKt;
-        currentHeading = currentHeading % 360;
-        if (currentHeading < 0)
-          currentHeading = 360 + currentHeading;
+        currentHeading = CoordinateUtils.normalizeHeading(currentHeading)
 
-        let distanceMeters = UnitConverter.ktToMps(this.configService.config.simulationSpeedKt) * dt / 1000;
+        this.calculateGpsPosition(currentHeading, now, dt);
 
-        let newLocation: LatLon;
-        let newSpeed: number; // making these nullable as we won't have speed / heading in real life until we've moved
-        let newHeading: number; // ^^^^^
-        if (this.locationData.value) {
-          newLocation = CoordinateUtils.calculateNewPosition(this.locationData.value.coords, distanceMeters, currentHeading);
-          let distanceSinceStart = CoordinateUtils.distanceBetweenPointsInMeters(this.locationData.value.coords, this.startLocation);
-          if (distanceSinceStart > 5) {
-            newSpeed = this.configService.config.simulationSpeedKt;
-            newHeading = Math.round(currentHeading);
-          }
-        } else {
-          newLocation = this.startLocation;
-        }
-
-        this.locationData.next({
-          coords: {
-            accuracy: 6,
-            latitude: newLocation.latitude,
-            longitude: newLocation.longitude,
-          },
-          timestamp: now,
-          heading: newHeading,
-          speedMps: newSpeed,
-        })
-
-
-        const headingWithNoise = currentHeading + (Math.random() - 0.5) * this.configService.config.simulationNoiseAmplitude;
+        const headingWithNoise = currentHeading + this.compassErrorOffset + (Math.random() - 0.5) * this.configService.config.simulationNoiseAmplitude;
         this.moveQueue.push(new SensorWithNoise(currentHeading, headingWithNoise, now));
         if (this.moveQueue.length > 5) {
           this.moveQueue.shift();
@@ -94,8 +69,37 @@ export class MockBoatSensorAndTillerController {
         this.previousTime = now;
         this.heading.next(new HeadingAndTime(now, headingWithNoise));
       })
+  }
 
 
+  private calculateGpsPosition(heading: number, time: number, timeDelta: number): void {
+    let distanceMeters = UnitConverter.ktToMps(this.configService.config.simulationSpeedKt) * timeDelta / 1000;
+
+    let newLocation: LatLon;
+    let newSpeed: number; // making these nullable as we won't have speed / heading in real life until we've moved
+    let newHeading: number; // ^^^^^
+
+    if (this.locationData.value) {
+      newLocation = CoordinateUtils.calculateNewPosition(this.locationData.value.coords, distanceMeters, heading);
+      let distanceSinceStart = CoordinateUtils.distanceBetweenPointsInMeters(this.locationData.value.coords, this.startLocation);
+      if (distanceSinceStart > 5) {
+        newSpeed = UnitConverter.ktToMps(this.configService.config.simulationSpeedKt);
+        newHeading = CoordinateUtils.normalizeHeading(Math.round(heading));
+      }
+    } else {
+      newLocation = this.startLocation;
+    }
+
+    this.locationData.next({
+      coords: {
+        accuracy: 6,
+        latitude: newLocation.latitude,
+        longitude: newLocation.longitude,
+      },
+      timestamp: time,
+      speedMps: newSpeed,
+      heading: newHeading,
+    })
   }
 
 
@@ -178,4 +182,3 @@ class SensorWithNoise {
 }
 
 
-const INITIAL_HEADING = 30;

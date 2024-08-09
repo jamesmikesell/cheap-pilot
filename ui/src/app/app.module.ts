@@ -16,6 +16,7 @@ import { AppComponent } from './app.component';
 import { BlackoutComponent } from './component/blackout/blackout.component';
 import { ChartComponent } from './component/chart/chart.component';
 import { ConfigComponent } from './component/config/config.component';
+import { MapComponent } from './component/map/map.component';
 import { TestComponent } from './component/test/test.component';
 
 
@@ -25,7 +26,8 @@ import { TestComponent } from './component/test/test.component';
     TestComponent,
     ChartComponent,
     ConfigComponent,
-    BlackoutComponent
+    BlackoutComponent,
+    MapComponent,
   ],
   imports: [
     BrowserModule,
