@@ -50,7 +50,6 @@ export class ControllerOrientationService implements Controller<number> {
 
 
   command(level: number): void {
-    this.enabled = true;
     this._desired = level;
   }
 
@@ -200,6 +199,7 @@ export class ControllerOrientationService implements Controller<number> {
 
     this.setDesiredHeadingToCurrent();
     this._enabled = false;
+    this.rotationRateController.enabled = true;
     this.tuner = new PidTuner(this.rotationRateController, tuneConfig);
     this.tuner.tuneComplete.subscribe(result => {
       this.finalizePidTune();

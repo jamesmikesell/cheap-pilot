@@ -151,6 +151,7 @@ export class TestComponent implements OnInit {
 
 
   async maintainCurrentHeading(): Promise<void> {
+    this.controllerOrientation.enabled = true;
     this.controllerOrientation.maintainCurrentHeading();
     this.dataLog.clearLogData();
   }
@@ -165,10 +166,12 @@ export class TestComponent implements OnInit {
 
   moveManually(level: number): void {
     this.vibrate();
-    if (this.controllerOrientation.enabled)
+    if (this.controllerOrientation.enabled) {
       this.controllerOrientation.command((this.controllerOrientation.desired - (level * 5)) % 360);
-    else
+    } else {
+      this.controllerRotationRate.enabled = true;
       this.controllerRotationRate.command(this.controllerRotationRate.desired + level);
+    }
   }
 
   stopManually(): void {

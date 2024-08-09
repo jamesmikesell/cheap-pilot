@@ -79,7 +79,6 @@ export class ControllerRotationRateService implements Controller<number> {
 
   command(level: number): void {
     this._desired = level;
-    this.enabled = true;
   }
 
 
