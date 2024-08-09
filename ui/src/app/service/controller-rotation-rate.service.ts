@@ -30,11 +30,12 @@ export class ControllerRotationRateService implements Controller<number> {
     let speedKts = UnitConverter.mpsToKts(this.getCurrentSpeedMps());
     return this.configService.config.maxTurnRateDegreesPerSecondPerKt * speedKts
   }
-  desired = 0;
   lastErrorFiltered: number;
 
+  get desired(): number { return this._desired }
 
 
+  private _desired = 0;
   private pidController: PidController;
   private filter = this.getFilter();
   private _enabled = false;
@@ -77,7 +78,7 @@ export class ControllerRotationRateService implements Controller<number> {
 
 
   command(level: number): void {
-    this.desired = level;
+    this._desired = level;
     this.enabled = true;
   }
 
@@ -118,7 +119,7 @@ export class ControllerRotationRateService implements Controller<number> {
         command = this.tuner.sensorValueUpdated(filteredRotationRate, heading.time);
       } else {
         let maxRotationRate = UnitConverter.ktToMps(this.configService.config.maxTurnRateDegreesPerSecondPerKt) * speedMps;
-        let limitedDesired = Math.min(this.desired, maxRotationRate);
+        let limitedDesired = Math.min(this._desired, maxRotationRate);
         limitedDesired = Math.max(limitedDesired, -maxRotationRate);
         let error = filteredRotationRate - limitedDesired;
 
@@ -137,7 +138,7 @@ export class ControllerRotationRateService implements Controller<number> {
 
 
       let logData = new ControllerRotationRateLogData(
-        this.desired,
+        this._desired,
         filteredRotationRate,
         this.deviceSelectService.mockBoat.rotationRateReal(),
         command,
@@ -208,7 +209,7 @@ export class ControllerRotationRateService implements Controller<number> {
 
   async startPidTune(): Promise<TuningResult> {
     let tuneConfig = new TuneConfig();
-    this.desired = 0;
+    this._desired = 0;
     tuneConfig.setPoint = 0;
     tuneConfig.step = 1;
     tuneConfig.maxCycleCount = 20;

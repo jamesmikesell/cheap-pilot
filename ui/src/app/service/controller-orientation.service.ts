@@ -9,11 +9,12 @@ import { HeadingStats } from './heading-stats';
 import { PidConfig, PidController } from './pid-controller';
 import { PidTuner, PidTuningSuggestedValues, TuneConfig, TuningResult } from './pid-tuner';
 import { HeadingAndTime } from './sensor-orientation.service';
+import { Controller } from './controller';
 
 @Injectable({
   providedIn: 'root'
 })
-export class ControllerOrientationService {
+export class ControllerOrientationService implements Controller<number> {
 
   get enabled(): boolean { return this._enabled && this.rotationRateController.enabled; }
   set enabled(val: boolean) {
@@ -21,9 +22,10 @@ export class ControllerOrientationService {
     this.rotationRateController.enabled = val;
   }
 
-  desired = 0;
+  get desired(): number { return this._desired }
 
 
+  private _desired = 0;
   private pidController: PidController;
   private errorFilter = this.getFilter();
   private headingHistory: number[] = [];
@@ -46,6 +48,18 @@ export class ControllerOrientationService {
   }
 
 
+
+  command(level: number): void {
+    this.enabled = true;
+    this._desired = level;
+  }
+
+
+  stop(): void {
+    this.enabled = false
+  }
+
+
   private configurePidController(): void {
     let self = this;
     let config: PidConfig = {
@@ -60,20 +74,20 @@ export class ControllerOrientationService {
     );
   }
 
+
   maintainCurrentHeading() {
     this.setDesiredHeadingToCurrent();
     this.enabled = true;
   }
 
+
   private setDesiredHeadingToCurrent(): void {
-    this.desired = this.getAverageHeading();
-    this.errorFilter = this.getFilter();
-    this.configurePidController();
+    this._desired = this.getAverageHeading();
   }
 
 
   private getError(currentHeading: number): number {
-    let delta = currentHeading - this.desired;
+    let delta = currentHeading - this._desired;
     if (delta > 180)
       delta = delta - 360;
     if (delta < -180)
@@ -101,12 +115,12 @@ export class ControllerOrientationService {
       command = Math.min(command, maxRate)
 
       if (this._enabled)
-        this.rotationRateController.desired = command;
+        this.rotationRateController.command(command);
     }
 
 
     let logData = new ControllerOrientationLogData(
-      this.desired,
+      this._desired,
       heading.heading,
       errorRaw,
       errorFiltered,

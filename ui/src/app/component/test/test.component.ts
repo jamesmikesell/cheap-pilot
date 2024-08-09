@@ -166,7 +166,7 @@ export class TestComponent implements OnInit {
   moveManually(level: number): void {
     this.vibrate();
     if (this.controllerOrientation.enabled)
-      this.controllerOrientation.desired = (this.controllerOrientation.desired - (level * 5)) % 360;
+      this.controllerOrientation.command((this.controllerOrientation.desired - (level * 5)) % 360);
     else
       this.controllerRotationRate.command(this.controllerRotationRate.desired + level);
   }
