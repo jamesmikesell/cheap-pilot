@@ -11,7 +11,7 @@ import { OrientationSensor, SensorOrientationService } from './sensor-orientatio
 })
 export class DeviceSelectService {
 
-  motorController: Controller & ConnectableDevice;
+  motorController: Controller<number> & ConnectableDevice;
   orientationSensor: OrientationSensor;
   gpsSensor: GpsSensor;
 

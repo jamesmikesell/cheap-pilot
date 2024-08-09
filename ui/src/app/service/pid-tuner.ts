@@ -14,7 +14,7 @@ export class PidTuner {
 
 
   constructor(
-    private controller: Controller,
+    private controller: Controller<number>,
     private config: TuneConfig
   ) { }
 

@@ -1,7 +1,7 @@
 
-export interface Controller {
+export interface Controller<T> {
 
-  command(level: number): void;
+  command(level: T): void;
 
   stop(): void;
   

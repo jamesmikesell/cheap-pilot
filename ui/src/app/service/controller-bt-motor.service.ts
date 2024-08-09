@@ -5,7 +5,7 @@ import { Controller } from './controller';
 @Injectable({
   providedIn: 'root'
 })
-export class ControllerBtMotorService implements Controller, ConnectableDevice {
+export class ControllerBtMotorService implements Controller<number>, ConnectableDevice {
 
   connected = new BehaviorSubject<boolean>(false);
 

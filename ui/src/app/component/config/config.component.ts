@@ -22,7 +22,7 @@ export class ConfigComponent implements OnInit {
   selectedOrientationConfig: ControllerConfig[];
 
 
-  private motorControllerService: Controller & ConnectableDevice;
+  private motorControllerService: Controller<number> & ConnectableDevice;
 
 
   constructor(

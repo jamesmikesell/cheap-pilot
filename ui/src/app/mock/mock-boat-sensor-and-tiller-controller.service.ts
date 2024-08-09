@@ -115,7 +115,7 @@ export class MockBoatSensorAndTillerController {
   }
 
 
-  getMotorController(): Controller & ConnectableDevice {
+  getMotorController(): Controller<number> & ConnectableDevice {
     let self = this;
     return {
       command(level: number) { self.command(level) },

@@ -14,7 +14,7 @@ import { GpsSensor } from './sensor-gps.service';
 @Injectable({
   providedIn: 'root'
 })
-export class ControllerRotationRateService implements Controller {
+export class ControllerRotationRateService implements Controller<number> {
 
   get enabled(): boolean { return this._enabled; }
   set enabled(val: boolean) {
@@ -39,7 +39,7 @@ export class ControllerRotationRateService implements Controller {
   private filter = this.getFilter();
   private _enabled = false;
   private tuner: PidTuner;
-  private motorService: Controller;
+  private motorService: Controller<number>;
   private previousHeading: HeadingAndTime;
   private pidTuneComplete = new Subject<TuningResult>();
   private sensorLocation: GpsSensor;

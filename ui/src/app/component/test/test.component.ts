@@ -30,7 +30,7 @@ export class TestComponent implements OnInit {
   UnitConverter = UnitConverter;
   speedKts = 0;
 
-  private motorControllerService: Controller & ConnectableDevice;
+  private motorControllerService: Controller<number> & ConnectableDevice;
 
 
   constructor(
