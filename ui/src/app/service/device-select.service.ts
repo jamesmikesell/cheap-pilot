@@ -3,7 +3,7 @@ import { MockBoatSensorAndTillerController } from '../mock/mock-boat-sensor-and-
 import { ConfigService } from './config.service';
 import { Controller } from './controller';
 import { ConnectableDevice, ControllerBtMotorService } from './controller-bt-motor.service';
-import { SensorGpsService, SpeedSensor } from './sensor-gps.service';
+import { GpsSensor, SensorGpsService } from './sensor-gps.service';
 import { OrientationSensor, SensorOrientationService } from './sensor-orientation.service';
 
 @Injectable({
@@ -13,7 +13,7 @@ export class DeviceSelectService {
 
   motorController: Controller & ConnectableDevice;
   orientationSensor: OrientationSensor;
-  locationSensor: SpeedSensor;
+  gpsSensor: GpsSensor;
 
   constructor(
     public mockBoat: MockBoatSensorAndTillerController,
@@ -26,11 +26,11 @@ export class DeviceSelectService {
     if (configService.config.simulation) {
       this.motorController = mockBoat.getMotorController();
       this.orientationSensor = mockBoat.getOrientationSensor();
-      this.locationSensor = mockBoat.getSpeedSensor();
+      this.gpsSensor = mockBoat.getGpsSensor();
     } else {
       this.motorController = realBtMotorController;
       this.orientationSensor = realOrientationService;
-      this.locationSensor = realGpsSensor;
+      this.gpsSensor = realGpsSensor;
     }
 
   }

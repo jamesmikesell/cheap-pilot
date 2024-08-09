@@ -56,7 +56,6 @@ export class DataLogService {
       this.lastLocation?.locationLat,
       this.lastLocation?.locationLon,
       this.lastLocation?.locationSpeedKt,
-      this.lastLocation?.locationDistanceFromTarget,
       this.lastLocation?.locationGpsHeading,
 
       this.lastControllerOrientation?.headingDesired,
@@ -88,7 +87,6 @@ class LogData {
     public locationLat: number,
     public locationLon: number,
     public locationSpeedKt: number,
-    public locationDistanceFromTarget: number,
     public locationGpsHeading: number,
 
     public headingDesired: number,

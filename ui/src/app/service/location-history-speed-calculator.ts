@@ -62,7 +62,7 @@ export class LocationHistory {
 }
 
 
-interface LocationData {
+export interface LocationData {
   coords: {
     accuracy: number;
     latitude: number;

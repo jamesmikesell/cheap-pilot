@@ -3,7 +3,8 @@ import { BehaviorSubject, timer } from "rxjs";
 import { ConfigService } from "../service/config.service";
 import { Controller } from "../service/controller";
 import { ConnectableDevice } from "../service/controller-bt-motor.service";
-import { SpeedSensor } from "../service/sensor-gps.service";
+import { CoordinateUtils, LatLon } from "../service/coordinate-utils";
+import { GpsSensor, GpsSensorData } from "../service/sensor-gps.service";
 import { HeadingAndTime, OrientationSensor } from "../service/sensor-orientation.service";
 import { UnitConverter } from "../service/unit-converter";
 
@@ -23,6 +24,8 @@ export class MockBoatSensorAndTillerController {
   private heading = new BehaviorSubject<HeadingAndTime>(new HeadingAndTime(0, INITIAL_HEADING));
   private tillerAngle = -0.1;
   private connected = new BehaviorSubject<boolean>(true);
+  private locationData = new BehaviorSubject<GpsSensorData>(undefined);
+  private startLocation: LatLon = { latitude: 40, longitude: -80 };
 
   constructor(
     private configService: ConfigService,
@@ -48,14 +51,42 @@ export class MockBoatSensorAndTillerController {
         const dt = now - this.previousTime;
         this.tillerAngle += this.tillerGainDegreesPerSecond * (dt / 1000);
 
-        let current = this.moveQueue[this.moveQueue.length - 1].real;
-        current -= this.tillerAngle * (dt / 1000) * this.configService.config.simulationSpeedKt;
-        current = current % 360;
-        if (current < 0)
-          current = 360 + current;
+        let currentHeading = this.moveQueue[this.moveQueue.length - 1].real;
+        currentHeading -= this.tillerAngle * (dt / 1000) * this.configService.config.simulationSpeedKt;
+        currentHeading = currentHeading % 360;
+        if (currentHeading < 0)
+          currentHeading = 360 + currentHeading;
 
-        const headingWithNoise = current + (Math.random() - 0.5) * this.configService.config.simulationNoiseAmplitude;
-        this.moveQueue.push(new SensorWithNoise(current, headingWithNoise, now));
+        let distanceMeters = UnitConverter.ktToMps(this.configService.config.simulationSpeedKt) * dt / 1000;
+
+        let newLocation: LatLon;
+        let newSpeed: number; // making these nullable as we won't have speed / heading in real life until we've moved
+        let newHeading: number; // ^^^^^
+        if (this.locationData.value) {
+          newLocation = CoordinateUtils.calculateNewPosition(this.locationData.value.coords, distanceMeters, currentHeading);
+          let distanceSinceStart = CoordinateUtils.haversineDistanceInMeters(this.locationData.value.coords, this.startLocation);
+          if (distanceSinceStart > 5) {
+            newSpeed = this.configService.config.simulationSpeedKt;
+            newHeading = Math.round(currentHeading);
+          }
+        } else {
+          newLocation = this.startLocation;
+        }
+
+        this.locationData.next({
+          coords: {
+            accuracy: 6,
+            latitude: newLocation.latitude,
+            longitude: newLocation.longitude,
+          },
+          timestamp: now,
+          heading: newHeading,
+          speedMps: newSpeed,
+        })
+
+
+        const headingWithNoise = currentHeading + (Math.random() - 0.5) * this.configService.config.simulationNoiseAmplitude;
+        this.moveQueue.push(new SensorWithNoise(currentHeading, headingWithNoise, now));
         if (this.moveQueue.length > 5) {
           this.moveQueue.shift();
         }
@@ -68,9 +99,10 @@ export class MockBoatSensorAndTillerController {
   }
 
 
-  getSpeedSensor(): SpeedSensor {
+  getGpsSensor(): GpsSensor {
+    let self = this;
     return {
-      getSpeedMps: () => { return UnitConverter.ktToMps(this.configService.config.simulationSpeedKt); }
+      locationData: self.locationData,
     }
   }
 

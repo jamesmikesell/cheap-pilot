@@ -1,6 +1,6 @@
 
 import { LocationHistory, LocationHistorySpeedTracker } from './location-history-speed-calculator';
-import { Location, CoordinateUtils } from './coordinate-utils';
+import { LatLon, CoordinateUtils } from './coordinate-utils';
 
 describe('Location History Speed Calculator', () => {
 
@@ -98,7 +98,7 @@ type LocationAndAccuracy = {
   longitude: number;
 }
 
-function getCoordsFromLocation(location: Location, accuracy: number): LocationAndAccuracy {
+function getCoordsFromLocation(location: LatLon, accuracy: number): LocationAndAccuracy {
   (location as LocationAndAccuracy).accuracy = accuracy;
   return location as LocationAndAccuracy;
 }

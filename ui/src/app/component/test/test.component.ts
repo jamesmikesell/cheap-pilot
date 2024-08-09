@@ -1,14 +1,13 @@
 import { Component, HostListener, OnInit } from '@angular/core';
-import { timer } from 'rxjs';
+import { filter, timer } from 'rxjs';
 import { ConfigService } from 'src/app/service/config.service';
 import { Controller } from 'src/app/service/controller';
 import { ConnectableDevice } from 'src/app/service/controller-bt-motor.service';
 import { ControllerOrientationService } from 'src/app/service/controller-orientation.service';
 import { ControllerRotationRateService } from 'src/app/service/controller-rotation-rate.service';
-import { CoordinateUtils } from 'src/app/service/coordinate-utils';
 import { DataLogService } from 'src/app/service/data-log.service';
 import { DeviceSelectService } from 'src/app/service/device-select.service';
-import { SensorGpsService, SpeedSensor } from 'src/app/service/sensor-gps.service';
+import { GpsSensor, GpsSensorData } from 'src/app/service/sensor-gps.service';
 import { OrientationSensor } from 'src/app/service/sensor-orientation.service';
 import { UnitConverter } from 'src/app/service/unit-converter';
 import { WakeLockService } from 'src/app/service/wake-lock.service';
@@ -26,9 +25,10 @@ export class TestComponent implements OnInit {
   chartGpsHeading: AppChartData[] = [];
   btConnected = false;
   sensorOrientation: OrientationSensor;
-  sensorLocation: SpeedSensor;
+  sensorLocation: GpsSensor;
   blackoutScreen = false;
   UnitConverter = UnitConverter;
+  speedKts = 0;
 
   private motorControllerService: Controller & ConnectableDevice;
 
@@ -37,20 +37,21 @@ export class TestComponent implements OnInit {
     private wakeLockService: WakeLockService,
     public controllerRotationRate: ControllerRotationRateService,
     public controllerOrientation: ControllerOrientationService,
-    public sensorGpsService: SensorGpsService,
     deviceSelectService: DeviceSelectService,
     private dataLog: DataLogService,
     public configService: ConfigService,
   ) {
     this.motorControllerService = deviceSelectService.motorController;
     this.sensorOrientation = deviceSelectService.orientationSensor;
-    this.sensorLocation = deviceSelectService.locationSensor;
+    this.sensorLocation = deviceSelectService.gpsSensor;
   }
 
 
 
   ngOnInit(): void {
-    this.sensorGpsService.update.subscribe(() => this.updateReceived());
+    this.sensorLocation.locationData
+      .pipe(filter(locationData => !!locationData))
+      .subscribe(locationData => this.locationUpdated(locationData));
 
     this.motorControllerService.connected.subscribe(isConnected => this.btConnected = isConnected);
 
@@ -85,32 +86,16 @@ export class TestComponent implements OnInit {
   }
 
 
-  private gpsLat: number;
-  private gpsLon: number;
-  private gpsHeading: number;
-  setGpsHeading(): void {
-    this.gpsLat = this.sensorGpsService.latitude;
-    this.gpsLon = this.sensorGpsService.longitude;
-    this.gpsHeading = this.sensorGpsService.currentHeading;
-    this.clearGraphs();
-  }
 
-  private updateReceived(): void {
-    let distanceKm = CoordinateUtils.calculateDistanceFromLineMeters(
-      this.gpsLat,
-      this.gpsLon,
-      this.gpsHeading,
-      this.sensorGpsService.latitude,
-      this.sensorGpsService.longitude
-    ) / 1000
-
+  private locationUpdated(locationData: GpsSensorData): void {
     let logData = new LocationLogData(
-      this.sensorGpsService.latitude,
-      this.sensorGpsService.longitude,
-      UnitConverter.mpsToKts(this.sensorGpsService.getSpeedMps()),
-      distanceKm,
-      this.sensorGpsService.currentHeading
+      locationData.coords.latitude,
+      locationData.coords.longitude,
+      UnitConverter.mpsToKts(locationData.speedMps),
+      locationData.heading,
     )
+
+    this.speedKts = UnitConverter.mpsToKts(locationData.speedMps);
 
     this.dataLog.logLocation(logData);
   }
@@ -155,7 +140,6 @@ export class TestComponent implements OnInit {
         rotationRateFiltered.data.push({ x: time, y: singleLog.rotationRateDesired })
         rotationRateCommand.data.push({ x: time, y: singleLog.rotationRateCommand })
         rotationRateErrorFilter.data.push({ x: time, y: singleLog.rotationRateReal })
-        distanceFromLine.data.push({ x: time, y: singleLog.locationDistanceFromTarget })
         gpsHeading.data.push({ x: time, y: singleLog.locationGpsHeading })
       })
 
@@ -233,7 +217,6 @@ export class LocationLogData {
     public locationLat: number,
     public locationLon: number,
     public locationSpeedKt: number,
-    public locationDistanceFromTarget: number,
     public locationGpsHeading: number,
   ) { }
 }

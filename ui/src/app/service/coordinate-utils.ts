@@ -57,7 +57,7 @@ export class CoordinateUtils {
   }
 
 
-  static calculateNewPosition(start: Location, distanceMeters: number, angleDegrees: number): Location {
+  static calculateNewPosition(start: LatLon, distanceMeters: number, angleDegrees: number): LatLon {
     const angularDistance = distanceMeters / CoordinateUtils.EARTH_RADIUS_METERS;
     const bearing = this.toRadians(angleDegrees);
 
@@ -77,7 +77,7 @@ export class CoordinateUtils {
   }
 
 
-  static haversineDistanceInMeters(location1: Location, location2: Location) {
+  static haversineDistanceInMeters(location1: LatLon, location2: LatLon) {
     const lat1 = this.toRadians(location1.latitude);
     const lon1 = this.toRadians(location1.longitude);
     const lat2 = this.toRadians(location2.latitude);
@@ -96,7 +96,7 @@ export class CoordinateUtils {
 }
 
 
-export interface Location {
+export interface LatLon {
   latitude: number;
   longitude: number;
 }

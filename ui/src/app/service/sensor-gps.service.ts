@@ -1,20 +1,17 @@
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
-import { LocationHistorySpeedTracker } from './location-history-speed-calculator';
+import { BehaviorSubject } from 'rxjs';
+import { LocationData, LocationHistorySpeedTracker } from './location-history-speed-calculator';
 
 @Injectable({
   providedIn: 'root'
 })
-export class SensorGpsService implements SpeedSensor {
+export class SensorGpsService implements GpsSensor {
 
-  desired = 0;
-  currentHeading = 0
-  update = new Subject<void>();
-  latitude = 0;
-  longitude = 0;
+  locationData = new BehaviorSubject<GpsSensorData>(undefined);
 
-  private speedMps = 0;
+
   private speedTracker = new LocationHistorySpeedTracker();
+
 
   constructor() {
     navigator.geolocation.watchPosition((data) => this.locationChange(data), null, { enableHighAccuracy: true });
@@ -22,26 +19,30 @@ export class SensorGpsService implements SpeedSensor {
 
 
   private locationChange(locationData: GeolocationPosition): void {
-    let heading = locationData.coords.heading;
-    if (heading != null)
-      this.currentHeading = heading;
-
-    this.latitude = locationData.coords.latitude;
-    this.longitude = locationData.coords.longitude;
-
     this.speedTracker.tryAddLocationToHistory(locationData);
-    this.speedMps = this.speedTracker.getSpeedMpsFromHistory();
 
-    this.update.next();
+    this.locationData.next({
+      coords: {
+        latitude: locationData.coords.latitude,
+        longitude: locationData.coords.longitude,
+        accuracy: locationData.coords.accuracy,
+      },
+      speedMps: this.speedTracker.getSpeedMpsFromHistory(),
+      timestamp: locationData.timestamp,
+      heading: locationData.coords.heading,
+    })
   }
 
-
-  getSpeedMps(): number {
-    return this.speedMps;
-  }
 
 }
 
-export interface SpeedSensor {
-  getSpeedMps(): number
+
+export interface GpsSensor {
+  locationData: BehaviorSubject<GpsSensorData>;
+}
+
+
+export interface GpsSensorData extends LocationData {
+  speedMps: number;
+  heading: number;
 }

@@ -7,9 +7,9 @@ import { DeviceSelectService } from './device-select.service';
 import { Filter, LowPassFilter } from './filter';
 import { PidConfig, PidController } from './pid-controller';
 import { PidTuner, PidTuningSuggestedValues, TuneConfig, TuningResult } from './pid-tuner';
-import { SpeedSensor } from './sensor-gps.service';
 import { HeadingAndTime } from './sensor-orientation.service';
 import { UnitConverter } from './unit-converter';
+import { GpsSensor } from './sensor-gps.service';
 
 @Injectable({
   providedIn: 'root'
@@ -27,7 +27,7 @@ export class ControllerRotationRateService implements Controller {
   }
 
   get maxRotationRate(): number {
-    let speedKts = UnitConverter.mpsToKts(this.sensorLocation.getSpeedMps());
+    let speedKts = UnitConverter.mpsToKts(this.getCurrentSpeedMps());
     return this.configService.config.maxTurnRateDegreesPerSecondPerKt * speedKts
   }
   desired = 0;
@@ -42,7 +42,7 @@ export class ControllerRotationRateService implements Controller {
   private motorService: Controller;
   private previousHeading: HeadingAndTime;
   private pidTuneComplete = new Subject<TuningResult>();
-  private sensorLocation: SpeedSensor;
+  private sensorLocation: GpsSensor;
 
 
   constructor(
@@ -51,7 +51,7 @@ export class ControllerRotationRateService implements Controller {
     private configService: ConfigService,
   ) {
     this.motorService = deviceSelectService.motorController;
-    this.sensorLocation = deviceSelectService.locationSensor;
+    this.sensorLocation = deviceSelectService.gpsSensor;
 
 
     this.configurePidController();
@@ -106,8 +106,8 @@ export class ControllerRotationRateService implements Controller {
 
       // disabling speed compensation if we're truly stopped
       let speedMps = 1;
-      if (this.sensorLocation.getSpeedMps() > 0.01)
-        speedMps = this.sensorLocation.getSpeedMps();
+      if (this.getCurrentSpeedMps() > 0.01)
+        speedMps = this.getCurrentSpeedMps();
 
       let timeDeltaSeconds = (heading.time - this.previousHeading.time) / 1000;
       let rawRotationRate = this.getGetRotationAmount(heading.heading, this.previousHeading.heading) / timeDeltaSeconds;
@@ -162,6 +162,15 @@ export class ControllerRotationRateService implements Controller {
   }
 
 
+  private getCurrentSpeedMps(): number {
+    let currentData = this.sensorLocation.locationData.value;
+    if (!currentData || !currentData.speedMps)
+      return 0;
+
+    return currentData.speedMps;
+  }
+
+
   cancelPidTune(): void {
     this.finalizePidTune();
     this.pidTuneComplete.next({
@@ -178,7 +187,7 @@ export class ControllerRotationRateService implements Controller {
     this.configService.config.rotationKi = +tuningMethod.kI.toPrecision(4);
     this.configService.config.rotationKd = +tuningMethod.kD.toPrecision(4);
     this.configService.config.rotationTuneSpeedKts = +UnitConverter
-      .mpsToKts(this.sensorLocation.getSpeedMps())
+      .mpsToKts(this.getCurrentSpeedMps())
       .toPrecision(3);
 
     let configValues = PidTuneSaver.convert(suggestedPidValues,
@@ -186,7 +195,7 @@ export class ControllerRotationRateService implements Controller {
       this.configService.config.rotationPidDerivativeLowPassFrequency)
       .map(singleConfig => {
         let cast = (singleConfig as RotationControllerConfig);
-        cast.rotationTuneSpeedMps = +this.sensorLocation.getSpeedMps().toPrecision(3);
+        cast.rotationTuneSpeedMps = +this.getCurrentSpeedMps().toPrecision(3);
         return cast;
       })
 
