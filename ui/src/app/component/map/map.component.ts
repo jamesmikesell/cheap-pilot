@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import * as L from 'leaflet';
 import { LatLngTuple } from 'leaflet';
+import 'leaflet.locatecontrol';
 import { filter } from 'rxjs';
 import { ConfigService } from 'src/app/service/config.service';
 import { ControllerPathService } from 'src/app/service/controller-path.service';
@@ -34,6 +35,8 @@ export class MapComponent implements OnInit {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(this.map);
 
+    this.addLocateControl();
+
     if (this.configService.config.simulation)
       this.configureSimulatorPositions();
 
@@ -58,6 +61,13 @@ export class MapComponent implements OnInit {
 
         historyPath.setLatLngs(this.pathPoints);
       })
+  }
+
+
+  private addLocateControl(): void {
+    L.control.locate({
+      showCompass: false
+    }).addTo(this.map);
   }
 
 
