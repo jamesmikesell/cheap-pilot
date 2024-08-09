@@ -64,7 +64,7 @@ export class MockBoatSensorAndTillerController {
         let newHeading: number; // ^^^^^
         if (this.locationData.value) {
           newLocation = CoordinateUtils.calculateNewPosition(this.locationData.value.coords, distanceMeters, currentHeading);
-          let distanceSinceStart = CoordinateUtils.haversineDistanceInMeters(this.locationData.value.coords, this.startLocation);
+          let distanceSinceStart = CoordinateUtils.distanceBetweenPointsInMeters(this.locationData.value.coords, this.startLocation);
           if (distanceSinceStart > 5) {
             newSpeed = this.configService.config.simulationSpeedKt;
             newHeading = Math.round(currentHeading);

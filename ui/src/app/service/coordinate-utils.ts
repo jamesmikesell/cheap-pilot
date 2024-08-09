@@ -3,19 +3,17 @@ export class CoordinateUtils {
 
   private static readonly EARTH_RADIUS_METERS = 6371e3;
 
-
-  static calculateDistanceFromLineMeters(
-    latitudeStart: number,
-    longitudeStart: number,
+  /** Calculate how far away the current location is from an imaginary line/circle drawn around the earth 
+   * that goes through the starting point at the specified heading */
+  static distanceFromLineMeters(
+    start: LatLon,
     headingDegrees: number,
-    latitudeCurrent: number,
-    longitudeCurrent: number
+    current: LatLon,
   ): number {
-    // Convert degrees to radians
-    const latitudeStartRad = CoordinateUtils.toRadians(latitudeStart);
-    const longitudeStartRad = CoordinateUtils.toRadians(longitudeStart);
-    const latitudeCurrentRad = CoordinateUtils.toRadians(latitudeCurrent);
-    const longitudeCurrentRad = CoordinateUtils.toRadians(longitudeCurrent);
+    const latitudeStartRad = CoordinateUtils.toRadians(start.latitude);
+    const longitudeStartRad = CoordinateUtils.toRadians(start.longitude);
+    const latitudeCurrentRad = CoordinateUtils.toRadians(current.latitude);
+    const longitudeCurrentRad = CoordinateUtils.toRadians(current.longitude);
     const headingRad = CoordinateUtils.toRadians(headingDegrees);
 
     // Calculate great circle bearing between starting point and current point
@@ -42,8 +40,7 @@ export class CoordinateUtils {
 
     // Calculate perpendicular distance from the line to the current point
     const perpendicularDistance = distance * Math.sin(bearingDifference);
-
-    return perpendicularDistance; // Distance in kilometers
+    return perpendicularDistance; 
   }
 
 
@@ -77,7 +74,7 @@ export class CoordinateUtils {
   }
 
 
-  static haversineDistanceInMeters(location1: LatLon, location2: LatLon) {
+  static distanceBetweenPointsInMeters(location1: LatLon, location2: LatLon) {
     const lat1 = this.toRadians(location1.latitude);
     const lon1 = this.toRadians(location1.longitude);
     const lat2 = this.toRadians(location2.latitude);

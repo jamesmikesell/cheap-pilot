@@ -24,7 +24,7 @@ export class LocationHistorySpeedTracker {
     if (this.locationHistory.length > 0) {
       this.lastLocation = currentLocation;
       let currentLocationIsCloseToHistory = this.locationHistory
-        .map(single => CoordinateUtils.haversineDistanceInMeters(single, currentLocation))
+        .map(single => CoordinateUtils.distanceBetweenPointsInMeters(single, currentLocation))
         .some(singleDistance => singleDistance < minAccuracyMeters)
 
       if (currentLocationIsCloseToHistory)
@@ -43,7 +43,7 @@ export class LocationHistorySpeedTracker {
 
     let oldest = this.locationHistory[0];
     let newest = this.lastLocation;
-    let distanceMeters = CoordinateUtils.haversineDistanceInMeters(newest, oldest);
+    let distanceMeters = CoordinateUtils.distanceBetweenPointsInMeters(newest, oldest);
 
     let timeInMs = newest.time.getTime() - oldest.time.getTime();
     let speedMetersPerSec = distanceMeters / (timeInMs / 1000);
