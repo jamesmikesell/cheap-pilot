@@ -34,6 +34,50 @@
 
 
 
+
+
+
+
+
+
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Remote Control</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="input-list">
+
+        <div>
+          <mat-button-toggle-group multiple>
+            <mat-button-toggle value="left"
+              [checked]="configService.config.remoteReceiverMode === RemoteReceiverMode.REMOTE"
+              (change)="remoteModeChange(RemoteReceiverMode.REMOTE)">
+              Remote
+            </mat-button-toggle>
+            <mat-button-toggle value="center" checked="true"
+              [checked]="configService.config.remoteReceiverMode === RemoteReceiverMode.RECEIVER"
+              (change)="remoteModeChange(RemoteReceiverMode.RECEIVER)">
+              Receiver
+            </mat-button-toggle>
+          </mat-button-toggle-group>
+        </div>
+
+        <mat-form-field *ngIf="configService.config.remoteReceiverMode !== undefined">
+          <mat-label>Remote Password</mat-label>
+          <input matInput type="text" [(ngModel)]="configService.config.remotePassword">
+        </mat-form-field>
+
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+
+
+
+
+
+
   <mat-card>
     <mat-card-header>
       <mat-card-title>Rotation Rate PID Controller</mat-card-title>

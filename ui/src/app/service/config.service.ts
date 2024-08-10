@@ -85,8 +85,10 @@ export class AppConfig {
   orientationConfigs: ControllerConfig[] = [];
 
 
-  waypointProximityMeters: 20; 
+  waypointProximityMeters = 20;
 
+  remoteReceiverMode: RemoteReceiverMode;
+  remotePassword = (Math.random() + 1).toString(36).substring(2);
 
   showGraphRotation = false;
   showGraphOrientation = false;
@@ -133,4 +135,9 @@ export class PidTuneSaver {
       lowPassFrequency: lowPassFrequency,
     };
   }
+}
+
+export enum RemoteReceiverMode {
+  REMOTE,
+  RECEIVER,
 }

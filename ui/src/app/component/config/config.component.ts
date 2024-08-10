@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { ConfigService, ControllerConfig, RotationControllerConfig } from 'src/app/service/config.service';
+import { ConfigService, ControllerConfig, RemoteReceiverMode, RotationControllerConfig } from 'src/app/service/config.service';
 import { Controller } from 'src/app/service/controller';
 import { ConnectableDevice } from 'src/app/service/controller-bt-motor.service';
 import { ControllerOrientationService } from 'src/app/service/controller-orientation.service';
@@ -20,7 +20,7 @@ export class ConfigComponent implements OnInit {
   btConnected = false;
   selectedRotationConfig: RotationControllerConfig[];
   selectedOrientationConfig: ControllerConfig[];
-
+  RemoteReceiverMode = RemoteReceiverMode;
 
   private motorControllerService: Controller<number> & ConnectableDevice;
 
@@ -49,6 +49,14 @@ export class ConfigComponent implements OnInit {
 
   downloadLog(): void {
     this.dataLog.downloadLog();
+  }
+
+
+  remoteModeChange(mode: RemoteReceiverMode) {
+    if (this.configService.config.remoteReceiverMode === mode)
+      this.configService.config.remoteReceiverMode = undefined;
+    else
+      this.configService.config.remoteReceiverMode = mode
   }
 
 
