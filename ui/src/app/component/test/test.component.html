@@ -42,9 +42,6 @@
   <app-chart *ngIf="configService.config.showGraphGps" [data]="chartGpsHeading" title="GPS Heading"
     (dblclick)="clearGraphs()">
   </app-chart>
-  <app-chart *ngIf="configService.config.showGraphDistanceFromLine" [data]="chartNavigation" title="GPS Path Controller"
-    (dblclick)="clearGraphs()">
-  </app-chart>
   <app-chart *ngIf="configService.config.showGraphOrientation" [data]="chartOrientation"
     title="Orientation Controller (Zero is Set Point)" (dblclick)="clearGraphs()">
   </app-chart>

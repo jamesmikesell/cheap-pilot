@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-import { filter } from 'rxjs';
+import { filter, Subject } from 'rxjs';
 import { ControllerOrientationService } from './controller-orientation.service';
 import { CoordinateUtils, LatLon } from './coordinate-utils';
 import { DeviceSelectService } from './device-select.service';
 import { Controller } from './controller';
 import { OrientationSensor } from './sensor-orientation.service';
+import { ConfigService } from './config.service';
 
 @Injectable({
   providedIn: 'root'
@@ -19,9 +20,10 @@ export class ControllerPathService implements Controller<LatLon[]> {
       this.orientationController.enabled = true
     this._enabled = val;
   }
+  pointReached = new Subject<void>();
 
 
-  _enabled = false;
+  private _enabled = false;
   private _desiredHeadingToDestination: number;
   private path: LatLon[] = [];
   private orientationSensor: OrientationSensor;
@@ -30,6 +32,7 @@ export class ControllerPathService implements Controller<LatLon[]> {
   constructor(
     deviceSelectService: DeviceSelectService,
     private orientationController: ControllerOrientationService,
+    configService: ConfigService,
   ) {
     this.orientationSensor = deviceSelectService.orientationSensor;
 
@@ -45,8 +48,10 @@ export class ControllerPathService implements Controller<LatLon[]> {
 
         this._desiredHeadingToDestination = bearingToTarget;
 
-        if (distanceToTarget < 20)
+        if (distanceToTarget < configService.config.waypointProximityMeters) {
+          this.pointReached.next();
           this.path.shift()
+        }
 
         let compassDrift = this.orientationSensor.heading.value.heading - locationData.heading;
         let correctedDestinationCompassHeading = CoordinateUtils.normalizeHeading(bearingToTarget + compassDrift)

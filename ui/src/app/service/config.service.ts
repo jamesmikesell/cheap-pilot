@@ -85,9 +85,11 @@ export class AppConfig {
   orientationConfigs: ControllerConfig[] = [];
 
 
+  waypointProximityMeters: 20; 
+
+
   showGraphRotation = false;
   showGraphOrientation = false;
-  showGraphDistanceFromLine = false;
   showGraphGps = false;
 }
 
