@@ -11,19 +11,19 @@ export class SensorGpsService implements GpsSensor {
   locationData = new BehaviorSubject<GpsSensorData>(undefined);
 
 
-  private speedTracker;
+  private locationTracker;
 
 
   constructor(
     configService: ConfigService,
   ) {
     navigator.geolocation.watchPosition((data) => this.locationChange(data), null, { enableHighAccuracy: true });
-    this.speedTracker = new LocationHistoryTracker({ getNumber: () => configService.config.minimumRequiredGpsAccuracyMeters })
+    this.locationTracker = new LocationHistoryTracker({ getNumber: () => configService.config.minimumRequiredGpsAccuracyMeters })
   }
 
 
   private locationChange(locationData: GeolocationPosition): void {
-    this.speedTracker.tryAddLocationToHistory(locationData);
+    this.locationTracker.tryAddLocationToHistory(locationData);
 
     this.locationData.next({
       coords: {
@@ -31,9 +31,9 @@ export class SensorGpsService implements GpsSensor {
         longitude: locationData.coords.longitude,
         accuracy: locationData.coords.accuracy,
       },
-      speedMps: this.speedTracker.getSpeedMpsFromHistory(),
+      speedMps: this.locationTracker.getSpeedMpsFromHistory(),
       timestamp: locationData.timestamp,
-      heading: locationData.coords.heading,
+      heading: this.locationTracker.getHeadingFromHistory(),
     })
   }
 

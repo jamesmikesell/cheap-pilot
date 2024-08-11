@@ -56,6 +56,16 @@ export class LocationHistoryTracker {
     return speedMetersPerSec;
   }
 
+
+  getHeadingFromHistory(): number {
+    if (this.locationHistory.length < 2 || !this.lastLocation)
+      return 0;
+
+    let oldest = this.locationHistory[this.locationHistory.length - 2];
+    let newest = this.locationHistory[this.locationHistory.length - 1];
+    return CoordinateUtils.calculateBearing(oldest, newest);
+  }
+
 }
 
 

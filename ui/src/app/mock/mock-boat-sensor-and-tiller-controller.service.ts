@@ -4,6 +4,7 @@ import { ConfigService } from "../service/config.service";
 import { Controller } from "../service/controller";
 import { ConnectableDevice } from "../service/controller-bt-motor.service";
 import { CoordinateUtils, LatLon } from "../service/coordinate-utils";
+import { LocationData, LocationHistoryTracker } from "../service/location-history-calculator";
 import { GpsSensor, GpsSensorData } from "../service/sensor-gps.service";
 import { HeadingAndTime, OrientationSensor } from "../service/sensor-orientation.service";
 import { UnitConverter } from "../service/unit-converter";
@@ -28,11 +29,14 @@ export class MockBoatSensorAndTillerController {
   private connected = new BehaviorSubject<boolean>(false);
   private locationData = new BehaviorSubject<GpsSensorData>(undefined);
   private startLocation: LatLon = { latitude: 40.00, longitude: -80.00 };
+  private locationTracker;
 
 
   constructor(
     private configService: ConfigService,
   ) {
+    this.locationTracker = new LocationHistoryTracker({ getNumber: () => configService.config.minimumRequiredGpsAccuracyMeters });
+
     // This simulates how the we only send control updates to the bluetooth motor every 200ms
     timer(0, 200)
       .subscribe(() => {
@@ -72,30 +76,29 @@ export class MockBoatSensorAndTillerController {
     let distanceMeters = UnitConverter.ktToMps(this.configService.config.simulationSpeedKt) * timeDelta / 1000;
 
     let newLocation: LatLon;
-    let newSpeed: number; // making these nullable as we won't have speed / heading in real life until we've moved
-    let newHeading: number; // ^^^^^
-
     if (this.locationData.value) {
       newLocation = CoordinateUtils.calculateNewPosition(this.locationData.value.coords, distanceMeters, heading);
-      let distanceSinceStart = CoordinateUtils.distanceBetweenPointsInMeters(this.locationData.value.coords, this.startLocation);
-      if (distanceSinceStart > 5) {
-        newSpeed = UnitConverter.ktToMps(this.configService.config.simulationSpeedKt);
-        newHeading = CoordinateUtils.normalizeHeading(Math.round(heading));
-      }
     } else {
       newLocation = this.startLocation;
     }
 
-    this.locationData.next({
+    let locationWithoutSpeedAndHeading: LocationData = {
       coords: {
         accuracy: 6,
         latitude: newLocation.latitude,
         longitude: newLocation.longitude,
       },
       timestamp: time,
-      speedMps: newSpeed,
-      heading: newHeading,
-    })
+    }
+    this.locationTracker.tryAddLocationToHistory(locationWithoutSpeedAndHeading);
+
+    let location: GpsSensorData = {
+      coords: locationWithoutSpeedAndHeading.coords,
+      timestamp: locationWithoutSpeedAndHeading.timestamp,
+      speedMps: this.locationTracker.getSpeedMpsFromHistory(),
+      heading: this.locationTracker.getHeadingFromHistory(),
+    };
+    this.locationData.next(location)
   }
 
 
