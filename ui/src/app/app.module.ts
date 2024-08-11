@@ -18,6 +18,7 @@ import { BlackoutComponent } from './component/blackout/blackout.component';
 import { ChartComponent } from './component/chart/chart.component';
 import { ConfigComponent } from './component/config/config.component';
 import { MapComponent } from './component/map/map.component';
+import { RemoteControlComponent } from './component/remote-control/remote-control.component';
 import { TestComponent } from './component/test/test.component';
 
 
@@ -29,6 +30,7 @@ import { TestComponent } from './component/test/test.component';
     ConfigComponent,
     BlackoutComponent,
     MapComponent,
+    RemoteControlComponent,
   ],
   imports: [
     BrowserModule,

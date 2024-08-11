@@ -25,7 +25,7 @@ export class MockBoatSensorAndTillerController {
   private previousTime: number;
   private heading = new BehaviorSubject<HeadingAndTime>(new HeadingAndTime(0, this.compassErrorOffset));
   private tillerAngle = -0.1;
-  private connected = new BehaviorSubject<boolean>(true);
+  private connected = new BehaviorSubject<boolean>(false);
   private locationData = new BehaviorSubject<GpsSensorData>(undefined);
   private startLocation: LatLon = { latitude: 40.00, longitude: -80.00 };
 
@@ -33,10 +33,6 @@ export class MockBoatSensorAndTillerController {
   constructor(
     private configService: ConfigService,
   ) {
-    setTimeout(() => {
-      this.connected.next(true);
-    }, 1000);
-
     // This simulates how the we only send control updates to the bluetooth motor every 200ms
     timer(0, 200)
       .subscribe(() => {

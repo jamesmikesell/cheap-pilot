@@ -1,0 +1,14 @@
+.center-controls {
+  margin-top: 20px;
+  display: flex;
+  place-content: space-around;
+  max-width: 532px;
+}
+
+.manual-controls {
+  margin-top: 60px !important;
+}
+
+.manual-controls>button {
+  transform: scale(1.5);
+}

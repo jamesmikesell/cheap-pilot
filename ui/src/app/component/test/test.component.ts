@@ -1,6 +1,6 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { filter, timer } from 'rxjs';
-import { ConfigService } from 'src/app/service/config.service';
+import { ConfigService, RemoteReceiverMode } from 'src/app/service/config.service';
 import { Controller } from 'src/app/service/controller';
 import { ConnectableDevice } from 'src/app/service/controller-bt-motor.service';
 import { ControllerOrientationService } from 'src/app/service/controller-orientation.service';
@@ -29,6 +29,7 @@ export class TestComponent implements OnInit {
   sensorLocation: GpsSensor;
   blackoutScreen = false;
   UnitConverter = UnitConverter;
+  RemoteReceiverMode = RemoteReceiverMode;
   speedKts = 0;
   gpsHeading: number;
 

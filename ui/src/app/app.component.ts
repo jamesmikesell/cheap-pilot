@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { AppVersion } from './app-version';
+import { ReceiverService } from './remote/receiver-service';
 
 @Component({
   selector: 'app-root',
@@ -8,6 +9,12 @@ import { AppVersion } from './app-version';
 })
 export class AppComponent {
   AppVersion = AppVersion;
+
+  constructor(
+    public receiver: ReceiverService,
+  ) {
+    console.log("receiver registered", !!receiver)
+  }
 
 }
 

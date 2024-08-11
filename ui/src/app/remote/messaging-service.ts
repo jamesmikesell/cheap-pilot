@@ -86,7 +86,9 @@ export class MessagingService {
 
       this.hashedTopicsHandlers.set(await this.hashTopic(this.configService.config.remotePassword, key), value);
     }
-    this.client.subscribe([...this.hashedTopicsHandlers.keys()], (err: any) => { if (err) console.error(err) })
+
+    if (this.hashedTopicsHandlers.size)
+      this.client.subscribe([...this.hashedTopicsHandlers.keys()], (err: any) => { if (err) console.error(err) })
   }
 
 

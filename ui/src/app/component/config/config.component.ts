@@ -57,6 +57,9 @@ export class ConfigComponent implements OnInit {
       this.configService.config.remoteReceiverMode = undefined;
     else
       this.configService.config.remoteReceiverMode = mode
+
+    if (this.configService.config.remoteReceiverMode === RemoteReceiverMode.REMOTE)
+      this.motorControllerService.disconnect()
   }
 
 

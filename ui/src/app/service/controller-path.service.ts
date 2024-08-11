@@ -18,6 +18,8 @@ export class ControllerPathService implements Controller<LatLon[]> {
   set enabled(val: boolean) {
     if (val)
       this.orientationController.enabled = true
+    else
+      this._desiredHeadingToDestination = undefined;
     this._enabled = val;
   }
   pointReached = new Subject<void>();
