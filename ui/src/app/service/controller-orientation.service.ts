@@ -69,7 +69,7 @@ export class ControllerOrientationService implements Controller<number> {
 
     this.pidController = new PidController(
       config,
-      new LowPassFilter({ getCutoffFrequency: () => this.configService.config.orientationPidDerivativeLowPassFrequency }),
+      new LowPassFilter({ getNumber: () => this.configService.config.orientationPidDerivativeLowPassFrequency }),
     );
   }
 
@@ -153,7 +153,7 @@ export class ControllerOrientationService implements Controller<number> {
 
 
   private getFilter(): Filter {
-    return new LowPassFilter({ getCutoffFrequency: () => this.configService.config.orientationLowPassFrequency });
+    return new LowPassFilter({ getNumber: () => this.configService.config.orientationLowPassFrequency });
   }
 
 

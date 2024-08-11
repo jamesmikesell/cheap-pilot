@@ -71,7 +71,7 @@ export class ControllerRotationRateService implements Controller<number> {
 
     this.pidController = new PidController(
       config,
-      new LowPassFilter({ getCutoffFrequency: () => this.configService.config.rotationPidDerivativeLowPassFrequency }),
+      new LowPassFilter({ getNumber: () => this.configService.config.rotationPidDerivativeLowPassFrequency }),
     );
   }
 
@@ -154,7 +154,7 @@ export class ControllerRotationRateService implements Controller<number> {
 
 
   private getFilter(): Filter {
-    return new LowPassFilter({ getCutoffFrequency: () => this.configService.config.rotationLowPassFrequency });
+    return new LowPassFilter({ getNumber: () => this.configService.config.rotationLowPassFrequency });
   }
 
 
