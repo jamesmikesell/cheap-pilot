@@ -1,27 +1,31 @@
 import { Injectable } from "@angular/core";
+import { Subject } from "rxjs";
 import { ConfigService, RemoteReceiverMode } from "../service/config.service";
-import { MessagingService } from "./messaging-service";
 import { ControllerOrientationService } from "../service/controller-orientation.service";
-import { DataLogService } from "../service/data-log.service";
 import { ControllerRotationRateService } from "../service/controller-rotation-rate.service";
+import { LatLon } from "../service/coordinate-utils";
+import { DataLogService } from "../service/data-log.service";
+import { MessagingService } from "./messaging-service";
 
 @Injectable({
   providedIn: 'root'
 })
 export class ReceiverService {
 
+  routeUpdated = new Subject<LatLon[]>();
 
   constructor(
     private configService: ConfigService,
     private messageService: MessagingService,
     private controllerOrientation: ControllerOrientationService,
     private dataLog: DataLogService,
-    public controllerRotationRate: ControllerRotationRateService,
+    private controllerRotationRate: ControllerRotationRateService,
 
   ) {
     this.messageService.addMessageHandler(RemoteMessageTopics.MAINTAIN_CURRENT_HEADING, payload => this.maintainHeading(payload))
     this.messageService.addMessageHandler(RemoteMessageTopics.MOVE_MANUALLY, payload => this.moveManually(payload))
     this.messageService.addMessageHandler(RemoteMessageTopics.STOP_MANUALLY, () => this.stopManually())
+    this.messageService.addMessageHandler(RemoteMessageTopics.NAVIGATE_ROUTE, route => this.routeUpdated.next(route))
   }
 
 
@@ -61,5 +65,5 @@ export class RemoteMessageTopics {
   static readonly MAINTAIN_CURRENT_HEADING = "MAINTAIN_CURRENT_HEADING";
   static readonly MOVE_MANUALLY = "MOVE_MANUALLY";
   static readonly STOP_MANUALLY = "STOP_MANUALLY";
-
+  static readonly NAVIGATE_ROUTE = "NAVIGATE_ROUTE";
 }

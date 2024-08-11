@@ -3,7 +3,9 @@ import * as L from 'leaflet';
 import 'leaflet-editable';
 import 'leaflet.locatecontrol';
 import { filter } from 'rxjs';
-import { ConfigService } from 'src/app/service/config.service';
+import { MessagingService } from 'src/app/remote/messaging-service';
+import { ReceiverService, RemoteMessageTopics } from 'src/app/remote/receiver-service';
+import { ConfigService, RemoteReceiverMode } from 'src/app/service/config.service';
 import { ControllerPathService } from 'src/app/service/controller-path.service';
 import { CoordinateUtils, LatLon } from 'src/app/service/coordinate-utils';
 import { DeviceSelectService } from 'src/app/service/device-select.service';
@@ -28,11 +30,15 @@ export class MapComponent implements OnInit {
     private deviceSelectionService: DeviceSelectService,
     private configService: ConfigService,
     private controllerPath: ControllerPathService,
+    private receiverService: ReceiverService,
+    private messageService: MessagingService,
   ) { }
 
 
   ngOnInit(): void {
     this.controllerPath.pointReached.subscribe(() => this.deletePoint())
+
+    this.receiverService.routeUpdated.subscribe(route => this.pathReceived(route))
 
     this.map = L.map('map', { editable: true, }).setView([0, 0], 0)
 
@@ -160,20 +166,28 @@ export class MapComponent implements OnInit {
   }
 
 
-  private redrawPath(): void {
-    if (this.pathDrawn) {
-      let points = this.pathDrawn.getLatLngs();
+  private clearAndDrawPath(path: L.LatLng[]): void {
+    if (this.pathDrawn)
       this.map.removeLayer(this.pathDrawn)
-      this.pathDrawn = undefined;
 
-      if (points.length > 1) {
-        this.pathDrawn = L.polyline([]).addTo(this.map);
-        this.pathDrawn.setLatLngs(points);
-        this.pathDrawn.enableEdit();
-        this.pathDrawn.setStyle({ color: "rgb(51, 136, 255)", dashArray: "5 15" })
-      }
+    this.pathDrawn = undefined;
+
+    if (path && path.length > 1) {
+      this.pathDrawn = L.polyline([]).addTo(this.map);
+      this.pathDrawn.setLatLngs(path);
+      this.pathDrawn.enableEdit();
+      this.pathDrawn.setStyle({ color: "rgb(51, 136, 255)", dashArray: "5 15" })
     }
     this.redrawWaypointProximityCircles();
+  }
+
+
+  private redrawPath(): void {
+    let points: L.LatLng[];
+    if (this.pathDrawn)
+      points = this.pathDrawn.getLatLngs() as L.LatLng[];
+
+    this.clearAndDrawPath(points);
   }
 
 
@@ -208,10 +222,31 @@ export class MapComponent implements OnInit {
         .map((single): LatLon => ({ latitude: single.lat, longitude: single.lng }))
     }
 
-    setTimeout(() => {
-      this.controllerPath.enabled = navCoordinates.length > 0;
-      this.controllerPath.command(navCoordinates);
-    }, 0);
+    if (this.configService.config.remoteReceiverMode === RemoteReceiverMode.REMOTE) {
+      if (this.pathDrawn) {
+        let mapCoordinates = (this.pathDrawn.getLatLngs() as L.LatLng[]);
+        let uiCoordinates = mapCoordinates
+          .map((single): LatLon => ({ latitude: single.lat, longitude: single.lng }))
+        this.messageService.sendMessage(RemoteMessageTopics.NAVIGATE_ROUTE, uiCoordinates);
+      }
+    }
+
+    if (this.deviceSelectionService.motorController.connected.value) {
+      setTimeout(() => {
+        this.controllerPath.enabled = navCoordinates.length > 0;
+        this.controllerPath.command(navCoordinates);
+      }, 0);
+    }
   }
+
+
+  pathReceived(route: LatLon[]): void {
+    if (this.configService.config.remoteReceiverMode === RemoteReceiverMode.RECEIVER) {
+      let uiPath = route.map(single => new L.LatLng(single.latitude, single.longitude))
+      this.clearAndDrawPath(uiPath);
+      this.drawnPathUpdated();
+    }
+  }
+
 
 }
