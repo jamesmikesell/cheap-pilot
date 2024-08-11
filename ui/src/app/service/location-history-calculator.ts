@@ -1,18 +1,24 @@
+import { NumberProvider, ProviderConverter } from '../types/providers';
 import { CoordinateUtils } from './coordinate-utils';
 
 export class LocationHistoryTracker {
 
   private locationHistory: LocationHistory[] = [];
   private lastLocation: LocationHistory;
+  minimumRequiredAccuracyMeters: NumberProvider;
 
 
-  constructor(private maxHistoriesToKeep = 3) { }
+  constructor(
+    minimumRequiredAccuracyMeters: number | NumberProvider,
+    private maxHistoriesToKeep = 3,
+  ) {
+    this.minimumRequiredAccuracyMeters = ProviderConverter.ensureNumberProvider(minimumRequiredAccuracyMeters);
+  }
 
 
   tryAddLocationToHistory(locationData: LocationData | GeolocationPosition) {
-    const minAccuracyMeters = 7;
-    if (locationData.coords.accuracy > minAccuracyMeters) {
-      console.log(`GPS accuracy ${locationData.coords.accuracy.toFixed(1)} is above ${minAccuracyMeters} meters, ignoring location`);
+    if (locationData.coords.accuracy > this.minimumRequiredAccuracyMeters.getNumber()) {
+      console.log(`GPS accuracy ${locationData.coords.accuracy.toFixed(1)} is above ${this.minimumRequiredAccuracyMeters} meters, ignoring location`);
       return;
     }
 
@@ -25,7 +31,7 @@ export class LocationHistoryTracker {
       this.lastLocation = currentLocation;
       let currentLocationIsCloseToHistory = this.locationHistory
         .map(single => CoordinateUtils.distanceBetweenPointsInMeters(single, currentLocation))
-        .some(singleDistance => singleDistance < minAccuracyMeters)
+        .some(singleDistance => singleDistance < this.minimumRequiredAccuracyMeters.getNumber())
 
       if (currentLocationIsCloseToHistory)
         return;

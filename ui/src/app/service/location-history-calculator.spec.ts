@@ -8,7 +8,7 @@ describe('Location History Speed Calculator', () => {
   });
 
   it('track speed', () => {
-    let tracker = new LocationHistoryTracker(3);
+    let tracker = new LocationHistoryTracker(7, 3);
     let trackerDeepState: TrackerDeepState = tracker as any;
 
     expect(trackerDeepState.locationHistory).toHaveSize(0);
@@ -52,7 +52,7 @@ describe('Location History Speed Calculator', () => {
       expect(trackerDeepState.locationHistory).toHaveSize(2);
       expect(tracker.getSpeedMpsFromHistory()).toBeCloseTo(1, 3);
     }
-    
+
     {
       let oldestHistory = trackerDeepState.locationHistory[0];
       expect(oldestHistory.latitude).toBe(start.latitude);

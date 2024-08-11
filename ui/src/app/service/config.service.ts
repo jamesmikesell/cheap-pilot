@@ -87,6 +87,8 @@ export class AppConfig {
 
   waypointProximityMeters = 20;
 
+  minimumRequiredGpsAccuracyMeters = 7;
+
   remoteReceiverMode: RemoteReceiverMode;
   remotePassword = (Math.random() + 1).toString(36).substring(2);
 

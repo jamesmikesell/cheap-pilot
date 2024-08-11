@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+import { ConfigService } from './config.service';
 import { LocationData, LocationHistoryTracker } from './location-history-calculator';
 
 @Injectable({
@@ -10,11 +11,14 @@ export class SensorGpsService implements GpsSensor {
   locationData = new BehaviorSubject<GpsSensorData>(undefined);
 
 
-  private speedTracker = new LocationHistoryTracker();
+  private speedTracker;
 
 
-  constructor() {
+  constructor(
+    configService: ConfigService,
+  ) {
     navigator.geolocation.watchPosition((data) => this.locationChange(data), null, { enableHighAccuracy: true });
+    this.speedTracker = new LocationHistoryTracker({ getNumber: () => configService.config.minimumRequiredGpsAccuracyMeters })
   }
 
 
