@@ -1,5 +1,5 @@
 
-import { LocationHistory, LocationHistorySpeedTracker } from './location-history-speed-calculator';
+import { LocationHistory, LocationHistoryTracker } from './location-history-calculator';
 import { LatLon, CoordinateUtils } from './coordinate-utils';
 
 describe('Location History Speed Calculator', () => {
@@ -8,7 +8,7 @@ describe('Location History Speed Calculator', () => {
   });
 
   it('track speed', () => {
-    let tracker = new LocationHistorySpeedTracker(3);
+    let tracker = new LocationHistoryTracker(3);
     let trackerDeepState: TrackerDeepState = tracker as any;
 
     expect(trackerDeepState.locationHistory).toHaveSize(0);

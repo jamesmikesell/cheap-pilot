@@ -1,6 +1,6 @@
 import { CoordinateUtils } from './coordinate-utils';
 
-export class LocationHistorySpeedTracker {
+export class LocationHistoryTracker {
 
   private locationHistory: LocationHistory[] = [];
   private lastLocation: LocationHistory;

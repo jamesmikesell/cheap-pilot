@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { LocationData, LocationHistorySpeedTracker } from './location-history-speed-calculator';
+import { LocationData, LocationHistoryTracker } from './location-history-calculator';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +10,7 @@ export class SensorGpsService implements GpsSensor {
   locationData = new BehaviorSubject<GpsSensorData>(undefined);
 
 
-  private speedTracker = new LocationHistorySpeedTracker();
+  private speedTracker = new LocationHistoryTracker();
 
 
   constructor() {
