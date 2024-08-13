@@ -1,15 +1,14 @@
 import { Injectable } from '@angular/core';
 import { Subject, firstValueFrom } from 'rxjs';
 import { ConfigService, PidTuneSaver } from './config.service';
+import { Controller } from './controller';
 import { ControllerRotationRateService } from './controller-rotation-rate.service';
 import { ControllerOrientationLogData, DataLogService } from './data-log.service';
 import { DeviceSelectService } from './device-select.service';
 import { Filter, LowPassFilter } from './filter';
-import { HeadingStats } from './heading-stats';
 import { PidConfig, PidController } from './pid-controller';
 import { PidTuner, PidTuningSuggestedValues, TuneConfig, TuningResult } from './pid-tuner';
 import { HeadingAndTime } from './sensor-orientation.service';
-import { Controller } from './controller';
 
 @Injectable({
   providedIn: 'root'
@@ -28,7 +27,7 @@ export class ControllerOrientationService implements Controller<number> {
   private _desired = 0;
   private pidController: PidController;
   private errorFilter = this.getFilter();
-  private headingHistory: number[] = [];
+  private currentHeading: number;
   private _enabled = false;
   private tuner: PidTuner;
   private pidTuneComplete = new Subject<TuningResult>();
@@ -81,7 +80,7 @@ export class ControllerOrientationService implements Controller<number> {
 
 
   private setDesiredHeadingToCurrent(): void {
-    this._desired = this.getAverageHeading();
+    this._desired = this.currentHeading;
   }
 
 
@@ -100,7 +99,7 @@ export class ControllerOrientationService implements Controller<number> {
     if (!this._enabled && !this.tuner)
       this._desired = heading.heading; //this prevents a buildup of error if the controller isn't enabled
 
-    this.updateAverageHeading(heading.heading);
+    this.currentHeading = heading.heading;
     let errorRaw = this.getError(heading.heading);
 
     const errorFiltered = this.errorFilter.process(errorRaw, heading.time)
@@ -128,27 +127,9 @@ export class ControllerOrientationService implements Controller<number> {
       errorFiltered,
       command,
       this.enabled,
-      this.getAverageHeading(),
     )
 
     this.dataLog.logControllerOrientation(logData);
-  }
-
-
-  private getAverageHeading(): number {
-    let avg = HeadingStats.circularMean(this.headingHistory);
-
-    if (avg < 0)
-      return 360 + avg;
-
-    return avg;
-  }
-
-
-  private updateAverageHeading(currentHeading: number) {
-    this.headingHistory.push(currentHeading);
-    if (this.headingHistory.length > 6)
-      this.headingHistory.shift()
   }
 
 

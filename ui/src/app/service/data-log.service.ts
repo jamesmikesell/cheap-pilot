@@ -51,26 +51,25 @@ export class DataLogService {
   }
 
   private update(): void {
-    this._logData.push(new LogData(
-      new Date(),
-      this.lastLocation?.locationLat,
-      this.lastLocation?.locationLon,
-      this.lastLocation?.locationSpeedKt,
-      this.lastLocation?.locationGpsHeading,
+    this._logData.push({
+      time: new Date(),
+      locationLat: this.lastLocation?.locationLat,
+      locationLon: this.lastLocation?.locationLon,
+      locationSpeedKt: this.lastLocation?.locationSpeedKt,
+      locationGpsHeading: this.lastLocation?.locationGpsHeading,
 
-      this.lastControllerOrientation?.headingDesired,
-      this.lastControllerOrientation?.headingRaw,
-      this.lastControllerOrientation?.headingErrorRaw,
-      this.lastControllerOrientation?.headingErrorFiltered,
-      this.lastControllerOrientation?.headingCommand,
-      this.lastControllerOrientation?.headingPidEnabled,
-      this.lastControllerOrientation?.headingAvg,
+      headingDesired: this.lastControllerOrientation?.headingDesired,
+      headingRaw: this.lastControllerOrientation?.headingRaw,
+      headingErrorRaw: this.lastControllerOrientation?.headingErrorRaw,
+      headingErrorFiltered: this.lastControllerOrientation?.headingErrorFiltered,
+      headingCommand: this.lastControllerOrientation?.headingCommand,
+      headingPidEnabled: this.lastControllerOrientation?.headingPidEnabled,
 
-      this.lastControllerRotationRate?.rotationRateDesired,
-      this.lastControllerRotationRate?.rotationRateCurrent,
-      this.lastControllerRotationRate?.rotationRateReal,
-      this.lastControllerRotationRate?.rotationRateCommand,
-    ));
+      rotationRateDesired: this.lastControllerRotationRate?.rotationRateDesired,
+      rotationRateCurrent: this.lastControllerRotationRate?.rotationRateCurrent,
+      rotationRateReal: this.lastControllerRotationRate?.rotationRateReal,
+      rotationRateCommand: this.lastControllerRotationRate?.rotationRateCommand,
+    });
 
     this._logData = this._logData.filter(single => Date.now() - single.time.getTime() < 5 * 60 * 1000)
 
@@ -81,27 +80,24 @@ export class DataLogService {
 
 
 
-class LogData {
-  constructor(
-    public time: Date,
-    public locationLat: number,
-    public locationLon: number,
-    public locationSpeedKt: number,
-    public locationGpsHeading: number,
+interface LogData {
+  time: Date,
+  locationLat: number,
+  locationLon: number,
+  locationSpeedKt: number,
+  locationGpsHeading: number,
 
-    public headingDesired: number,
-    public headingRaw: number,
-    public headingErrorRaw: number,
-    public headingErrorFiltered: number,
-    public headingCommand: number,
-    public headingPidEnabled: boolean,
-    public headingAvg: number,
+  headingDesired: number,
+  headingRaw: number,
+  headingErrorRaw: number,
+  headingErrorFiltered: number,
+  headingCommand: number,
+  headingPidEnabled: boolean,
 
-    public rotationRateDesired: number,
-    public rotationRateCurrent: number,
-    public rotationRateReal: number,
-    public rotationRateCommand: number,
-  ) { }
+  rotationRateDesired: number,
+  rotationRateCurrent: number,
+  rotationRateReal: number,
+  rotationRateCommand: number,
 }
 
 
@@ -113,7 +109,6 @@ export class ControllerOrientationLogData {
     public headingErrorFiltered: number,
     public headingCommand: number,
     public headingPidEnabled: boolean,
-    public headingAvg: number,
   ) { }
 }
 
