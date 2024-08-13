@@ -28,6 +28,11 @@
           <mat-label>Heading Sensor Noise Amplitude</mat-label>
           <input matInput type="number" [(ngModel)]="configService.config.simulationNoiseAmplitude">
         </mat-form-field>
+
+        <mat-form-field *ngIf="configService.config.simulation">
+          <mat-label>Compass Drift from GPS</mat-label>
+          <input matInput type="number" [(ngModel)]="configService.config.simulationCompassDrift">
+        </mat-form-field>
       </div>
     </mat-card-content>
   </mat-card>

@@ -60,6 +60,7 @@ export class AppConfig {
   simulation = false;
   simulationSpeedKt = 3;
   simulationNoiseAmplitude = 0.01;
+  simulationCompassDrift = 30;
 
   rotationKp = 0;
   rotationKi = 0;

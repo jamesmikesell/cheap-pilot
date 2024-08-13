@@ -15,27 +15,26 @@ import { UnitConverter } from "../service/unit-converter";
 })
 export class MockBoatSensorAndTillerController {
 
-  private compassErrorOffset = 23; // magnetic sensor heading will seldom exactly match real gps heading, adding an offset to model that
-
-  private moveQueue: SensorWithNoise[] = [
-    new SensorWithNoise(0, 0, 0),
-    new SensorWithNoise(0, 0, 1)
+  private headingHistory: HeadingWithNoise[] = [
+    { real: 0, noisy: 0, time: 0 },
+    { real: 0, noisy: 0, time: 1 },
   ];
   private tillerGainDegreesPerSecond = 0;
   private nextTillerDegreesPerSecond = 0;
   private previousTime: number;
-  private heading = new BehaviorSubject<HeadingAndTime>(new HeadingAndTime(0, this.compassErrorOffset));
+  private heading;
   private tillerAngle = -0.1;
   private connected = new BehaviorSubject<boolean>(false);
-  private locationData = new BehaviorSubject<GpsSensorData>(undefined);
+  private locationData = new BehaviorSubject<PositionWithNoise>(undefined);
   private startLocation: LatLon = { latitude: 40.00, longitude: -80.00 };
-  private locationTracker;
+  private locationTrackerNoisy;
 
 
   constructor(
     private configService: ConfigService,
   ) {
-    this.locationTracker = new LocationHistoryTracker({ getNumber: () => configService.config.minimumRequiredGpsAccuracyMeters });
+    this.locationTrackerNoisy = new LocationHistoryTracker({ getNumber: () => configService.config.minimumRequiredGpsAccuracyMeters });
+    this.heading = new BehaviorSubject<HeadingAndTime>(new HeadingAndTime(0, this.configService.config.simulationCompassDrift))
 
     // This simulates how the we only send control updates to the bluetooth motor every 200ms
     timer(0, 200)
@@ -54,20 +53,20 @@ export class MockBoatSensorAndTillerController {
         const dt = now - this.previousTime;
         this.tillerAngle += this.tillerGainDegreesPerSecond * (dt / 1000);
 
-        let currentHeading = this.moveQueue[this.moveQueue.length - 1].real;
-        currentHeading -= this.tillerAngle * (dt / 1000) * this.configService.config.simulationSpeedKt;
-        currentHeading = CoordinateUtils.normalizeHeading(currentHeading)
+        let headingReal = this.headingHistory[this.headingHistory.length - 1].real;
+        headingReal -= this.tillerAngle * (dt / 1000) * this.configService.config.simulationSpeedKt;
+        headingReal = CoordinateUtils.normalizeHeading(headingReal)
 
-        this.calculateGpsPosition(currentHeading, now, dt);
+        this.calculateGpsPosition(headingReal, now, dt);
 
-        const headingWithNoise = currentHeading + this.compassErrorOffset + (Math.random() - 0.5) * this.configService.config.simulationNoiseAmplitude;
-        this.moveQueue.push(new SensorWithNoise(currentHeading, headingWithNoise, now));
-        if (this.moveQueue.length > 5) {
-          this.moveQueue.shift();
+        const headingNoisy = headingReal + this.configService.config.simulationCompassDrift + (Math.random() - 0.5) * this.configService.config.simulationNoiseAmplitude;
+        this.headingHistory.push({ real: headingReal, noisy: headingNoisy, time: now });
+        if (this.headingHistory.length > 5) {
+          this.headingHistory.shift();
         }
 
         this.previousTime = now;
-        this.heading.next(new HeadingAndTime(now, headingWithNoise));
+        this.heading.next(new HeadingAndTime(now, headingNoisy));
       })
   }
 
@@ -75,37 +74,63 @@ export class MockBoatSensorAndTillerController {
   private calculateGpsPosition(heading: number, time: number, timeDelta: number): void {
     let distanceMeters = UnitConverter.ktToMps(this.configService.config.simulationSpeedKt) * timeDelta / 1000;
 
-    let newLocation: LatLon;
+    let accuracy = this.configService.config.minimumRequiredGpsAccuracyMeters;
+    let newLocationReal: LatLon;
+    let newLocationNoisy: LatLon;
     if (this.locationData.value) {
-      newLocation = CoordinateUtils.calculateNewPosition(this.locationData.value.coords, distanceMeters, heading);
+      newLocationReal = CoordinateUtils.calculateNewPosition(this.locationData.value.real.coords, distanceMeters, heading);
+
+      let distanceError = accuracy * Math.random();
+      let angleError = 359 * Math.random();
+      newLocationNoisy = CoordinateUtils.calculateNewPosition(newLocationReal, distanceError, angleError);
     } else {
-      newLocation = this.startLocation;
+      newLocationReal = this.startLocation;
+      newLocationNoisy = this.startLocation;
     }
 
-    let locationWithoutSpeedAndHeading: LocationData = {
-      coords: {
-        accuracy: 6,
-        latitude: newLocation.latitude,
-        longitude: newLocation.longitude,
+
+    this.locationData.next({
+      real: {
+        coords: {
+          accuracy: accuracy,
+          latitude: newLocationReal.latitude,
+          longitude: newLocationReal.longitude,
+        },
+        timestamp: time,
       },
-      timestamp: time,
-    }
-    this.locationTracker.tryAddLocationToHistory(locationWithoutSpeedAndHeading);
-
-    let location: GpsSensorData = {
-      coords: locationWithoutSpeedAndHeading.coords,
-      timestamp: locationWithoutSpeedAndHeading.timestamp,
-      speedMps: this.locationTracker.getSpeedMpsFromHistory(),
-      heading: this.locationTracker.getHeadingFromHistory(),
-    };
-    this.locationData.next(location)
+      noisy: {
+        coords: {
+          accuracy: accuracy,
+          latitude: newLocationNoisy.latitude,
+          longitude: newLocationNoisy.longitude,
+        },
+        timestamp: time,
+      },
+    })
   }
 
 
   getGpsSensor(): GpsSensor {
-    let self = this;
+    let locationNoisy = new BehaviorSubject<GpsSensorData>(undefined);
+    timer(0, 1000)
+      .subscribe(() => {
+        if (this.locationData.value?.noisy) {
+          let location = this.locationData.value.noisy;
+          this.locationTrackerNoisy.tryAddLocationToHistory(location);
+          let gpsDataNoisy: GpsSensorData = {
+            coords: location.coords,
+            timestamp: location.timestamp,
+            speedMps: this.locationTrackerNoisy.getSpeedMpsFromHistory(),
+            heading: this.locationTrackerNoisy.getHeadingFromHistory(),
+          };
+          locationNoisy.next(gpsDataNoisy)
+        } else {
+          locationNoisy.next(undefined)
+        }
+      })
+
     return {
-      locationData: self.locationData,
+      locationData: locationNoisy,
     }
   }
 
@@ -142,8 +167,8 @@ export class MockBoatSensorAndTillerController {
 
 
   rotationRateReal(): number {
-    let end = this.moveQueue[this.moveQueue.length - 1];
-    let start = this.moveQueue[this.moveQueue.length - 2];
+    let end = this.headingHistory[this.headingHistory.length - 1];
+    let start = this.headingHistory[this.headingHistory.length - 2];
     let rotation = this.getGetRotationAmount(end.real, start.real);
     return rotation / ((end.time - start.time) / 1000);
   }
@@ -172,12 +197,14 @@ export class MockBoatSensorAndTillerController {
 }
 
 
-class SensorWithNoise {
-  constructor(
-    public real: number,
-    public withNoise: number,
-    public time: number,
-  ) { }
+interface HeadingWithNoise {
+  real: number;
+  noisy: number;
+  time: number;
 }
 
 
+interface PositionWithNoise {
+  real: LocationData;
+  noisy: LocationData;
+}
