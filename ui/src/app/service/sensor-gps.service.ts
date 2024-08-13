@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { ConfigService } from './config.service';
-import { LocationData, LocationHistoryTracker } from './location-history-calculator';
+import { LocationData, LocationHistoryTracker } from '../utils/location-history-calculator';
 
 @Injectable({
   providedIn: 'root'

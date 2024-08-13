@@ -3,11 +3,11 @@ import { BehaviorSubject, timer } from "rxjs";
 import { ConfigService } from "../service/config.service";
 import { Controller } from "../service/controller";
 import { ConnectableDevice } from "../service/controller-bt-motor.service";
-import { CoordinateUtils, LatLon } from "../service/coordinate-utils";
-import { LocationData, LocationHistoryTracker } from "../service/location-history-calculator";
 import { GpsSensor, GpsSensorData } from "../service/sensor-gps.service";
 import { HeadingAndTime, OrientationSensor } from "../service/sensor-orientation.service";
-import { UnitConverter } from "../service/unit-converter";
+import { CoordinateUtils, LatLon } from "../utils/coordinate-utils";
+import { LocationData, LocationHistoryTracker } from "../utils/location-history-calculator";
+import { UnitConverter } from "../utils/unit-converter";
 
 
 @Injectable({

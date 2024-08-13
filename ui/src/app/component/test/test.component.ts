@@ -10,7 +10,7 @@ import { DataLogService } from 'src/app/service/data-log.service';
 import { DeviceSelectService } from 'src/app/service/device-select.service';
 import { GpsSensor, GpsSensorData } from 'src/app/service/sensor-gps.service';
 import { OrientationSensor } from 'src/app/service/sensor-orientation.service';
-import { UnitConverter } from 'src/app/service/unit-converter';
+import { UnitConverter } from 'src/app/utils/unit-converter';
 import { WakeLockService } from 'src/app/service/wake-lock.service';
 import { AppChartData } from '../chart/chart.component';
 

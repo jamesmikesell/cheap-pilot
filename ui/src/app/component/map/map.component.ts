@@ -7,8 +7,8 @@ import { MessagingService } from 'src/app/remote/messaging-service';
 import { ReceiverService, RemoteMessageTopics } from 'src/app/remote/receiver-service';
 import { ConfigService, RemoteReceiverMode } from 'src/app/service/config.service';
 import { ControllerPathService } from 'src/app/service/controller-path.service';
-import { CoordinateUtils, LatLon } from 'src/app/service/coordinate-utils';
 import { DeviceSelectService } from 'src/app/service/device-select.service';
+import { CoordinateUtils, LatLon } from 'src/app/utils/coordinate-utils';
 
 
 @Component({

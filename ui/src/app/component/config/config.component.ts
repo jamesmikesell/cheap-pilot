@@ -8,7 +8,7 @@ import { ControllerRotationRateService } from 'src/app/service/controller-rotati
 import { DataLogService } from 'src/app/service/data-log.service';
 import { DeviceSelectService } from 'src/app/service/device-select.service';
 import { TuningResult } from 'src/app/service/pid-tuner';
-import { UnitConverter } from 'src/app/service/unit-converter';
+import { UnitConverter } from 'src/app/utils/unit-converter';
 
 @Component({
   selector: 'app-config',

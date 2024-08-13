@@ -8,7 +8,7 @@ import { Filter, LowPassFilter } from './filter';
 import { PidConfig, PidController } from './pid-controller';
 import { PidTuner, PidTuningSuggestedValues, TuneConfig, TuningResult } from './pid-tuner';
 import { HeadingAndTime } from './sensor-orientation.service';
-import { UnitConverter } from './unit-converter';
+import { UnitConverter } from '../utils/unit-converter';
 import { GpsSensor } from './sensor-gps.service';
 
 @Injectable({

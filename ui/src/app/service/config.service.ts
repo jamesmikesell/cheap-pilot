@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { instanceToPlain, plainToInstance } from 'class-transformer';
 import { PidConfig } from './pid-controller';
 import { PidTuningSuggestedValues } from './pid-tuner';
-import { UnitConverter } from './unit-converter';
+import { UnitConverter } from '../utils/unit-converter';
 
 @Injectable({
   providedIn: 'root'

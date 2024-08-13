@@ -1,6 +1,6 @@
 
+import { CoordinateUtils, LatLon } from './coordinate-utils';
 import { LocationHistory, LocationHistoryTracker } from './location-history-calculator';
-import { LatLon, CoordinateUtils } from './coordinate-utils';
 
 describe('Location History Speed Calculator', () => {
 

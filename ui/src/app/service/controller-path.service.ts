@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { filter, Subject } from 'rxjs';
+import { CoordinateUtils, LatLon } from '../utils/coordinate-utils';
 import { ConfigService } from './config.service';
 import { Controller } from './controller';
 import { ControllerOrientationService } from './controller-orientation.service';
-import { CoordinateUtils, LatLon } from './coordinate-utils';
 import { DeviceSelectService } from './device-select.service';
 import { HeadingFilter } from './filter';
 import { GpsSensorData } from './sensor-gps.service';

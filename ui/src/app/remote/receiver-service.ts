@@ -3,8 +3,8 @@ import { Subject } from "rxjs";
 import { ConfigService, RemoteReceiverMode } from "../service/config.service";
 import { ControllerOrientationService } from "../service/controller-orientation.service";
 import { ControllerRotationRateService } from "../service/controller-rotation-rate.service";
-import { LatLon } from "../service/coordinate-utils";
 import { DataLogService } from "../service/data-log.service";
+import { LatLon } from "../utils/coordinate-utils";
 import { MessagingService } from "./messaging-service";
 
 @Injectable({
