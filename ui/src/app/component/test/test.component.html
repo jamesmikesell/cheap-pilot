@@ -15,8 +15,9 @@
 
 
 <div>
-  Heading Current (compass / gps):
-  {{sensorOrientation.heading.value.heading | number:'1.0-0'}} / {{gpsHeading | number:'1.0-0'}}
+  Heading Current (compass / gps / [drift]):
+  {{sensorOrientation.heading.value.heading | number:'1.0-0'}} / {{gpsHeading | number:'1.0-0'}} /
+  [{{controllerPath.compassDriftDegrees | number:'1.0-0'}}]
   <br>
   Heading Desired (compass / gps):
   {{controllerOrientation.desired | number:'1.0-0'}} / {{controllerPath.desiredHeadingToDestination| number:'1.0-0'}}

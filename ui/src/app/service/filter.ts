@@ -29,6 +29,30 @@ export class LowPassFilter implements Filter {
 }
 
 
+// This accounts for the fact that 359 degrees and 1 degree are almost 
+// identical headings, but when expressed as numbers are very far apart.
+export class HeadingFilter implements Filter {
+  private xFilter: LowPassFilter;
+  private yFilter: LowPassFilter;
+
+  constructor(cutoffFrequency: number | NumberProvider) {
+    this.xFilter = new LowPassFilter(cutoffFrequency)
+    this.yFilter = new LowPassFilter(cutoffFrequency)
+  }
+
+
+  process(headingDegrees: number, time: number): number {
+    let x = Math.cos(headingDegrees * Math.PI / 180);
+    let y = Math.sin(headingDegrees * Math.PI / 180);
+    let xFiltered = this.xFilter.process(x, time);
+    let yFiltered = this.yFilter.process(y, time);
+
+    return Math.atan2(yFiltered, xFiltered) * 180 / Math.PI;
+  }
+}
+
+
+
 
 export class ChainedFilter implements Filter {
 

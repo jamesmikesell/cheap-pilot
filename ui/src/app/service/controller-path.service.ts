@@ -5,7 +5,7 @@ import { Controller } from './controller';
 import { ControllerOrientationService } from './controller-orientation.service';
 import { CoordinateUtils, LatLon } from './coordinate-utils';
 import { DeviceSelectService } from './device-select.service';
-import { LowPassFilter } from './filter';
+import { HeadingFilter } from './filter';
 import { GpsSensorData } from './sensor-gps.service';
 import { OrientationSensor } from './sensor-orientation.service';
 
@@ -25,7 +25,7 @@ export class ControllerPathService implements Controller<LatLon[]> {
     this._enabled = val;
   }
   pointReached = new Subject<void>();
-
+  compassDriftDegrees: number;
 
   private _enabled = false;
   private _desiredHeadingToDestination: number;
@@ -33,7 +33,7 @@ export class ControllerPathService implements Controller<LatLon[]> {
   private orientationSensor: OrientationSensor;
   private lastUpdateTime: number;
   private totalDistanceTraveled = 0;
-  private compassDriftFilter: LowPassFilter;
+  private compassDriftFilter: HeadingFilter;
 
 
   constructor(
@@ -42,13 +42,14 @@ export class ControllerPathService implements Controller<LatLon[]> {
     configService: ConfigService,
   ) {
     this.orientationSensor = deviceSelectService.orientationSensor;
-    this.compassDriftFilter = new LowPassFilter({ getNumber: () => 1 / configService.config.minimumRequiredGpsAccuracyMeters })
+    this.compassDriftFilter = new HeadingFilter({ getNumber: () => 1 / configService.config.minimumRequiredGpsAccuracyMeters })
 
     deviceSelectService.gpsSensor.locationData
       .pipe(filter(data => !!data && data.heading != undefined))
       .subscribe(locationData => {
         // always calculate filtered drift, even if we're not navigating.
         let filteredDrift = this.calculateFilteredHeadingDrift(locationData)
+        this.compassDriftDegrees = filteredDrift;
 
         if (this.enabled && this.path && this.path.length) {
           let destination = this.path[0];
