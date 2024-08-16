@@ -42,7 +42,7 @@ export class ControllerPathService implements Controller<LatLon[]> {
     configService: ConfigService,
   ) {
     this.orientationSensor = deviceSelectService.orientationSensor;
-    this.compassDriftFilter = new HeadingFilter({ getNumber: () => 1 / configService.config.minimumRequiredGpsAccuracyMeters })
+    this.compassDriftFilter = new HeadingFilter({ getNumber: () => configService.config.minimumRequiredGpsAccuracyMeters / 3 })
 
     deviceSelectService.gpsSensor.locationData
       .pipe(filter(data => !!data && data.heading != undefined))

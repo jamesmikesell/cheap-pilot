@@ -61,8 +61,8 @@ export class LocationHistoryTracker {
     if (this.locationHistory.length < 2 || !this.lastLocation)
       return undefined;
 
-    let oldest = this.locationHistory[this.locationHistory.length - 2];
-    let newest = this.locationHistory[this.locationHistory.length - 1];
+    let oldest = this.locationHistory[0];
+    let newest = this.lastLocation;
     return CoordinateUtils.calculateBearing(oldest, newest);
   }
 

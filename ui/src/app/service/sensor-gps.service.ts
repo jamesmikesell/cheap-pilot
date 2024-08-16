@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { ConfigService } from './config.service';
 import { LocationData, LocationHistoryTracker } from '../utils/location-history-calculator';
+import { GpsFilter } from './gps-filter';
 
 @Injectable({
   providedIn: 'root'
@@ -12,6 +13,7 @@ export class SensorGpsService implements GpsSensor {
 
 
   private locationTracker;
+  private gpsFilter: GpsFilter;
 
 
   constructor(
@@ -19,22 +21,25 @@ export class SensorGpsService implements GpsSensor {
   ) {
     navigator.geolocation.watchPosition((data) => this.locationChange(data), null, { enableHighAccuracy: true });
     this.locationTracker = new LocationHistoryTracker({ getNumber: () => configService.config.minimumRequiredGpsAccuracyMeters })
+
+    this.gpsFilter = new GpsFilter({ getNumber: () => configService.config.minimumRequiredGpsAccuracyMeters });
   }
 
 
   private locationChange(locationData: GeolocationPosition): void {
     this.locationTracker.tryAddLocationToHistory(locationData);
 
-    this.locationData.next({
+    let locationRaw: LocationData = {
       coords: {
         latitude: locationData.coords.latitude,
         longitude: locationData.coords.longitude,
         accuracy: locationData.coords.accuracy,
       },
-      speedMps: this.locationTracker.getSpeedMpsFromHistory(),
       timestamp: locationData.timestamp,
-      heading: this.locationTracker.getHeadingFromHistory(),
-    })
+    };
+
+    let locationFiltered = this.gpsFilter.process(locationRaw)
+    this.locationData.next(locationFiltered)
   }
 
 

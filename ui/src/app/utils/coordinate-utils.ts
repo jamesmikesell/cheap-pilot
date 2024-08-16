@@ -44,12 +44,12 @@ export class CoordinateUtils {
   }
 
 
-  private static toRadians(degrees: number): number {
+  static toRadians(degrees: number): number {
     return degrees * (Math.PI / 180);
   }
 
 
-  private static toDegrees(radians: number): number {
+  static toDegrees(radians: number): number {
     return radians * (180 / Math.PI);
   }
 

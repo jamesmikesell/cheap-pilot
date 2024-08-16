@@ -3,10 +3,11 @@ import { BehaviorSubject, timer } from "rxjs";
 import { ConfigService } from "../service/config.service";
 import { Controller } from "../service/controller";
 import { ConnectableDevice } from "../service/controller-bt-motor.service";
+import { GpsFilter } from "../service/gps-filter";
 import { GpsSensor, GpsSensorData } from "../service/sensor-gps.service";
 import { HeadingAndTime, OrientationSensor } from "../service/sensor-orientation.service";
 import { CoordinateUtils, LatLon } from "../utils/coordinate-utils";
-import { LocationData, LocationHistoryTracker } from "../utils/location-history-calculator";
+import { LocationData } from "../utils/location-history-calculator";
 import { UnitConverter } from "../utils/unit-converter";
 
 
@@ -27,13 +28,11 @@ export class MockBoatSensorAndTillerController {
   private connected = new BehaviorSubject<boolean>(false);
   private locationData = new BehaviorSubject<PositionWithNoise>(undefined);
   private startLocation: LatLon = { latitude: 40.00, longitude: -80.00 };
-  private locationTrackerNoisy;
 
 
   constructor(
     private configService: ConfigService,
   ) {
-    this.locationTrackerNoisy = new LocationHistoryTracker({ getNumber: () => configService.config.minimumRequiredGpsAccuracyMeters });
     this.heading = new BehaviorSubject<HeadingAndTime>(new HeadingAndTime(0, this.configService.config.simulationCompassDrift))
 
     // This simulates how the we only send control updates to the bluetooth motor every 200ms
@@ -112,18 +111,13 @@ export class MockBoatSensorAndTillerController {
 
   getGpsSensor(): GpsSensor {
     let locationNoisy = new BehaviorSubject<GpsSensorData>(undefined);
+    let gpsFilter = new GpsFilter({ getNumber: () => this.configService.config.minimumRequiredGpsAccuracyMeters })
     timer(0, 1000)
       .subscribe(() => {
         if (this.locationData.value?.noisy) {
-          let location = this.locationData.value.noisy;
-          this.locationTrackerNoisy.tryAddLocationToHistory(location);
-          let gpsDataNoisy: GpsSensorData = {
-            coords: location.coords,
-            timestamp: location.timestamp,
-            speedMps: this.locationTrackerNoisy.getSpeedMpsFromHistory(),
-            heading: this.locationTrackerNoisy.getHeadingFromHistory(),
-          };
-          locationNoisy.next(gpsDataNoisy)
+          let locationRaw = this.locationData.value.noisy;
+          let locationFiltered = gpsFilter.process(locationRaw);
+          locationNoisy.next(locationFiltered)
         } else {
           locationNoisy.next(undefined)
         }
