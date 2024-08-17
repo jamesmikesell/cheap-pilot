@@ -126,20 +126,6 @@ export class MapComponent implements OnInit {
     });
 
 
-    this.map.on('editable:drawing:start', _event => {
-      let tooltip = L.tooltip({ direction: 'center' })
-        .setContent("Click on map to set first route waypoint.<br>" +
-          "Navigation will not start until route finalized.<br>" +
-          "Click on last point to finalize route."
-        )
-        .setLatLng(this.map.getCenter())
-        .addTo(this.map);
-
-      setTimeout(() => {
-        this.map.removeLayer(tooltip);
-      }, 12000);
-    });
-
     this.map.addControl(new newLineControl());
   }
 
