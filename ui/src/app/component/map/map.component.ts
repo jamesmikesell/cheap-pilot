@@ -132,7 +132,10 @@ export class MapComponent implements OnInit {
 
   private addLocateControl(): void {
     L.control.locate({
-      showCompass: false
+      showCompass: false,
+      setView: "untilPan",
+      keepCurrentZoomLevel: true,
+      clickBehavior: { inView: 'stop', outOfView: 'setView', inViewNotFollowing: 'setView' }
     }).addTo(this.map);
   }
 
