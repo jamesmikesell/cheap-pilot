@@ -8,10 +8,17 @@ export class ThemeService {
   public themeSubscription = new BehaviorSubject<ThemeAndName>(undefined);
   public allowMapInversionSubscription = new BehaviorSubject<boolean>(undefined);
 
+  get theme(): AppThemeNames { return this.themeSubscription.value.name }
   set theme(val: AppThemeNames) {
     let theme = this.getTheme(val);
     localStorage.setItem(this.THEME, "" + val);
     this.themeSubscription.next({ name: val, theme: theme });
+  }
+
+  get allowMapInversion(): boolean { return this.allowMapInversionSubscription.value }
+  set allowMapInversion(val: boolean) {
+    localStorage.setItem(this.ALLOW_MAP_INVERSION, "" + val);
+    this.allowMapInversionSubscription.next(val);
   }
 
 
@@ -20,10 +27,7 @@ export class ThemeService {
   private themeMap = new Map<AppThemeNames, AppTheme>();
   private lightTheme = new AppTheme("", false);
 
-  set allowMapInversion(val: boolean) {
-    localStorage.setItem(this.ALLOW_MAP_INVERSION, "" + val);
-    this.allowMapInversionSubscription.next(val);
-  }
+
 
 
   constructor() {
