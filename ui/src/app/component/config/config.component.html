@@ -155,7 +155,8 @@
         <div class="flex-break"></div>
 
         <mat-form-field>
-          <mat-select placeholder="Configs" [(value)]="selectedRotationConfig" multiple>
+          <mat-label>Config</mat-label>
+          <mat-select [(value)]="selectedRotationConfig" multiple>
             <mat-option *ngFor="let single of configService.config.rotationConfigs" [value]="single">
               {{single.title}}
             </mat-option>
@@ -251,7 +252,8 @@
         <div class="flex-break"></div>
 
         <mat-form-field>
-          <mat-select placeholder="Configs" [(value)]="selectedOrientationConfig" multiple>
+          <mat-label>Config</mat-label>
+          <mat-select [(value)]="selectedOrientationConfig" multiple>
             <mat-option *ngFor="let single of configService.config.orientationConfigs" [value]="single">
               {{single.title}}
             </mat-option>
