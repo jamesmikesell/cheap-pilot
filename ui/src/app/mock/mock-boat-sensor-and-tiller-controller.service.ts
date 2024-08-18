@@ -27,8 +27,7 @@ export class MockBoatSensorAndTillerController {
   private tillerAngle = -0.1;
   private connected = new BehaviorSubject<boolean>(false);
   private locationData = new BehaviorSubject<PositionWithNoise>(undefined);
-  private startLocation: LatLon = { latitude: 40.00, longitude: -80.00 };
-
+  private startLocation: LatLon = { latitude: 41.892462, longitude: -78.946368 };
 
   constructor(
     private configService: ConfigService,
