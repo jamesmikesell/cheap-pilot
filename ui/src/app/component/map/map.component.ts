@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import * as L from 'leaflet';
 import 'leaflet-editable';
 import 'leaflet-providers';
@@ -17,9 +17,11 @@ import { CoordinateUtils, LatLon } from 'src/app/utils/coordinate-utils';
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.scss']
 })
-export class MapComponent implements OnInit {
+export class MapComponent implements AfterViewInit {
 
-  map: L.Map;
+  @ViewChild("uxMap") uxMap: ElementRef<HTMLDivElement>;
+
+  private map: L.Map;
 
   private pathPoints: L.LatLng[] = [];
   private pathDrawn: L.Polyline;
@@ -36,12 +38,12 @@ export class MapComponent implements OnInit {
   ) { }
 
 
-  ngOnInit(): void {
+  ngAfterViewInit(): void {
     this.controllerPath.pointReached.subscribe(() => this.deletePoint())
 
     this.receiverService.routeUpdated.subscribe(route => this.pathReceived(route))
 
-    this.map = L.map('map', { editable: true, }).setView([0, 0], 0)
+    this.map = L.map(this.uxMap.nativeElement, { editable: true, }).setView([0, 0], 0)
 
     let baseMaps = {
       "Open Street Maps": L.tileLayer.provider('OpenStreetMap.Mapnik'),
