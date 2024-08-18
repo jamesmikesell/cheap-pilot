@@ -1,46 +1,49 @@
 @use '@angular/material' as mat;
+@use 'app/core/theming' as app;
 @use 'sass:map';
 
-$candy-app-primary: mat.define-palette(mat.$indigo-palette);
-$candy-app-accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);
-$candy-app-warn: mat.define-palette(mat.$red-palette);
+@include mat.core();
+
 
 $color-config-light: (
-  color: (primary: $candy-app-primary,
-    accent: $candy-app-accent,
-    warn: $candy-app-warn,
+  color: (primary: mat.define-palette(mat.$indigo-palette),
+    accent: mat.define-palette(mat.$pink-palette, A200, A100, A400),
+    warn: mat.define-palette(mat.$red-palette),
   ),
   typography: mat.define-typography-config(),
 );
+
+$light-theme: mat.define-light-theme($color-config-light);
+@include mat.all-component-themes($light-theme);
+
+
+.app-night-theme {
+  $app-night-primary: mat.define-palette(mat.$indigo-palette);
+  $app-night-accent: mat.define-palette(mat.$pink-palette);
+
+  $app-night-theme: app.define-dark-theme((color: (primary: $app-night-primary,
+          accent: $app-night-accent,
+        )));
+
+  @include mat.all-component-colors($app-night-theme);
+}
 
 
 
 $color-config-dark: (
-  color: (primary: mat.define-palette(mat.$indigo-palette, 900, 500, 900),
+  color: (primary: mat.define-palette(mat.$indigo-palette),
     accent: mat.define-palette(mat.$pink-palette, A200, A100, A400),
-    warn: $candy-app-warn,
+    warn: mat.define-palette(mat.$red-palette),
   ),
   typography: mat.define-typography-config(),
 );
 
-
-$light-theme: mat.define-light-theme($color-config-light);
-$dark-theme: mat.define-dark-theme($color-config-dark);
-
-$material-theme-overrides: (
-  'color': ('background': ('background': #000,
-    ),
-  ),
-);
-
-$dark-theme: map.deep-merge($dark-theme, $material-theme-overrides);
-
-
-@include mat.all-component-themes($light-theme);
-
 .app-dark-theme {
+  $dark-theme: mat.define-dark-theme($color-config-dark);
   @include mat.all-component-colors($dark-theme);
 }
+
+
 
 
 html,

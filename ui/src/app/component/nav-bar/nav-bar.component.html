@@ -2,13 +2,17 @@
   <mat-sidenav #drawer class="sidenav" fixedInViewport>
     <mat-toolbar>Menu</mat-toolbar>
     <mat-nav-list>
-      <a mat-list-item (click)="toggleTheme()">
-        {{themeService.darkMode ? "Light" : "Dark"}} Mode
-        <mat-icon *ngIf="!(themeService.darkModeSubscription | async)">mode_night</mat-icon>
-        <mat-icon *ngIf="themeService.darkModeSubscription | async">brightness_high</mat-icon>
-      </a>
+      <mat-form-field>
+        <mat-label>Color Mode</mat-label>
+        <mat-select placeholder="Configs" [value]="(themeService.themeSubscription | async).name"
+          (valueChange)="themeService.theme = $event">
+          <mat-option [value]="AppThemeNames.LIGHT">Light Mode</mat-option>
+          <mat-option [value]="AppThemeNames.DARK">Dark Mode</mat-option>
+          <mat-option [value]="AppThemeNames.NIGHT">Night Mode</mat-option>
+        </mat-select>
+      </mat-form-field>
 
-      <a mat-list-item [disabled]="!themeService.darkMode" (click)="invertMap()">
+      <a mat-list-item [disabled]="!(themeService.themeSubscription | async).theme.isDark" (click)="invertMap()">
         Allow Dark Maps
         <mat-icon *ngIf="themeService.allowMapInversionSubscription | async">check_box</mat-icon>
         <mat-icon *ngIf="!(themeService.allowMapInversionSubscription | async)">check_box_outline_blank</mat-icon>

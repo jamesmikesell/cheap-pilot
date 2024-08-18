@@ -23,10 +23,10 @@ export class AppComponent implements OnDestroy {
   ) {
     console.log("receiver registered", !!receiver)
 
-    this.themeService.darkModeSubscription
+    this.themeService.themeSubscription
       .pipe(takeUntil(this.destroy))
-      .subscribe(darkMode => {
-        this.setTheme(darkMode ? 'app-dark-theme' : undefined);
+      .subscribe(theme => {
+        this.setTheme(theme.theme.styleClass);
       });
   }
 
@@ -36,7 +36,7 @@ export class AppComponent implements OnDestroy {
     this.destroy.complete();
   }
 
-  setTheme(theme: string): void {
+  private setTheme(theme: string): void {
     if (theme)
       this.overlayContainer.getContainerElement().classList.add(theme);
     this.componentCssClass = theme;

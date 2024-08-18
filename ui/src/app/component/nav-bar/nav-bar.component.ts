@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { AppVersion } from 'src/app/app-version';
-import { ThemeService } from 'src/app/service/theme-service';
+import { AppThemeNames, ThemeService } from 'src/app/service/theme-service';
 
 @Component({
   selector: 'app-nav-bar',
@@ -10,19 +10,15 @@ import { ThemeService } from 'src/app/service/theme-service';
 export class NavBarComponent {
 
   AppVersion = AppVersion;
+  AppThemeNames = AppThemeNames;
 
   constructor(
     public themeService: ThemeService,
   ) { }
 
 
-  toggleTheme(): void {
-    this.themeService.darkMode = !this.themeService.darkMode;
-  }
-
-
   invertMap(): void {
-    if (!this.themeService.darkMode)
+    if (!this.themeService.themeSubscription.value.theme.isDark)
       return;
     this.themeService.allowMapInversion = !this.themeService.allowMapInversion;
   }
