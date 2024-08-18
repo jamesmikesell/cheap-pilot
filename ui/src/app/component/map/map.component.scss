@@ -10,6 +10,8 @@
   .leaflet-control-attribution> :not(.leaflet-attribution-flag) {
     filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
   }
+
+  background-color: #000;
 }
 
 .dark-mode.allow-invert ::ng-deep {
