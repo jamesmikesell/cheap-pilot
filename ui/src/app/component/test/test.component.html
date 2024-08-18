@@ -14,6 +14,19 @@
 <app-blackout *ngIf="blackoutScreen" (click)="blackoutScreen = false"></app-blackout>
 
 
+
+<app-map></app-map>
+
+
+<div>
+  <div class="center-controls heading-button-container">
+    <button *ngIf="btConnected" mat-raised-button color="primary" (click)="maintainCurrentHeading()">
+      Maintain Current Heading
+    </button>
+  </div>
+</div>
+
+
 <div>
   Heading Current (compass / gps / [drift]):
   {{sensorOrientation.heading.value.heading | number:'1.0-0'}} / {{gpsHeading | number:'1.0-0'}} /
@@ -27,17 +40,6 @@
   Path: {{controllerPath.enabled ? "on" : "off"}}
   <br>
   Speed (kt): {{speedKts | number:'1.2-2'}} <br>
-</div>
-
-
-<app-map></app-map>
-
-
-
-<div class="center-controls">
-  <button *ngIf="btConnected" mat-raised-button color="primary" (click)="maintainCurrentHeading()">
-    Maintain Current Heading
-  </button>
 </div>
 
 
