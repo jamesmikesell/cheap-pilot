@@ -77,6 +77,7 @@ export class MapComponent implements AfterViewInit {
     this.addEditControls();
     this.addLocateControl();
 
+
     this.deviceSelectionService.gpsSensor.locationData
       .pipe(filter(locationData => !!locationData))
       .subscribe(location => {
@@ -134,6 +135,19 @@ export class MapComponent implements AfterViewInit {
             this.pathDrawn = undefined;
             this.drawnPathUpdated()
           } else {
+            if (!this.deviceSelectionService.motorController.connected.value
+              && this.configService.config.remoteReceiverMode !== RemoteReceiverMode.REMOTE) {
+              let tooltip = L.tooltip({ direction: 'center' })
+                .setContent("Connect or set to Remote mode draw a route")
+                .setLatLng(this.map.getCenter())
+                .addTo(this.map);
+
+              setTimeout(() => {
+                this.map.removeLayer(tooltip);
+              }, 5000);
+              return;
+            }
+
             this.map.editTools.startPolyline(this.currentLocation, { color: "tomato", dashArray: '5, 15', dashOffset: '0' })
           }
         },
@@ -152,8 +166,7 @@ export class MapComponent implements AfterViewInit {
       this.drawnPathUpdated()
     });
 
-
-    this.map.addControl(new newLineControl());
+    this.map.addControl(new newLineControl())
   }
 
 
