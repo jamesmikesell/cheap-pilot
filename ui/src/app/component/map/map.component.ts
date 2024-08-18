@@ -28,6 +28,7 @@ export class MapComponent implements AfterViewInit {
   private pathDrawn: L.Polyline;
   private currentLocation: L.LatLng;
   private waypointCircles: L.Circle[] = [];
+  private MAP_BASE_LAYER = "MAP_BASE_LAYER";
 
 
   constructor(
@@ -56,9 +57,13 @@ export class MapComponent implements AfterViewInit {
       "USGS Sat.": L.tileLayer.provider('USGS.USImagery', { maxZoom: 16, className: "no-invert" }),
       "Dark": L.tileLayer.provider('CartoDB.DarkMatter', { className: "no-invert" }),
     }
-    
-    // set default map
-    this.map.addLayer(baseMaps['Open Street Maps']);
+
+    // set displayed map
+    let savedMap = localStorage.getItem(this.MAP_BASE_LAYER);
+    if (Object.hasOwn(baseMaps, savedMap))
+      this.map.addLayer(baseMaps[savedMap as keyof typeof baseMaps]);
+    else
+      this.map.addLayer(baseMaps['Open Street Maps']);
 
     let historyPath = L.polyline([], { color: 'crimson' }).addTo(this.map);
     let layers: L.Control.LayersObject = {
@@ -67,6 +72,7 @@ export class MapComponent implements AfterViewInit {
 
     L.control.layers(baseMaps, layers).addTo(this.map);
 
+    this.map.on('baselayerchange', (event) => localStorage.setItem(this.MAP_BASE_LAYER, event.name));
 
     this.addEditControls();
     this.addLocateControl();

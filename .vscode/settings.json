@@ -3,11 +3,16 @@
     "ui"
   ],
   "cSpell.words": [
+    "baselayerchange",
+    "Carto",
     "Fltr",
     "Kalman",
     "Lngs",
     "locatecontrol",
+    "Mapnik",
     "pessen",
-    "topleft"
+    "topleft",
+    "Topo",
+    "USGS"
   ],
 }
