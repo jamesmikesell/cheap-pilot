@@ -21,7 +21,8 @@
             "index": "src/index.html",
             "main": "src/main.ts",
             "allowedCommonJsDependencies": [
-              "leaflet"
+              "leaflet",
+              "leaflet-providers"
             ],
             "polyfills": [
               "zone.js"

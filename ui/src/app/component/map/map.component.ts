@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import * as L from 'leaflet';
 import 'leaflet-editable';
+import 'leaflet-providers';
 import 'leaflet.locatecontrol';
 import { filter } from 'rxjs';
 import { MessagingService } from 'src/app/remote/messaging-service';
@@ -42,14 +43,30 @@ export class MapComponent implements OnInit {
 
     this.map = L.map('map', { editable: true, }).setView([0, 0], 0)
 
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(this.map);
+    let baseMaps = {
+      "Open Street Maps": L.tileLayer.provider('OpenStreetMap.Mapnik'),
+      "Esri Sat": L.tileLayer.provider('Esri.WorldImagery'),
+      "Esri Topo": L.tileLayer.provider('Esri.WorldTopoMap'),
+      "USGS Topo": L.tileLayer.provider('USGS.USTopo', { maxZoom: 16 }),
+      "USGS Sat w Topo": L.tileLayer.provider('USGS.USImageryTopo', { maxZoom: 16 }),
+      "USGS Sat": L.tileLayer.provider('USGS.USImagery', { maxZoom: 16 }),
+      "Dark": L.tileLayer.provider('CartoDB.DarkMatter'),
+    }
+
+    // set default map
+    this.map.addLayer(baseMaps['Open Street Maps']);
+
+    let historyPath = L.polyline([], { color: 'crimson' }).addTo(this.map);
+    let layers: L.Control.LayersObject = {
+      "History": historyPath,
+    }
+
+    L.control.layers(baseMaps, layers).addTo(this.map);
+
 
     this.addEditControls();
     this.addLocateControl();
 
-    let historyPath = L.polyline([], { color: 'crimson' }).addTo(this.map);
     this.deviceSelectionService.gpsSensor.locationData
       .pipe(filter(locationData => !!locationData))
       .subscribe(location => {
