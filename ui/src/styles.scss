@@ -17,8 +17,20 @@ $light-theme: mat.define-light-theme($color-config-light);
 @include mat.all-component-themes($light-theme);
 
 
+
+
+$night-primary: (
+  700: #ff000036,
+  800: #ff000032,
+  900: #fe737389,
+  contrast: (700: rgb(0, 0, 0),
+    800:rgb(0, 0, 0),
+    900: rgb(0, 0, 0),
+  )
+);
+
 .app-night-theme {
-  $app-night-primary: mat.define-palette(mat.$indigo-palette);
+  $app-night-primary: mat.define-palette($night-primary, 900, 800, 700);
   $app-night-accent: mat.define-palette(mat.$pink-palette);
 
   $app-night-theme: app.define-dark-theme((color: (primary: $app-night-primary,
