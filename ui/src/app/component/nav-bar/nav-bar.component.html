@@ -1,9 +1,18 @@
 <mat-sidenav-container class="sidenav-container">
-  <mat-sidenav #drawer class="sidenav" fixedInViewport [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
-    [mode]="(isHandset$ | async) ? 'over' : 'side'">
+  <mat-sidenav #drawer class="sidenav" fixedInViewport>
     <mat-toolbar>Menu</mat-toolbar>
     <mat-nav-list>
-      <!-- <a mat-list-item href="#">Link 3</a> -->
+      <a mat-list-item (click)="toggleTheme()">
+        {{themeService.darkMode ? "Light" : "Dark"}} Mode
+        <mat-icon *ngIf="!(themeService.darkModeSubscription | async)">mode_night</mat-icon>
+        <mat-icon *ngIf="themeService.darkModeSubscription | async">brightness_high</mat-icon>
+      </a>
+
+      <a mat-list-item [disabled]="!themeService.darkMode" (click)="invertMap()">
+        Allow Dark Maps
+        <mat-icon *ngIf="themeService.allowMapInversionSubscription | async">check_box</mat-icon>
+        <mat-icon *ngIf="!(themeService.allowMapInversionSubscription | async)">check_box_outline_blank</mat-icon>
+      </a>
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>

@@ -1,8 +1,6 @@
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { Component, inject } from '@angular/core';
-import { Observable } from 'rxjs';
-import { map, shareReplay } from 'rxjs/operators';
+import { Component } from '@angular/core';
 import { AppVersion } from 'src/app/app-version';
+import { ThemeService } from 'src/app/service/theme-service';
 
 @Component({
   selector: 'app-nav-bar',
@@ -13,17 +11,20 @@ export class NavBarComponent {
 
   AppVersion = AppVersion;
 
-  private breakpoints = [Breakpoints.Handset];
-  private breakpointObserver = inject(BreakpointObserver);
-  isHandset$: Observable<boolean> = this.breakpointObserver.observe(this.breakpoints)
-    .pipe(
-      map(result => result.matches),
-      shareReplay()
-    );
+  constructor(
+    public themeService: ThemeService,
+  ) { }
 
-  closeIfMobile(drawer: any): void {
-    if (this.breakpointObserver.isMatched(this.breakpoints))
-      drawer.toggle();
+
+  toggleTheme(): void {
+    this.themeService.darkMode = !this.themeService.darkMode;
+  }
+
+
+  invertMap(): void {
+    if (!this.themeService.darkMode)
+      return;
+    this.themeService.allowMapInversion = !this.themeService.allowMapInversion;
   }
 
 

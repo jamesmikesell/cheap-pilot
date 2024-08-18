@@ -1,1 +1,3 @@
-<div class="map" #uxMap></div>
+<div class="map" #uxMap [class.dark-mode]="themeService.darkModeSubscription | async"
+  [class.allow-invert]="themeService.allowMapInversionSubscription | async">
+</div>

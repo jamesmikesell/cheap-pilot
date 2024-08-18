@@ -3,3 +3,17 @@
   width: 100%;
   max-height: 65vh;
 }
+
+.dark-mode ::ng-deep {
+
+  .leaflet-control,
+  .leaflet-control-attribution> :not(.leaflet-attribution-flag) {
+    filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+  }
+}
+
+.dark-mode.allow-invert ::ng-deep {
+  .leaflet-layer:not(.no-invert) {
+    filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+  }
+}

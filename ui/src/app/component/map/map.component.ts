@@ -9,6 +9,7 @@ import { ReceiverService, RemoteMessageTopics } from 'src/app/remote/receiver-se
 import { ConfigService, RemoteReceiverMode } from 'src/app/service/config.service';
 import { ControllerPathService } from 'src/app/service/controller-path.service';
 import { DeviceSelectService } from 'src/app/service/device-select.service';
+import { ThemeService } from 'src/app/service/theme-service';
 import { CoordinateUtils, LatLon } from 'src/app/utils/coordinate-utils';
 
 
@@ -35,6 +36,7 @@ export class MapComponent implements AfterViewInit {
     private controllerPath: ControllerPathService,
     private receiverService: ReceiverService,
     private messageService: MessagingService,
+    public themeService: ThemeService,
   ) { }
 
 
@@ -47,14 +49,14 @@ export class MapComponent implements AfterViewInit {
 
     let baseMaps = {
       "Open Street Maps": L.tileLayer.provider('OpenStreetMap.Mapnik'),
-      "Esri Sat": L.tileLayer.provider('Esri.WorldImagery'),
+      "Esri Sat.": L.tileLayer.provider('Esri.WorldImagery', { className: "no-invert" }),
       "Esri Topo": L.tileLayer.provider('Esri.WorldTopoMap'),
       "USGS Topo": L.tileLayer.provider('USGS.USTopo', { maxZoom: 16 }),
-      "USGS Sat w Topo": L.tileLayer.provider('USGS.USImageryTopo', { maxZoom: 16 }),
-      "USGS Sat": L.tileLayer.provider('USGS.USImagery', { maxZoom: 16 }),
-      "Dark": L.tileLayer.provider('CartoDB.DarkMatter'),
+      "USGS Sat. w Topo": L.tileLayer.provider('USGS.USImageryTopo', { maxZoom: 16, className: "no-invert" }),
+      "USGS Sat.": L.tileLayer.provider('USGS.USImagery', { maxZoom: 16, className: "no-invert" }),
+      "Dark": L.tileLayer.provider('CartoDB.DarkMatter', { className: "no-invert" }),
     }
-
+    
     // set default map
     this.map.addLayer(baseMaps['Open Street Maps']);
 
