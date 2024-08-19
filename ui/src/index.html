@@ -13,11 +13,18 @@
 
   <link rel="manifest" href="manifest.webmanifest">
   <meta name="theme-color" content="#1976d2">
+
 </head>
 
-<body class="mat-typography mat-app-background">
+<body class="mat-typography">
   <app-root></app-root>
   <noscript>Please enable JavaScript to continue using this application.</noscript>
 </body>
+
+<script>
+  let bgColor = localStorage.getItem("APP_RELOAD_BG_COLOR");
+  if (bgColor)
+    document.body.style.backgroundColor = bgColor;
+</script>
 
 </html>
