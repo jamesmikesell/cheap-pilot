@@ -35,14 +35,17 @@
                 "glob": "**/*",
                 "input": "node_modules/leaflet/dist/images",
                 "output": "/assets"
-              }
+              },
+              "src/manifest.webmanifest"
             ],
             "styles": [
               "leaflet.locatecontrol/dist/L.Control.Locate.min.css",
               "leaflet/dist/leaflet.css",
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [],
+            "serviceWorker": true,
+            "ngswConfigPath": "ngsw-config.json"
           },
           "configurations": {
             "production": {
@@ -104,7 +107,8 @@
                 "glob": "**/*",
                 "input": "node_modules/leaflet/dist/images",
                 "output": "/assets"
-              }
+              },
+              "src/manifest.webmanifest"
             ],
             "styles": [
               "@angular/material/prebuilt-themes/indigo-pink.css",

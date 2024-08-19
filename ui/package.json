@@ -6,6 +6,7 @@
     "start": "ng serve",
     "startExternal": "ng serve --host 0.0.0.0 --ssl --ssl-key localhost.key --ssl-cert localhost.crt",
     "build": "ng build --configuration production --base-href \"/tiller-pilot/\" ",
+    "testOffline": "ng build --configuration production && npx http-server -p 8080 -c-1 dist/ui",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
@@ -21,6 +22,7 @@
     "@angular/platform-browser": "^16.0.0",
     "@angular/platform-browser-dynamic": "^16.0.0",
     "@angular/router": "^16.0.0",
+    "@angular/service-worker": "^16.0.0",
     "chart.js": "^3.6.0",
     "class-transformer": "^0.5.1",
     "leaflet": "^1.9.4",
