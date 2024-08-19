@@ -1,4 +1,4 @@
-<div class="fullscreen-overlay">
+<div class="fullscreen-overlay" [class.night-mode]="(themeService.themeSubscription | async).theme.isDark">
   Blacking out screen to conserve battery and reduce heat.
   <br>
   <br>
