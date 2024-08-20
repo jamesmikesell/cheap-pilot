@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { filter, Subject } from 'rxjs';
+import { BehaviorSubject, filter } from 'rxjs';
 import { CoordinateUtils, LatLon } from '../utils/coordinate-utils';
 import { ConfigService } from './config.service';
 import { Controller } from './controller';
@@ -24,8 +24,8 @@ export class ControllerPathService implements Controller<LatLon[]> {
       this._desiredHeadingToDestination = undefined;
     this._enabled = val;
   }
-  pointReached = new Subject<void>();
   compassDriftDegrees: number;
+  pathSubscription = new BehaviorSubject<LatLon[]>(undefined);
 
   private _enabled = false;
   private _desiredHeadingToDestination: number;
@@ -59,8 +59,8 @@ export class ControllerPathService implements Controller<LatLon[]> {
           this._desiredHeadingToDestination = bearingToTarget;
 
           if (distanceToTarget < configService.config.waypointProximityMeters) {
-            this.pointReached.next();
             this.path.shift()
+            this.pathUpdated();
           }
 
           let correctedDestinationCompassHeading = CoordinateUtils.normalizeHeading(bearingToTarget + filteredDrift)
@@ -89,11 +89,18 @@ export class ControllerPathService implements Controller<LatLon[]> {
 
   command(path: LatLon[]): void {
     this.path = path;
+    this.pathUpdated();
+  }
+
+
+  private pathUpdated(): void {
+    this.pathSubscription.next(JSON.parse(JSON.stringify(this.path)));
   }
 
 
   stop(): void {
     this.path = undefined;
+    this.pathUpdated();
   }
 
 }

@@ -5,7 +5,7 @@ import 'leaflet-providers';
 import 'leaflet.locatecontrol';
 import { filter } from 'rxjs';
 import { MessagingService } from 'src/app/remote/messaging-service';
-import { ReceiverService, RemoteMessageTopics } from 'src/app/remote/receiver-service';
+import { RemoteMessageTopics } from 'src/app/remote/receiver-service';
 import { ConfigService, RemoteReceiverMode } from 'src/app/service/config.service';
 import { ControllerPathService } from 'src/app/service/controller-path.service';
 import { DeviceSelectService } from 'src/app/service/device-select.service';
@@ -29,25 +29,44 @@ export class MapComponent implements AfterViewInit {
   private currentLocation: L.LatLng;
   private waypointCircles: L.Circle[] = [];
   private MAP_BASE_LAYER = "MAP_BASE_LAYER";
+  private pathEditInProgress = false;
+  private historyPath: any;
 
 
   constructor(
     private deviceSelectionService: DeviceSelectService,
     private configService: ConfigService,
     private controllerPath: ControllerPathService,
-    private receiverService: ReceiverService,
     private messageService: MessagingService,
     public themeService: ThemeService,
   ) { }
 
 
   ngAfterViewInit(): void {
-    this.controllerPath.pointReached.subscribe(() => this.deletePoint())
-
-    this.receiverService.routeUpdated.subscribe(route => this.pathReceived(route))
-
     this.map = L.map(this.uxMap.nativeElement, { editable: true, }).setView([0, 0], 0)
+    this.configureUpdatesFromController();
+    this.configureBaseMaps();
+    this.addEditControls();
+    this.addLocateControl();
+    this.configureUpdatesFromGps();
+  }
 
+
+  private configureUpdatesFromController(): void {
+    this.controllerPath.pathSubscription.subscribe(path => {
+      let uiPath: L.LatLng[] = undefined;
+      if (path) {
+        uiPath = path.map(single => new L.LatLng(single.latitude, single.longitude))
+        if (this.currentLocation)
+          uiPath.unshift(this.currentLocation);
+      }
+
+      this.clearAndDrawPath(uiPath)
+    })
+  }
+
+
+  private configureBaseMaps(): void {
     let baseMaps = {
       "Open Street Maps": L.tileLayer.provider('OpenStreetMap.Mapnik'),
       "Esri Sat.": L.tileLayer.provider('Esri.WorldImagery', { className: "no-invert" }),
@@ -65,19 +84,18 @@ export class MapComponent implements AfterViewInit {
     else
       this.map.addLayer(baseMaps['Open Street Maps']);
 
-    let historyPath = L.polyline([], { color: 'crimson' }).addTo(this.map);
+    this.historyPath = L.polyline([], { color: 'crimson' }).addTo(this.map);
     let layers: L.Control.LayersObject = {
-      "History": historyPath,
+      "History": this.historyPath,
     }
 
     L.control.layers(baseMaps, layers).addTo(this.map);
 
     this.map.on('baselayerchange', (event) => localStorage.setItem(this.MAP_BASE_LAYER, event.name));
-
-    this.addEditControls();
-    this.addLocateControl();
+  }
 
 
+  private configureUpdatesFromGps(): void {
     this.deviceSelectionService.gpsSensor.locationData
       .pipe(filter(locationData => !!locationData))
       .subscribe(location => {
@@ -95,7 +113,7 @@ export class MapComponent implements AfterViewInit {
         if (distanceSinceLast === undefined || distanceSinceLast > 3)
           this.pathPoints.push(this.currentLocation);
 
-        historyPath.setLatLngs(this.pathPoints);
+        this.historyPath.setLatLngs(this.pathPoints);
       })
   }
 
@@ -130,10 +148,13 @@ export class MapComponent implements AfterViewInit {
       options: {
         position: 'topleft',
         callback: () => {
-          if (this.pathDrawn) {
-            this.map.removeLayer(this.pathDrawn)
+          if (this.pathDrawn || this.pathEditInProgress) {
+            let pathToRemove = this.pathDrawn
             this.pathDrawn = undefined;
-            this.drawnPathUpdated()
+            if (pathToRemove)
+              this.map.removeLayer(pathToRemove)
+            this.pathEditInProgress = false;
+            this.sendPathToController()
           } else {
             if (!this.deviceSelectionService.motorController.connected.value
               && this.configService.config.remoteReceiverMode !== RemoteReceiverMode.REMOTE) {
@@ -148,7 +169,8 @@ export class MapComponent implements AfterViewInit {
               return;
             }
 
-            this.map.editTools.startPolyline(this.currentLocation, { color: "tomato", dashArray: '5, 15', dashOffset: '0' })
+            this.pathEditInProgress = true;
+            this.pathDrawn = this.map.editTools.startPolyline(this.currentLocation, { color: "tomato", dashArray: '5, 15', dashOffset: '0' })
           }
         },
         kind: 'line',
@@ -156,17 +178,29 @@ export class MapComponent implements AfterViewInit {
       }
     });
 
-
-    this.map.on('editable:vertex:dragend', (_event) => this.drawnPathUpdated());
-    this.map.on('editable:vertex:clicked', (_event) => this.drawnPathUpdated());
-
-
-    this.map.on('editable:drawing:end', (event) => {
-      this.pathDrawn = event.layer;
-      this.drawnPathUpdated()
+    this.map.on('editable:vertex:new', (_event) => this.handlePathDrawingChanges());
+    this.map.on('editable:vertex:deleted', (_event) => this.handlePathDrawingChanges());
+    this.map.on('editable:vertex:dragend', (_event) => {
+      this.pathEditInProgress = false;
+      this.handlePathDrawingChanges()
+    });
+    this.map.on('editable:drawing:end', (_event) => {
+      this.pathEditInProgress = false;
+      this.handlePathDrawingChanges()
+    });
+    this.map.on('editable:drawing:move', (_event) => {
+      this.pathEditInProgress = true;
+      this.handlePathDrawingChanges()
     });
 
     this.map.addControl(new newLineControl())
+  }
+
+
+  private handlePathDrawingChanges = () => {
+    if (!this.pathEditInProgress)
+      this.sendPathToController()
+    this.redrawWaypointProximityCircles()
   }
 
 
@@ -186,15 +220,6 @@ export class MapComponent implements AfterViewInit {
   }
 
 
-  private deletePoint(): void {
-    if (this.pathDrawn) {
-      let points = this.pathDrawn.getLatLngs();
-      points.shift()
-    }
-    this.redrawPath()
-  }
-
-
   private clearAndDrawPath(path: L.LatLng[]): void {
     if (this.pathDrawn)
       this.map.removeLayer(this.pathDrawn)
@@ -208,15 +233,6 @@ export class MapComponent implements AfterViewInit {
       this.pathDrawn.setStyle({ color: "rgb(51, 136, 255)", dashArray: "5 15" })
     }
     this.redrawWaypointProximityCircles();
-  }
-
-
-  private redrawPath(): void {
-    let points: L.LatLng[];
-    if (this.pathDrawn)
-      points = this.pathDrawn.getLatLngs() as L.LatLng[];
-
-    this.clearAndDrawPath(points);
   }
 
 
@@ -241,8 +257,7 @@ export class MapComponent implements AfterViewInit {
   }
 
 
-  private drawnPathUpdated(): void {
-    this.redrawPath()
+  private sendPathToController(): void {
     let navCoordinates: LatLon[] = [];
     if (this.pathDrawn) {
       let mapCoordinates = (this.pathDrawn.getLatLngs() as L.LatLng[]);
@@ -251,13 +266,10 @@ export class MapComponent implements AfterViewInit {
         .map((single): LatLon => ({ latitude: single.lat, longitude: single.lng }))
     }
 
+    console.log("path updated, navigating", navCoordinates)
+
     if (this.configService.config.remoteReceiverMode === RemoteReceiverMode.REMOTE) {
-      if (this.pathDrawn) {
-        let mapCoordinates = (this.pathDrawn.getLatLngs() as L.LatLng[]);
-        let uiCoordinates = mapCoordinates
-          .map((single): LatLon => ({ latitude: single.lat, longitude: single.lng }))
-        this.messageService.sendMessage(RemoteMessageTopics.NAVIGATE_ROUTE, uiCoordinates);
-      }
+      this.messageService.sendMessage(RemoteMessageTopics.NAVIGATE_ROUTE, navCoordinates);
     }
 
     if (this.deviceSelectionService.motorController.connected.value) {
@@ -267,15 +279,5 @@ export class MapComponent implements AfterViewInit {
       }, 0);
     }
   }
-
-
-  pathReceived(route: LatLon[]): void {
-    if (this.configService.config.remoteReceiverMode === RemoteReceiverMode.RECEIVER) {
-      let uiPath = route.map(single => new L.LatLng(single.latitude, single.longitude))
-      this.clearAndDrawPath(uiPath);
-      this.drawnPathUpdated();
-    }
-  }
-
 
 }
