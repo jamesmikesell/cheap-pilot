@@ -1,7 +1,8 @@
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import "reflect-metadata";
+import * as L from 'leaflet';
 
 import { AppModule } from './app/app.module';
-import * as L from 'leaflet';
 
 
 L.Icon.Default.imagePath = "assets/"
