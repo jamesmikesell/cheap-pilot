@@ -6,3 +6,17 @@ mat-slide-toggle {
   margin-top: 15px;
   margin-bottom: 15px;
 }
+
+.manual-controls {
+  margin-top: 29px !important;
+}
+
+.manual-controls>button {
+  transform: scale(1.5);
+}
+
+.center-controls {
+  display: flex;
+  place-content: space-around;
+  max-width: 532px;
+}

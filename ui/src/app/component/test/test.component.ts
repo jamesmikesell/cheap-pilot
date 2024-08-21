@@ -200,26 +200,6 @@ export class TestComponent implements OnInit {
   }
 
 
-  private eStop(): void {
-    this.controllerOrientation.cancelPidTune();
-    this.controllerRotationRate.cancelPidTune();
-
-    if (this.controllerOrientation.enabled)
-      this.controllerOrientation.enabled = false;
-
-    if (this.controllerRotationRate.enabled)
-      this.controllerRotationRate.enabled = false;
-  }
-
-
-  motor(power: number): void {
-    if (power === 0)
-      this.eStop();
-
-
-    this.motorControllerService.command(power);
-    this.vibrate();
-  }
 
 }
 

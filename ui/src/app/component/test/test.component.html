@@ -27,6 +27,23 @@
 </div>
 
 
+<div *ngIf="btConnected" class="center-controls manual-controls">
+  <button mat-raised-button color="primary" (click)="moveManually(1)">
+    &lt;- {{controllerOrientation.enabled ? "5°" : "°/s"}}
+  </button>
+  <button mat-raised-button color="primary" (click)="stopManually()">
+    stop
+  </button>
+  <button mat-raised-button color="primary" (click)="moveManually(-1)">
+    {{controllerOrientation.enabled ? "5°" : "°/s"}} -&gt;
+  </button>
+</div>
+
+
+<app-remote-control *ngIf="this.configService.config.remoteReceiverMode === RemoteReceiverMode.REMOTE">
+</app-remote-control>
+
+
 <div>
   Heading Current (compass / gps / [drift]):
   {{sensorOrientation.heading.value.heading | number:'1.0-0'}} / {{gpsHeading | number:'1.0-0'}} /
@@ -43,9 +60,6 @@
 </div>
 
 
-<app-remote-control *ngIf="this.configService.config.remoteReceiverMode === RemoteReceiverMode.REMOTE">
-</app-remote-control>
-
 
 <div class="charts">
   <app-chart *ngIf="configService.config.showGraphGps" [data]="chartGpsHeading" title="GPS Heading"
@@ -57,20 +71,6 @@
   <app-chart *ngIf="configService.config.showGraphRotation" [data]="chartDataRotationRate"
     title="Rotation Rate Controller" (dblclick)="clearGraphs()">
   </app-chart>
-</div>
-
-
-
-<div *ngIf="btConnected" class="center-controls manual-controls">
-  <button mat-raised-button color="primary" (click)="moveManually(1)">
-    &lt;- {{controllerOrientation.enabled ? "5°" : "°/s"}}
-  </button>
-  <button mat-raised-button color="primary" (click)="stopManually()">
-    stop
-  </button>
-  <button mat-raised-button color="primary" (click)="moveManually(-1)">
-    {{controllerOrientation.enabled ? "5°" : "°/s"}} -&gt;
-  </button>
 </div>
 
 
@@ -86,23 +86,4 @@
       <app-config></app-config>
     </mat-expansion-panel>
   </mat-accordion>
-</div>
-
-
-
-
-
-
-
-
-<div *ngIf="btConnected" class="center-controls manual-controls">
-  <button mat-raised-button color="primary" (click)="motor(1)">
-    &lt;-- Motor
-  </button>
-  <button mat-raised-button color="primary" (click)="motor(0)">
-    stop
-  </button>
-  <button mat-raised-button color="primary" (click)="motor(-1)">
-    Motor --&gt;
-  </button>
 </div>

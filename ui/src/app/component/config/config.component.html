@@ -11,6 +11,34 @@
   </ul>
   <br>
 
+
+
+
+  <mat-card *ngIf="btConnected">
+    <mat-card-header>
+      <mat-card-title>Motor Manual Controls</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+
+      <div *ngIf="btConnected" class="center-controls manual-controls">
+        <button mat-raised-button color="primary" (click)="motor(1)">
+          &lt;-- Motor
+        </button>
+        <button mat-raised-button color="primary" (click)="motor(0)">
+          stop
+        </button>
+        <button mat-raised-button color="primary" (click)="motor(-1)">
+          Motor --&gt;
+        </button>
+      </div>
+
+    </mat-card-content>
+  </mat-card>
+
+
+
+
   <mat-card>
     <mat-card-header>
       <mat-card-title>Simulator</mat-card-title>
