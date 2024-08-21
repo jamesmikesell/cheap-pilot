@@ -174,6 +174,9 @@ export class ControllerRotationRateService implements Controller<number> {
 
 
   cancelPidTune(): void {
+    if (!this.tuner)
+      return;
+
     this.finalizePidTune();
     this.pidTuneComplete.next({
       success: false,
