@@ -69,11 +69,11 @@ export class MapComponent implements AfterViewInit {
   private configureBaseMaps(): void {
     let baseMaps = {
       "Open Street Maps": L.tileLayer.provider('OpenStreetMap.Mapnik'),
-      "Esri Sat.": L.tileLayer.provider('Esri.WorldImagery', { className: "no-invert" }),
-      "Esri Topo": L.tileLayer.provider('Esri.WorldTopoMap'),
-      "USGS Topo": L.tileLayer.provider('USGS.USTopo', { maxZoom: 16 }),
-      "USGS Sat. w Topo": L.tileLayer.provider('USGS.USImageryTopo', { maxZoom: 16, className: "no-invert" }),
-      "USGS Sat.": L.tileLayer.provider('USGS.USImagery', { maxZoom: 16, className: "no-invert" }),
+      "Esri Sat.": L.tileLayer.provider('Esri.WorldImagery', { className: "no-invert", maxNativeZoom: 19, maxZoom: 20 }),
+      "Esri Topo": L.tileLayer.provider('Esri.WorldTopoMap', { maxNativeZoom: 19, maxZoom: 20 }),
+      "USGS Topo": L.tileLayer.provider('USGS.USTopo', { maxNativeZoom: 16, maxZoom: 20 }),
+      "USGS Sat. w Topo": L.tileLayer.provider('USGS.USImageryTopo', { maxNativeZoom: 16, maxZoom: 20, className: "no-invert" }),
+      "USGS Sat.": L.tileLayer.provider('USGS.USImagery', { maxNativeZoom: 16, maxZoom: 20, className: "no-invert" }),
       "Dark": L.tileLayer.provider('CartoDB.DarkMatter', { className: "no-invert" }),
     }
 
