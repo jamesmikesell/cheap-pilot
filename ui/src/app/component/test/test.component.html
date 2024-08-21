@@ -63,13 +63,13 @@
 
 <div *ngIf="btConnected" class="center-controls manual-controls">
   <button mat-raised-button color="primary" (click)="moveManually(1)">
-    &lt;--
+    &lt;- {{controllerOrientation.enabled ? "5°" : "°/s"}}
   </button>
   <button mat-raised-button color="primary" (click)="stopManually()">
     stop
   </button>
   <button mat-raised-button color="primary" (click)="moveManually(-1)">
-    --&gt;
+    {{controllerOrientation.enabled ? "5°" : "°/s"}} -&gt;
   </button>
 </div>
 
