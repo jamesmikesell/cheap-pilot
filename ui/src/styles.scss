@@ -93,3 +93,7 @@ body {
 .hidden {
   display: none !important;
 }
+
+.no-select {
+  user-select: none;
+}
