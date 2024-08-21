@@ -178,7 +178,10 @@ export class MapComponent implements AfterViewInit {
       }
     });
 
-    this.map.on('editable:vertex:new', (_event) => this.handlePathDrawingChanges());
+    // Disabling vertex:new there is no way to prevent a "new" vertex from triggering a path update,
+    // as the new event gets fired even if the user is still dragging the vertex around.  so
+    // a path update won't be triggered until the vertex is dragged
+    // this.map.on('editable:vertex:new', (_event) => this.handlePathDrawingChanges());
     this.map.on('editable:vertex:deleted', (_event) => this.handlePathDrawingChanges());
     this.map.on('editable:vertex:dragend', (_event) => {
       this.pathEditInProgress = false;
