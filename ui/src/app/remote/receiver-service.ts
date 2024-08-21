@@ -1,10 +1,12 @@
 import { Injectable } from "@angular/core";
+import { instanceToPlain } from "class-transformer";
 import { ConfigService, RemoteReceiverMode } from "../service/config.service";
 import { ControllerOrientationService } from "../service/controller-orientation.service";
 import { ControllerPathService } from "../service/controller-path.service";
 import { ControllerRotationRateService } from "../service/controller-rotation-rate.service";
 import { DataLogService } from "../service/data-log.service";
 import { LatLon } from "../utils/coordinate-utils";
+import { Update } from "./message-dtos";
 import { MessagingService } from "./messaging-service";
 
 @Injectable({
@@ -24,6 +26,9 @@ export class ReceiverService {
     this.messageService.addMessageHandler(RemoteMessageTopics.MOVE_MANUALLY, payload => this.moveManually(payload))
     this.messageService.addMessageHandler(RemoteMessageTopics.STOP_MANUALLY, () => this.stopManually())
     this.messageService.addMessageHandler(RemoteMessageTopics.NAVIGATE_ROUTE, route => this.pathReceived(route))
+    this.messageService.addMessageHandler(RemoteMessageTopics.REQUEST_UPDATE, () => this.broadcastUpdate())
+
+    this.controllerPath.pathSubscription.subscribe(() => this.broadcastUpdate());
   }
 
 
@@ -67,6 +72,17 @@ export class ReceiverService {
     }
   }
 
+
+  private broadcastUpdate(): void {
+    if (this.configService.config.remoteReceiverMode === RemoteReceiverMode.RECEIVER) {
+      let message: Update = {
+        path: this.controllerPath.pathSubscription.value,
+      }
+
+      this.messageService.sendMessage(RemoteMessageTopics.BROADCAST_UPDATE, instanceToPlain(message))
+    }
+  }
+
 }
 
 export class RemoteMessageTopics {
@@ -74,4 +90,6 @@ export class RemoteMessageTopics {
   static readonly MOVE_MANUALLY = "MOVE_MANUALLY";
   static readonly STOP_MANUALLY = "STOP_MANUALLY";
   static readonly NAVIGATE_ROUTE = "NAVIGATE_ROUTE";
+  static readonly REQUEST_UPDATE = "REQUEST_UPDATE";
+  static readonly BROADCAST_UPDATE = "BROADCAST_UPDATE";
 }

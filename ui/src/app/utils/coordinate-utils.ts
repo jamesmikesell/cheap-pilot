@@ -132,3 +132,9 @@ export interface LatLon {
   latitude: number;
   longitude: number;
 }
+
+
+export class LatLonInst implements LatLon {
+  latitude: number;
+  longitude: number;
+}

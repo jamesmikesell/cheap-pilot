@@ -1,9 +1,11 @@
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
+import { plainToInstance } from 'class-transformer';
 import * as L from 'leaflet';
 import 'leaflet-editable';
 import 'leaflet-providers';
 import 'leaflet.locatecontrol';
 import { filter } from 'rxjs';
+import { Update } from 'src/app/remote/message-dtos';
 import { MessagingService } from 'src/app/remote/messaging-service';
 import { RemoteMessageTopics } from 'src/app/remote/receiver-service';
 import { ConfigService, RemoteReceiverMode } from 'src/app/service/config.service';
@@ -18,7 +20,7 @@ import { CoordinateUtils, LatLon } from 'src/app/utils/coordinate-utils';
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.scss']
 })
-export class MapComponent implements AfterViewInit {
+export class MapComponent implements AfterViewInit, OnDestroy {
 
   @ViewChild("uxMap") uxMap: ElementRef<HTMLDivElement>;
 
@@ -49,20 +51,45 @@ export class MapComponent implements AfterViewInit {
     this.addEditControls();
     this.addLocateControl();
     this.configureUpdatesFromGps();
+    this.configureBroadcastUpdate();
+  }
+
+
+  ngOnDestroy(): void {
+    this.messageService.removeMessageHandler(RemoteMessageTopics.BROADCAST_UPDATE)
+  }
+
+
+  private configureBroadcastUpdate(): void {
+    this.messageService
+      .addMessageHandler(RemoteMessageTopics.BROADCAST_UPDATE,
+        payload => {
+          let message = plainToInstance(Update, payload);
+          this.remoteUpdateReceived(message.path)
+        })
+  }
+
+
+  private remoteUpdateReceived(path: LatLon[]): void {
+    if (this.configService.config.remoteReceiverMode === RemoteReceiverMode.REMOTE)
+      this.updatePathFromExternal(path);
+  }
+
+
+  private updatePathFromExternal(path: LatLon[]): void {
+    let uiPath: L.LatLng[] = undefined;
+    if (path) {
+      uiPath = path.map(single => new L.LatLng(single.latitude, single.longitude))
+      if (this.currentLocation)
+        uiPath.unshift(this.currentLocation);
+    }
+
+    this.clearAndDrawPath(uiPath)
   }
 
 
   private configureUpdatesFromController(): void {
-    this.controllerPath.pathSubscription.subscribe(path => {
-      let uiPath: L.LatLng[] = undefined;
-      if (path) {
-        uiPath = path.map(single => new L.LatLng(single.latitude, single.longitude))
-        if (this.currentLocation)
-          uiPath.unshift(this.currentLocation);
-      }
-
-      this.clearAndDrawPath(uiPath)
-    })
+    this.controllerPath.pathSubscription.subscribe(path => this.updatePathFromExternal(path))
   }
 
 

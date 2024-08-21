@@ -43,6 +43,12 @@ export class MessagingService {
   }
 
 
+  removeMessageHandler(topic: string): void {
+    this.clearTopicsHandlers.delete(topic)
+    this.resetSubscriptions();
+  }
+
+
   private ensureDisconnected(): void {
     if (this.client) {
       this.client.endAsync(true);
