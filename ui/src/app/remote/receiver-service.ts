@@ -53,6 +53,9 @@ export class ReceiverService {
     if (this.controllerOrientation.enabled)
       this.controllerOrientation.enabled = false;
 
+    if (this.controllerRotationRate.enabled && this.controllerRotationRate.desired === 0)
+      this.controllerRotationRate.enabled = false;
+
     this.controllerRotationRate.command(0)
   }
 

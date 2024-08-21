@@ -10,8 +10,9 @@ import { DataLogService } from 'src/app/service/data-log.service';
 import { DeviceSelectService } from 'src/app/service/device-select.service';
 import { GpsSensor, GpsSensorData } from 'src/app/service/sensor-gps.service';
 import { OrientationSensor } from 'src/app/service/sensor-orientation.service';
-import { UnitConverter } from 'src/app/utils/unit-converter';
 import { WakeLockService } from 'src/app/service/wake-lock.service';
+import { CoordinateUtils } from 'src/app/utils/coordinate-utils';
+import { UnitConverter } from 'src/app/utils/unit-converter';
 import { AppChartData } from '../chart/chart.component';
 
 @Component({
@@ -172,7 +173,7 @@ export class TestComponent implements OnInit {
   moveManually(level: number): void {
     this.vibrate();
     if (this.controllerOrientation.enabled) {
-      this.controllerOrientation.command((this.controllerOrientation.desired - (level * 5)) % 360);
+      this.controllerOrientation.command(CoordinateUtils.normalizeHeading(this.controllerOrientation.desired - (level * 5)));
     } else {
       this.controllerRotationRate.enabled = true;
       this.controllerRotationRate.command(this.controllerRotationRate.desired + level);
@@ -185,6 +186,9 @@ export class TestComponent implements OnInit {
 
     if (this.controllerOrientation.enabled)
       this.controllerOrientation.enabled = false;
+
+    if (this.controllerRotationRate.enabled && this.controllerRotationRate.desired === 0)
+      this.controllerRotationRate.enabled = false;
 
     this.controllerRotationRate.command(0)
 
