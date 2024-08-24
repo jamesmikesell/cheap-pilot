@@ -161,10 +161,10 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         link.href = '#';
         link.title = 'Create a new ' + this.options.kind;
         link.innerHTML = this.options.html;
-        L.DomEvent.on(link, 'click', L.DomEvent.stop)
-          .on(link, 'click', () => {
-            (window as any).LAYER = this.options.callback.call(map.editTools);
-          }, this);
+        L.DomEvent.on(link, 'click', event => {
+          L.DomEvent.stop(event);
+          (window as any).LAYER = this.options.callback.call(map.editTools);
+        }, this);
 
         return container;
       }
@@ -180,6 +180,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
             this.pathDrawn = undefined;
             if (pathToRemove)
               this.map.removeLayer(pathToRemove)
+            this.redrawWaypointProximityCircles();
             this.pathEditInProgress = false;
             this.sendPathToController()
           } else {
