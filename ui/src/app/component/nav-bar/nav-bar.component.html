@@ -2,16 +2,33 @@
   <mat-sidenav #drawer class="sidenav" fixedInViewport>
     <mat-toolbar>Menu</mat-toolbar>
     <mat-nav-list>
-      <mat-form-field>
-        <mat-label>Color Mode</mat-label>
-        <mat-select placeholder="Configs" [value]="(themeService.themeSubscription | async).name"
-          (valueChange)="themeService.theme = $event">
-          <mat-option [value]="AppThemeNames.LIGHT">Light Mode</mat-option>
-          <mat-option [value]="AppThemeNames.DARK">Dark Mode</mat-option>
-          <mat-option [value]="AppThemeNames.NIGHT">Night Mode</mat-option>
-        </mat-select>
-      </mat-form-field>
-
+      <a mat-list-item (click)="themeService.theme = AppThemeNames.LIGHT">
+        Light Mode
+        <mat-icon *ngIf="(themeService.themeSubscription | async).name === AppThemeNames.LIGHT">
+          check_box
+        </mat-icon>
+        <mat-icon *ngIf="(themeService.themeSubscription | async).name !== AppThemeNames.LIGHT">
+          check_box_outline_blank
+        </mat-icon>
+      </a>
+      <a mat-list-item (click)="themeService.theme = AppThemeNames.DARK">
+        Dark Mode
+        <mat-icon *ngIf="(themeService.themeSubscription | async).name === AppThemeNames.DARK">
+          check_box
+        </mat-icon>
+        <mat-icon *ngIf="(themeService.themeSubscription | async).name !== AppThemeNames.DARK">
+          check_box_outline_blank
+        </mat-icon>
+      </a>
+      <a mat-list-item (click)="themeService.theme = AppThemeNames.NIGHT">
+        Night Mode
+        <mat-icon *ngIf="(themeService.themeSubscription | async).name === AppThemeNames.NIGHT">
+          check_box
+        </mat-icon>
+        <mat-icon *ngIf="(themeService.themeSubscription | async).name !== AppThemeNames.NIGHT">
+          check_box_outline_blank
+        </mat-icon>
+      </a>
       <a mat-list-item [disabled]="!(themeService.themeSubscription | async).theme.isDark" (click)="invertMap()">
         Allow Dark Maps
         <mat-icon *ngIf="themeService.allowMapInversionSubscription | async">check_box</mat-icon>
