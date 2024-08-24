@@ -11,6 +11,7 @@ import { RemoteMessageTopics } from 'src/app/remote/receiver-service';
 import { ConfigService, RemoteReceiverMode } from 'src/app/service/config.service';
 import { ControllerPathService } from 'src/app/service/controller-path.service';
 import { DeviceSelectService } from 'src/app/service/device-select.service';
+import { PathHistoryDedupeService } from 'src/app/service/path-history-dedupe-service';
 import { ThemeService } from 'src/app/service/theme-service';
 import { CoordinateUtils, LatLon } from 'src/app/utils/coordinate-utils';
 
@@ -41,6 +42,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     private controllerPath: ControllerPathService,
     private messageService: MessagingService,
     public themeService: ThemeService,
+    private pathHistoryService: PathHistoryDedupeService,
   ) { }
 
 
@@ -70,13 +72,24 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   }
 
 
-  private remoteUpdateReceived(path: LatLon[]): void {
-    if (this.configService.config.remoteReceiverMode === RemoteReceiverMode.REMOTE)
-      this.updatePathFromExternal(path);
+  private async remoteUpdateReceived(path: LatLon[]): Promise<void> {
+    if (this.configService.config.remoteReceiverMode === RemoteReceiverMode.REMOTE) {
+      // we sometimes receive rebound messages... IE draw a path on the remote, send it to the receiver,
+      // the receiver then rebroadcasts "this is what i'm doing", at which point we try to update the map
+      // on the remote... the problem is that if the user is in the process of modifying the path on the remote
+      // at the time we receive the rebroadcast, we'll discard their edit and just overwrite the screen.
+      // this prevents that.
+      if (await this.pathHistoryService.historyContainsPath(path)) {
+        console.log("Received path update matches previously sent path, not updating UI");
+        return;
+      }
+
+      this.updatePathFromSourceOtherThanMap(path);
+    }
   }
 
 
-  private updatePathFromExternal(path: LatLon[]): void {
+  private updatePathFromSourceOtherThanMap(path: LatLon[]): void {
     let uiPath: L.LatLng[] = undefined;
     if (path) {
       uiPath = path.map(single => new L.LatLng(single.latitude, single.longitude))
@@ -89,7 +102,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
 
   private configureUpdatesFromController(): void {
-    this.controllerPath.pathSubscription.subscribe(path => this.updatePathFromExternal(path))
+    this.controllerPath.pathSubscription.subscribe(path => this.updatePathFromSourceOtherThanMap(path))
   }
 
 
@@ -300,6 +313,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     console.log("path updated, navigating", navCoordinates)
 
     if (this.configService.config.remoteReceiverMode === RemoteReceiverMode.REMOTE) {
+      this.pathHistoryService.addPathToHistory(navCoordinates);
       this.messageService.sendMessage(RemoteMessageTopics.NAVIGATE_ROUTE, navCoordinates);
     }
 
