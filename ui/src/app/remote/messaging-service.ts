@@ -31,7 +31,7 @@ export class MessagingService {
 
   async sendMessage(topic: string, payload: any): Promise<void> {
     let currentPassword = this.configService.config.remotePassword;
-    let encryptedDto = await this.encryption.encryptData(JSON.stringify(payload), currentPassword);
+    let encryptedDto = await this.encryption.encryptData(JSON.stringify({ payload: payload }), currentPassword);
     let hashedTopic = await this.hashTopic(currentPassword, topic)
     this.client.publish(hashedTopic, encryptedDto as any);
   }
@@ -103,7 +103,7 @@ export class MessagingService {
 
     let topicHandler = this.hashedTopicsHandlers.get(hashedTopic);
     if (topicHandler)
-      topicHandler(payload);
+      topicHandler(payload.payload);
     else
       console.error("Unknown topic", hashedTopic)
   }
