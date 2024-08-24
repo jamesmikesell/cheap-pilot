@@ -33,7 +33,7 @@ export class MessagingService {
     let currentPassword = this.configService.config.remotePassword;
     let encryptedDto = await this.encryption.encryptData(JSON.stringify(payload), currentPassword);
     let hashedTopic = await this.hashTopic(currentPassword, topic)
-    this.client.publish(hashedTopic, encryptedDto);
+    this.client.publish(hashedTopic, encryptedDto as any);
   }
 
 
@@ -98,8 +98,8 @@ export class MessagingService {
   }
 
 
-  private async handleMessage(hashedTopic: string, encryptedPayload: Buffer): Promise<void> {
-    let payload = JSON.parse(await this.encryption.decryptData(encryptedPayload.toString(), this.configService.config.remotePassword));
+  private async handleMessage(hashedTopic: string, encryptedPayload: Uint8Array): Promise<void> {
+    let payload = JSON.parse(await this.encryption.decryptData(encryptedPayload, this.configService.config.remotePassword));
 
     let topicHandler = this.hashedTopicsHandlers.get(hashedTopic);
     if (topicHandler)

@@ -12,8 +12,32 @@ export class Encryption {
   }
 
 
-  async encryptData(secretData: string, password: string): Promise<string> {
+  private async compress(uncompressed: Uint8Array, method: "deflate" | "gzip" | "deflate-raw"): Promise<ArrayBuffer> {
+    const stream = new (window as any).CompressionStream(method);
+    const writer = stream.writable.getWriter();
+
+    writer.write(uncompressed);
+    writer.close();
+
+    const compressedArrayBuffer = await new Response(stream.readable).arrayBuffer();
+
+    return compressedArrayBuffer;
+  }
+
+
+  private async decompress(compressed: ArrayBuffer, method: "deflate" | "gzip" | "deflate-raw"): Promise<ArrayBuffer> {
+    const decompressionStream = new (window as any).DecompressionStream(method);
+    const inputStream = new Response(compressed).body;
+    const decompressedStream = inputStream.pipeThrough(decompressionStream);
+    const decompressedArrayBuffer = await new Response(decompressedStream).arrayBuffer();
+
+    return decompressedArrayBuffer;
+  }
+
+
+  async encryptData(secretData: string, password: string): Promise<Uint8Array> {
     try {
+      let compressed = await this.compress(this.enc.encode(secretData), "deflate-raw");
       const salt = window.crypto.getRandomValues(new Uint8Array(16));
       const iv = window.crypto.getRandomValues(new Uint8Array(12));
       const passwordKey = await this.getPasswordKey(password);
@@ -24,7 +48,7 @@ export class Encryption {
           iv: iv,
         },
         aesKey,
-        this.enc.encode(secretData)
+        compressed
       );
 
       const encryptedContentArr = new Uint8Array(encryptedContent);
@@ -34,18 +58,17 @@ export class Encryption {
       buff.set(salt, 0);
       buff.set(iv, salt.byteLength);
       buff.set(encryptedContentArr, salt.byteLength + iv.byteLength);
-      const base64Buff = this.buff_to_base64(buff);
-      return base64Buff;
+      return buff
     } catch (e) {
       console.log(`Error - ${e}`);
-      return "";
+      return undefined;
     }
   }
 
 
-  async decryptData(encryptedData: string, password: string): Promise<string> {
+  async decryptData(encryptedData: Uint8Array, password: string): Promise<string> {
     try {
-      const encryptedDataBuff = this.base64_to_buf(encryptedData);
+      const encryptedDataBuff = encryptedData;
       const salt = encryptedDataBuff.slice(0, 16);
       const iv = encryptedDataBuff.slice(16, 16 + 12);
       const data = encryptedDataBuff.slice(16 + 12);
@@ -59,7 +82,9 @@ export class Encryption {
         aesKey,
         data
       );
-      return this.dec.decode(decryptedContent);
+
+      let decompressed = await this.decompress(decryptedContent, "deflate-raw");
+      return this.dec.decode(decompressed)
     } catch (e) {
       console.log(`Error - ${e}`);
       return "";
@@ -74,20 +99,6 @@ export class Encryption {
       return hexCode.padStart(2, '0');
     });
     return hexCodes.join('');
-  }
-
-
-  private buff_to_base64(buff: Iterable<number>): string {
-    return btoa(
-      new Uint8Array(buff).reduce(
-        (data, byte) => data + String.fromCharCode(byte), ''
-      )
-    );
-  }
-
-
-  private base64_to_buf(b64: string): Uint8Array {
-    return Uint8Array.from(atob(b64), (c) => c.charCodeAt(null));
   }
 
 
