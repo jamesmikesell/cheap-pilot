@@ -45,18 +45,25 @@
 
 
 <div>
-  Heading Current (compass / gps / [drift]):
-  {{sensorOrientation.heading.value.heading | number:'1.0-0'}} / {{gpsHeading | number:'1.0-0'}} /
-  [{{controllerPath.compassDriftDegrees | number:'1.0-0'}}]
+  Head. Cur. &nbsp;
+  <span class="heading-degrees">{{sensorOrientation.heading.value.heading | number:'1.0-0'}}</span>°<sub>cmps.</sub>
+  &nbsp;
+  <span class="heading-degrees">{{gpsHeading | number:'1.0-0'}}</span>°<sub>GPS</sub>
+  &nbsp;
+  <span class="heading-degrees">{{controllerPath.compassDriftDegrees | number:'1.0-0'}}</span>°<sub>drift</sub>
   <br>
-  Heading Desired (compass / gps):
-  {{controllerOrientation.desired | number:'1.0-0'}} / {{controllerPath.desiredHeadingToDestination| number:'1.0-0'}}
+  Head. Des.&nbsp;
+  <span class="heading-degrees">{{controllerOrientation.desired | number:'1.0-0'}}</span>°<sub>cmps.</sub>
+  &nbsp;
+  <span class="heading-degrees">{{controllerPath.desiredHeadingToDestination| number:'1.0-0'}}</span>°<sub>GPS</sub>
+
   <br>
-  Controllers: Rotation: {{controllerRotationRate.enabled ? "on" : "off"}}
-  Orientation: {{controllerOrientation.enabled ? "on" : "off"}}
-  Path: {{controllerPath.enabled ? "on" : "off"}}
+  Speed &nbsp;<span class="speed">{{speedKts | number:'1.2-2'}}</span><sub>kts</sub>
   <br>
-  Speed (kt): {{speedKts | number:'1.2-2'}} <br>
+  Controllers: Rot. [{{controllerRotationRate.enabled ? "on" : "off"}}]
+  Orient. [{{controllerOrientation.enabled ? "on" : "off"}}]
+  Path [{{controllerPath.enabled ? "on" : "off"}}]
+  <br>
 </div>
 
 
