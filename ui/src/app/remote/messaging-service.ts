@@ -14,12 +14,15 @@ export class MessagingService {
   private lastCheckPassword: string;
   private hashedTopicsHandlers = new Map<string, (payload: any) => void>();
   private clearTopicsHandlers = new Map<string, (payload: any) => void>();
+  private readonly MAX_MESSAGE_AGE_SECONDS = 30;
+  private receivedMessageKeys = new Map<string, Date>();
 
   constructor(
     private configService: ConfigService,
   ) {
     timer(0, 1000)
       .subscribe(async () => {
+        this.purgeOldMessageKeys();
         if (this.configService.config.remoteReceiverMode != undefined) {
           this.connectOrRepair();
         } else {
@@ -29,9 +32,22 @@ export class MessagingService {
   }
 
 
+  private purgeOldMessageKeys() {
+    this.receivedMessageKeys.forEach((date, key) => {
+      if ((Date.now() - date.getTime()) > this.MAX_MESSAGE_AGE_SECONDS * 1000)
+        this.receivedMessageKeys.delete(key);
+    });
+  }
+
+
   async sendMessage(topic: string, payload: any): Promise<void> {
     let currentPassword = this.configService.config.remotePassword;
-    let encryptedDto = await this.encryption.encryptData(JSON.stringify({ payload: payload }), currentPassword);
+    let wrappedMessage: MessageWrapper = {
+      payload: payload,
+      transmissionTime: Date.now(),
+      messageKey: `${Date.now()}|${Math.random()}`
+    }
+    let encryptedDto = await this.encryption.encryptData(JSON.stringify(wrappedMessage), currentPassword);
     let hashedTopic = await this.hashTopic(currentPassword, topic)
     this.client.publish(hashedTopic, encryptedDto as any);
   }
@@ -99,7 +115,17 @@ export class MessagingService {
 
 
   private async handleMessage(hashedTopic: string, encryptedPayload: Uint8Array): Promise<void> {
-    let payload = JSON.parse(await this.encryption.decryptData(encryptedPayload, this.configService.config.remotePassword));
+    let payload: MessageWrapper = JSON.parse(await this.encryption.decryptData(encryptedPayload, this.configService.config.remotePassword));
+    if ((Date.now() - payload.transmissionTime) > this.MAX_MESSAGE_AGE_SECONDS * 1000) {
+      console.log("stale message received, ignoring")
+      return;
+    }
+    if (this.receivedMessageKeys.has(payload.messageKey)) {
+      console.log("duplicate message received, ignoring")
+      return;
+    }
+
+    this.receivedMessageKeys.set(payload.messageKey, new Date(payload.transmissionTime))
 
     let topicHandler = this.hashedTopicsHandlers.get(hashedTopic);
     if (topicHandler)
@@ -117,3 +143,9 @@ export class MessagingService {
 
 }
 
+
+interface MessageWrapper {
+  payload: any;
+  transmissionTime: number;
+  messageKey: string;
+}
