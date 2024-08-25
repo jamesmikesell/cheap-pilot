@@ -14,6 +14,7 @@ import { WakeLockService } from 'src/app/service/wake-lock.service';
 import { CoordinateUtils } from 'src/app/utils/coordinate-utils';
 import { UnitConverter } from 'src/app/utils/unit-converter';
 import { AppChartData } from '../chart/chart.component';
+import { DisplayStats } from '../display-stats/display-stats.component';
 
 @Component({
   selector: 'app-test',
@@ -33,6 +34,7 @@ export class TestComponent implements OnInit {
   RemoteReceiverMode = RemoteReceiverMode;
   speedKts = 0;
   gpsHeading: number;
+  displayStatsConfig: DisplayStats;
 
   private motorControllerService: Controller<number> & ConnectableDevice;
 
@@ -62,7 +64,10 @@ export class TestComponent implements OnInit {
 
 
     timer(0, 1 * 250)
-      .subscribe(() => this.updateCharts());
+      .subscribe(() => {
+        this.updateCharts()
+        this.updateDisplayStats();
+      });
   }
 
 
@@ -90,6 +95,24 @@ export class TestComponent implements OnInit {
     return !!document.fullscreenElement;
   }
 
+
+  updateDisplayStats() {
+    this.displayStatsConfig = {
+      headingCurrentCompass: this.sensorOrientation.heading.value.heading,
+      headingCurrentGps: this.gpsHeading,
+      headingCurrentDrift: this.controllerPath.compassDriftDegrees,
+
+      headingDesiredCompass: this.controllerOrientation.desired,
+      headingDesiredGps: this.controllerPath.desiredHeadingToDestination,
+
+      speedKts: this.speedKts,
+
+      controllerRotationRate: this.controllerRotationRate.enabled,
+      controllerOrientation: this.controllerOrientation.enabled,
+      controllerPath: this.controllerPath.enabled,
+
+    }
+  }
 
 
   private locationUpdated(locationData: GpsSensorData): void {

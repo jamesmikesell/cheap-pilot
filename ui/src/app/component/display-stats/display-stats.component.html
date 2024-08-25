@@ -1,0 +1,19 @@
+Head. Cur. &nbsp;
+<span class="heading-degrees">{{config?.headingCurrentCompass | number:'1.0-0'}}</span>°<sub>cmps.</sub>
+&nbsp;
+<span class="heading-degrees">{{config?.headingCurrentGps | number:'1.0-0'}}</span>°<sub>GPS</sub>
+&nbsp;
+<span class="heading-degrees">{{config?.headingCurrentDrift | number:'1.0-0'}}</span>°<sub>drift</sub>
+<br>
+Head. Des.&nbsp;
+<span class="heading-degrees">{{config?.headingDesiredCompass | number:'1.0-0'}}</span>°<sub>cmps.</sub>
+&nbsp;
+<span class="heading-degrees">{{config?.headingDesiredGps | number:'1.0-0'}}</span>°<sub>GPS</sub>
+
+<br>
+Speed &nbsp;<span class="speed">{{config?.speedKts | number:'1.2-2'}}</span><sub>kts</sub>
+<br>
+Controllers: Rot. [{{config?.controllerRotationRate ? "on" : "off"}}]
+Orient. [{{config?.controllerOrientation ? "on" : "off"}}]
+Path [{{config?.controllerPath ? "on" : "off"}}]
+<br>

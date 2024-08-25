@@ -26,6 +26,7 @@ import { MapComponent } from './component/map/map.component';
 import { NavBarComponent } from './component/nav-bar/nav-bar.component';
 import { RemoteControlComponent } from './component/remote-control/remote-control.component';
 import { TestComponent } from './component/test/test.component';
+import { DisplayStatsComponent } from './component/display-stats/display-stats.component';
 
 
 @NgModule({
@@ -38,6 +39,7 @@ import { TestComponent } from './component/test/test.component';
     MapComponent,
     RemoteControlComponent,
     NavBarComponent,
+    DisplayStatsComponent,
   ],
   imports: [
     BrowserModule,

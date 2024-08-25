@@ -45,25 +45,7 @@
 
 
 <div>
-  Head. Cur. &nbsp;
-  <span class="heading-degrees">{{sensorOrientation.heading.value.heading | number:'1.0-0'}}</span>°<sub>cmps.</sub>
-  &nbsp;
-  <span class="heading-degrees">{{gpsHeading | number:'1.0-0'}}</span>°<sub>GPS</sub>
-  &nbsp;
-  <span class="heading-degrees">{{controllerPath.compassDriftDegrees | number:'1.0-0'}}</span>°<sub>drift</sub>
-  <br>
-  Head. Des.&nbsp;
-  <span class="heading-degrees">{{controllerOrientation.desired | number:'1.0-0'}}</span>°<sub>cmps.</sub>
-  &nbsp;
-  <span class="heading-degrees">{{controllerPath.desiredHeadingToDestination| number:'1.0-0'}}</span>°<sub>GPS</sub>
-
-  <br>
-  Speed &nbsp;<span class="speed">{{speedKts | number:'1.2-2'}}</span><sub>kts</sub>
-  <br>
-  Controllers: Rot. [{{controllerRotationRate.enabled ? "on" : "off"}}]
-  Orient. [{{controllerOrientation.enabled ? "on" : "off"}}]
-  Path [{{controllerPath.enabled ? "on" : "off"}}]
-  <br>
+  <app-display-stats [config]="displayStatsConfig"></app-display-stats>
 </div>
 
 
