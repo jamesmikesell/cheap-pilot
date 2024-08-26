@@ -292,6 +292,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
             fillColor: '#f03',
             weight: 1,
             fillOpacity: 0.4,
+            interactive: false,
             radius: this.configService.config.waypointProximityMeters,
           }).addTo(this.map);
 
