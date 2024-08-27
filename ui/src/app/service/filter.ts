@@ -1,4 +1,5 @@
 import { NumberProvider, ProviderConverter } from "../types/providers";
+import { CoordinateUtils } from "../utils/coordinate-utils";
 
 export class LowPassFilter implements Filter {
   private cutoffFrequency: NumberProvider;
@@ -42,12 +43,12 @@ export class HeadingFilter implements Filter {
 
 
   process(headingDegrees: number, time: number): number {
-    let x = Math.cos(headingDegrees * Math.PI / 180);
-    let y = Math.sin(headingDegrees * Math.PI / 180);
+    let x = Math.cos(CoordinateUtils.toRadians(headingDegrees));
+    let y = Math.sin(CoordinateUtils.toRadians(headingDegrees));
     let xFiltered = this.xFilter.process(x, time);
     let yFiltered = this.yFilter.process(y, time);
 
-    return Math.atan2(yFiltered, xFiltered) * 180 / Math.PI;
+    return CoordinateUtils.toDegrees(Math.atan2(yFiltered, xFiltered));
   }
 }
 
