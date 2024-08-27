@@ -4,9 +4,8 @@ import { CoordinateUtils, LatLon } from '../utils/coordinate-utils';
 import { ConfigService } from './config.service';
 import { Controller } from './controller';
 import { ControllerOrientationService } from './controller-orientation.service';
+import { AngleLagCalculator } from './angle-lag-calculator';
 import { DeviceSelectService } from './device-select.service';
-import { HeadingFilter } from './filter';
-import { GpsSensorData } from './sensor-gps.service';
 import { OrientationSensor } from './sensor-orientation.service';
 
 @Injectable({
@@ -31,9 +30,6 @@ export class ControllerPathService implements Controller<LatLon[]> {
   private _desiredHeadingToDestination: number;
   private path: LatLon[] = [];
   private orientationSensor: OrientationSensor;
-  private lastUpdateTime: number;
-  private totalDistanceTraveled = 0;
-  private compassDriftFilter: HeadingFilter;
 
 
   constructor(
@@ -42,14 +38,19 @@ export class ControllerPathService implements Controller<LatLon[]> {
     configService: ConfigService,
   ) {
     this.orientationSensor = deviceSelectService.orientationSensor;
-    this.compassDriftFilter = new HeadingFilter({ getNumber: () => configService.config.minimumRequiredGpsAccuracyMeters / 3 })
+    const maxRecordTimeSeconds = 6 * 60;
+    let driftCalculator = new AngleLagCalculator(30, maxRecordTimeSeconds);
 
     deviceSelectService.gpsSensor.locationData
       .pipe(filter(data => !!data && data.heading != undefined))
       .subscribe(locationData => {
         // always calculate filtered drift, even if we're not navigating.
-        let filteredDrift = this.calculateFilteredHeadingDrift(locationData)
-        this.compassDriftDegrees = filteredDrift;
+        let compass = this.orientationSensor.heading.value.heading
+        let gps = locationData.heading
+        driftCalculator.add(compass, gps)
+
+        let filteredDrift = driftCalculator.getLagAdjustedAvgDeltaDegrees();
+        this.compassDriftDegrees = filteredDrift
 
         if (this.enabled && this.path && this.path.length) {
           let destination = this.path[0];
@@ -69,22 +70,6 @@ export class ControllerPathService implements Controller<LatLon[]> {
       })
   }
 
-
-  private calculateFilteredHeadingDrift(locationData: GpsSensorData): number {
-    let distanceSinceLastUpdate = 0;
-    if (this.lastUpdateTime) {
-      let deltaSeconds = (locationData.timestamp - this.lastUpdateTime) / 1000;
-      distanceSinceLastUpdate = locationData.speedMps * deltaSeconds;
-      this.totalDistanceTraveled += distanceSinceLastUpdate;
-    }
-    this.lastUpdateTime = locationData.timestamp;
-    // normally the lowpass filter is used to average changes over a given time period. However
-    // in this case we want to average the drift between the compass heading and the GPS location history
-    // heading over a given travel distance, not over a given time period.  Thus using total distance
-    // traveled in place of time.
-    let compassDrift = this.orientationSensor.heading.value.heading - locationData.heading;
-    return this.compassDriftFilter.process(compassDrift, this.totalDistanceTraveled);
-  }
 
 
   command(path: LatLon[]): void {
