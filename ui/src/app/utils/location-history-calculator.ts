@@ -18,7 +18,7 @@ export class LocationHistoryTracker {
 
   tryAddLocationToHistory(locationData: LocationData | GeolocationPosition) {
     if (locationData.coords.accuracy > this.minimumRequiredAccuracyMeters.getNumber()) {
-      console.log(`GPS accuracy ${locationData.coords.accuracy.toFixed(1)} is above ${this.minimumRequiredAccuracyMeters} meters, ignoring location`);
+      console.log(`GPS accuracy ${locationData.coords.accuracy.toFixed(1)} is above ${this.minimumRequiredAccuracyMeters.getNumber()} meters, ignoring location`);
       return;
     }
 
