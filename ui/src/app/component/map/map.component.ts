@@ -33,7 +33,9 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   private waypointCircles: L.Circle[] = [];
   private MAP_BASE_LAYER = "MAP_BASE_LAYER";
   private pathEditInProgress = false;
-  private historyPath: any;
+  private historyPath: L.Polyline;
+  private currentNavSegmentStart: L.LatLng;
+  private currentNavSegmentEnd: L.LatLng;
 
 
   constructor(
@@ -91,10 +93,19 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
   private updatePathFromSourceOtherThanMap(path: LatLon[]): void {
     let uiPath: L.LatLng[] = undefined;
-    if (path) {
+    if (path && path.length) {
       uiPath = path.map(single => new L.LatLng(single.latitude, single.longitude))
-      if (this.currentLocation)
-        uiPath.unshift(this.currentLocation);
+
+      if (!uiPath[0].equals(this.currentNavSegmentEnd)) {
+        this.currentNavSegmentStart = this.currentLocation;
+        this.currentNavSegmentEnd = uiPath[0];
+      }
+
+      if (this.currentNavSegmentStart)
+        uiPath.unshift(this.currentNavSegmentStart);
+    } else {
+      this.currentNavSegmentStart = undefined;
+      this.currentNavSegmentEnd = undefined;
     }
 
     this.clearAndDrawPath(uiPath)
@@ -242,8 +253,23 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
 
   private handlePathDrawingChanges = () => {
-    if (!this.pathEditInProgress)
+    if (!this.pathEditInProgress) {
+      if (this.pathDrawn) {
+        let navPoints = this.pathDrawn.getLatLngs() as L.LatLng[];
+        if (!navPoints[1].equals(this.currentNavSegmentEnd)) {
+          this.currentNavSegmentStart = this.currentLocation || navPoints[0].clone()
+          navPoints[0] = this.currentNavSegmentStart;
+          setTimeout(() => {
+            this.clearAndDrawPath(navPoints);
+          }, 0);
+        }
+
+        this.currentNavSegmentEnd = navPoints[1].clone();
+      }
+
       this.sendPathToController()
+    }
+
     this.redrawWaypointProximityCircles()
   }
 
