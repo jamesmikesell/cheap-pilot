@@ -23,7 +23,7 @@ export class MockBoatSensorAndTillerController {
   private tillerGainDegreesPerSecond = 0;
   private nextTillerDegreesPerSecond = 0;
   private previousTime: number;
-  private heading;
+  private heading: BehaviorSubject<HeadingAndTime>;
   private tillerAngle = -0.1;
   private connected = new BehaviorSubject<boolean>(false);
   private locationData = new BehaviorSubject<PositionWithNoise>(undefined);
@@ -57,7 +57,8 @@ export class MockBoatSensorAndTillerController {
 
         this.calculateGpsPosition(headingReal, now, dt);
 
-        const headingNoisy = headingReal + this.configService.config.simulationCompassDrift + (Math.random() - 0.5) * this.configService.config.simulationNoiseAmplitude;
+        let headingNoisy = headingReal + this.configService.config.simulationCompassDrift + (Math.random() - 0.5) * this.configService.config.simulationNoiseAmplitude;
+        headingNoisy = CoordinateUtils.normalizeHeading(headingNoisy);
         this.headingHistory.push({ real: headingReal, noisy: headingNoisy, time: now });
         if (this.headingHistory.length > 5) {
           this.headingHistory.shift();
