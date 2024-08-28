@@ -38,6 +38,11 @@ $night-primary: (
         )));
 
   @include mat.all-component-colors($app-night-theme);
+
+  .mat-drawer-backdrop.mat-drawer-shown {
+    visibility: visible;
+    background-color: rgb(0 0 0 / 33%);
+  }
 }
 
 
