@@ -61,7 +61,7 @@ $dark-theme-background-palette: (
 
 // Foreground palette for dark themes.
 $dark-theme-foreground-palette: (
-  base: #363636,
+  base: #878787,
   divider: $light-dividers,
   dividers: $light-dividers,
   disabled: $light-disabled-text,
@@ -70,10 +70,10 @@ $dark-theme-foreground-palette: (
   elevation: black,
   hint-text: $light-disabled-text,
   secondary-text: $light-secondary-text,
-  icon: #363636,
-  icons: #363636,
-  text: #363636,
-  slider-min: #363636,
+  icon: #878787,
+  icons: #878787,
+  text: #878787,
+  slider-min: #878787,
   slider-off: rgba(white, 0.3),
   slider-off-active: rgba(white, 0.3),
 );
