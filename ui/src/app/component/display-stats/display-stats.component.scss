@@ -17,3 +17,17 @@
 sub {
   font-size: x-small;
 }
+
+.double-line {
+  font-size: x-small;
+  display: inline-flex;
+  flex-flow: column;
+  align-items: flex-end;
+  vertical-align: bottom;
+}
+
+.status-icon {
+  font-size: 1.2em;
+  margin-bottom: -7px;
+  margin-left: 3px;
+}

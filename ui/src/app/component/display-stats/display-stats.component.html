@@ -1,19 +1,70 @@
-Head. Cur. &nbsp;
-<span class="heading-degrees">{{config?.headingCurrentCompass | number:'1.0-0'}}</span>°<sub>cmps.</sub>
+<span class="heading-degrees">{{config?.headingCurrentCompass | number:'1.0-0'}}</span>°
+<div class="double-line">
+  <div>crnt.</div>
+  <div>cmps.</div>
+</div>
+
 &nbsp;
-<span class="heading-degrees">{{config?.headingCurrentGps | number:'1.0-0'}}</span>°<sub>GPS</sub>
+<span class="heading-degrees">{{config?.headingCurrentGps | number:'1.0-0'}}</span>°
+<div class="double-line">
+  <div>crnt.</div>
+  <div>GPS</div>
+</div>
 &nbsp;
-<span class="heading-degrees">{{config?.headingCurrentDrift | number:'1.0-0'}}</span>°<sub>drift</sub>
-<br>
-Head. Des.&nbsp;
-<span class="heading-degrees">{{config?.headingDesiredCompass | number:'1.0-0'}}</span>°<sub>cmps.</sub>
-&nbsp;
-<span class="heading-degrees">{{config?.headingDesiredGps | number:'1.0-0'}}</span>°<sub>GPS</sub>
+<span class="speed">{{config?.speedKts | number:'1.2-2'}}</span>
+<div class="double-line">
+  <div></div>
+  <div>kts</div>
+</div>
 
 <br>
-Speed &nbsp;<span class="speed">{{config?.speedKts | number:'1.2-2'}}</span><sub>kts</sub>
+<span class="heading-degrees">{{config?.headingDesiredCompass | number:'1.0-0'}}</span>°
+<div class="double-line">
+  <div>des.</div>
+  <div>cmps.</div>
+</div>
+&nbsp;
+<span class="heading-degrees">{{config?.headingDesiredGps | number:'1.0-0'}}</span>°
+<div class="double-line">
+  <div>des.</div>
+  <div>GPS</div>
+</div>
+&nbsp;
+<span class="heading-degrees">{{config?.headingCurrentDrift | number:'1.0-0'}}</span>°
+<div class="double-line">
+  <div>avg.</div>
+  <div>drift</div>
+</div>
+
 <br>
-Controllers: Rot. [{{config?.controllerRotationRate ? "on" : "off"}}]
-Orient. [{{config?.controllerOrientation ? "on" : "off"}}]
-Path [{{config?.controllerPath ? "on" : "off"}}]
-<br>
+
+&nbsp;
+&nbsp;
+
+<div class="double-line">
+  <div>rot.</div>
+  <div>ctrl.</div>
+</div>
+<mat-icon class="material-icons-outlined status-icon">
+  {{config?.controllerRotationRate ? "light_mode" : "motion_photos_off" }}
+</mat-icon>
+
+&nbsp;
+
+<div class="double-line">
+  <div>orient.</div>
+  <div>ctrl.</div>
+</div>
+<mat-icon class="material-icons-outlined status-icon">
+  {{config?.controllerOrientation ? "light_mode" : "motion_photos_off" }}
+</mat-icon>
+
+&nbsp;
+
+<div class="double-line">
+  <div>path</div>
+  <div>ctrl.</div>
+</div>
+<mat-icon class="material-icons-outlined status-icon">
+  {{config?.controllerPath ? "light_mode" : "motion_photos_off" }}
+</mat-icon>
