@@ -70,7 +70,6 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
 
   ngOnDestroy(): void {
-    this.messageService.removeMessageHandler(RemoteMessageTopics.BROADCAST_UPDATE)
     this.destroy.next();
     this.destroy.complete();
   }
@@ -104,11 +103,12 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
   private configureBroadcastUpdate(): void {
     this.messageService
-      .setMessageHandler(RemoteMessageTopics.BROADCAST_UPDATE,
-        payload => {
-          let message = plainToInstance(Update, payload);
-          this.remoteUpdateReceived(message.path)
-        })
+      .getMessagesForTopic(RemoteMessageTopics.BROADCAST_UPDATE)
+      .pipe(takeUntil(this.destroy))
+      .subscribe(payload => {
+        let message = plainToInstance(Update, payload);
+        this.remoteUpdateReceived(message.path)
+      })
   }
 
 

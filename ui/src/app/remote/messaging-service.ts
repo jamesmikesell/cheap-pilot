@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import mqtt from "mqtt";
-import { timer } from "rxjs";
+import { Subject, timer } from "rxjs";
 import { ConfigService } from "../service/config.service";
 import { Encryption } from "./encryption";
 
@@ -12,8 +12,8 @@ export class MessagingService {
   private client: mqtt.MqttClient;
   private readonly encryption = new Encryption();
   private lastCheckPassword: string;
-  private hashedTopicsHandlers = new Map<string, (payload: any) => void>();
-  private clearTopicsHandlers = new Map<string, (payload: any) => void>();
+  private hashedTopicsHandlers = new Map<string, Subject<any>>();
+  private clearTopicsHandlers = new Map<string, Subject<any>>();
   private readonly MAX_MESSAGE_AGE_SECONDS = 30;
   private receivedMessageKeys = new Map<string, Date>();
 
@@ -53,15 +53,15 @@ export class MessagingService {
   }
 
 
-  setMessageHandler(topic: string, handler: (payload: any) => void): void {
-    this.clearTopicsHandlers.set(topic, handler)
-    this.resetSubscriptions();
-  }
+  getMessagesForTopic(topic: string): Subject<any> {
+    if (this.clearTopicsHandlers.has(topic))
+      return this.clearTopicsHandlers.get(topic);
 
-
-  removeMessageHandler(topic: string): void {
-    this.clearTopicsHandlers.delete(topic)
+    let subject = new Subject<any>();
+    this.clearTopicsHandlers.set(topic, subject)
     this.resetSubscriptions();
+
+    return subject;
   }
 
 
@@ -129,7 +129,7 @@ export class MessagingService {
 
     let topicHandler = this.hashedTopicsHandlers.get(hashedTopic);
     if (topicHandler)
-      topicHandler(payload.payload);
+      topicHandler.next(payload.payload);
     else
       console.error("Unknown topic", hashedTopic)
   }
