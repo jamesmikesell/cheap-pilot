@@ -23,6 +23,9 @@
             "index": "src/index.html",
             "allowedCommonJsDependencies": [
               "leaflet",
+              "reflect-metadata",
+              "leaflet-editable",
+              "leaflet.locatecontrol",
               "leaflet-providers"
             ],
             "polyfills": [
