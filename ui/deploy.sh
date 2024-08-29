@@ -9,7 +9,7 @@ if [ -z "$(git status --porcelain)" ]; then
   rm -rf dist
   echo "export class AppVersion { static readonly VERSION = \""$(git rev-parse --short HEAD)"\"; }">src/app/app-version.ts
   npm run build
-  mv dist/ui ../docs
+  mv dist/ui/browser ../docs
 
   git add -A
   git commit -m "build(deploy): deploying "$(git rev-parse --short HEAD)
