@@ -1,0 +1,51 @@
+.map-div {
+  height: 100dvh;
+}
+
+.display-stats {
+  position: absolute;
+  z-index: 1000;
+  width: 100%;
+  padding-left: auto;
+  display: flex;
+  justify-content: center;
+}
+
+.stats-card {
+  padding: 5px;
+  margin-top: 6px;
+  margin-right: 14px;
+}
+
+.bottom-overlay-card {
+  padding: 5px;
+}
+
+.manual-control-overlay {
+  position: fixed;
+  z-index: 1001;
+  bottom: 5px;
+  left: 5px;
+
+  margin-right: 47px;
+}
+
+.remote {
+  margin-top: 20px;
+}
+
+.manual-controls>button {
+  padding-top: 30px;
+  padding-bottom: 28px;
+  margin-top: 10px;
+}
+
+.center-controls {
+  display: flex;
+  place-content: space-around;
+}
+
+.heading-button-container {
+  margin-top: 20px;
+  margin-bottom: 15px;
+}

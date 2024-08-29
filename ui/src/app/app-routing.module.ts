@@ -1,16 +1,20 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { FullScreenMapComponent } from './component/full-screen-map/full-screen-map.component';
 import { TestComponent } from './component/test/test.component';
-import { ConfigComponent } from './component/config/config.component';
 
 const routes: Routes = [
   {
     path: '',
-    component: TestComponent
+    component: FullScreenMapComponent
   },
   {
     path: 'config',
-    component: ConfigComponent
+    component: TestComponent
+  },
+  {
+    path: 'full-map',
+    component: FullScreenMapComponent
   },
 ];
 

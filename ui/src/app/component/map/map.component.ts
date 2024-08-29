@@ -4,7 +4,7 @@ import * as L from 'leaflet';
 import 'leaflet-editable';
 import 'leaflet-providers';
 import 'leaflet.locatecontrol';
-import { filter } from 'rxjs';
+import { filter, Subject, takeUntil } from 'rxjs';
 import { Update } from 'src/app/remote/message-dtos';
 import { MessagingService } from 'src/app/remote/messaging-service';
 import { RemoteMessageTopics } from 'src/app/remote/receiver-service';
@@ -14,6 +14,8 @@ import { DeviceSelectService } from 'src/app/service/device-select.service';
 import { PathHistoryDedupeService } from 'src/app/service/path-history-dedupe-service';
 import { ThemeService } from 'src/app/service/theme-service';
 import { CoordinateUtils, LatLon } from 'src/app/utils/coordinate-utils';
+import { MapControlConnect } from './map-control-connect';
+import { MapControlMenu } from './map-control-menu';
 
 
 @Component({
@@ -36,6 +38,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   private historyPath: L.Polyline;
   private currentNavSegmentStart: L.LatLng;
   private currentNavSegmentEnd: L.LatLng;
+  private destroy = new Subject<void>();
 
 
   constructor(
@@ -45,13 +48,20 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     private messageService: MessagingService,
     public themeService: ThemeService,
     private pathHistoryService: PathHistoryDedupeService,
-  ) { }
+    private mapControlConnect: MapControlConnect,
+    private mapControlMenu: MapControlMenu,
+  ) {
+  }
 
 
   ngAfterViewInit(): void {
-    this.map = L.map(this.uxMap.nativeElement, { editable: true, }).setView([0, 0], 0)
+    this.map = L.map(this.uxMap.nativeElement, { editable: true, zoomControl: false, }).setView([0, 0], 0)
+    this.setCurrentLocation();
+    this.configureZoomControl();
+    this.configureAppMenuControl();
     this.configureUpdatesFromController();
     this.configureBaseMaps();
+    this.configureConnection();
     this.addEditControls();
     this.addLocateControl();
     this.configureUpdatesFromGps();
@@ -61,6 +71,34 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.messageService.removeMessageHandler(RemoteMessageTopics.BROADCAST_UPDATE)
+    this.destroy.next();
+    this.destroy.complete();
+  }
+
+
+  private setCurrentLocation() {
+    let currentLocation = this.deviceSelectionService.gpsSensor.locationData.value
+    if (currentLocation)
+      this.currentLocation = new L.LatLng(currentLocation.coords.latitude, currentLocation.coords.longitude)
+  }
+
+
+  private configureZoomControl(): void {
+    L.control.zoom({
+      position: 'bottomright'
+    }).addTo(this.map);
+  }
+
+
+  private configureAppMenuControl(): void {
+    let control = this.mapControlMenu.getControl();
+    this.map.addControl(new control({ position: 'topleft' }));
+  }
+
+
+  private configureConnection(): void {
+    let control = this.mapControlConnect.getControl(this.destroy);
+    this.map.addControl(new control({ position: 'topright' }));
   }
 
 
@@ -113,19 +151,21 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
 
   private configureUpdatesFromController(): void {
-    this.controllerPath.pathSubscription.subscribe(path => this.updatePathFromSourceOtherThanMap(path))
+    this.controllerPath.pathSubscription
+      .pipe(takeUntil(this.destroy))
+      .subscribe(path => this.updatePathFromSourceOtherThanMap(path))
   }
 
 
   private configureBaseMaps(): void {
     let baseMaps = {
-      "Open Street Maps": L.tileLayer.provider('OpenStreetMap.Mapnik'),
-      "Esri Sat.": L.tileLayer.provider('Esri.WorldImagery', { className: "no-invert", maxNativeZoom: 19, maxZoom: 20 }),
-      "Esri Topo": L.tileLayer.provider('Esri.WorldTopoMap', { maxNativeZoom: 19, maxZoom: 20 }),
-      "USGS Topo": L.tileLayer.provider('USGS.USTopo', { maxNativeZoom: 16, maxZoom: 20 }),
-      "USGS Sat. w Topo": L.tileLayer.provider('USGS.USImageryTopo', { maxNativeZoom: 16, maxZoom: 20, className: "no-invert" }),
-      "USGS Sat.": L.tileLayer.provider('USGS.USImagery', { maxNativeZoom: 16, maxZoom: 20, className: "no-invert" }),
-      "Dark": L.tileLayer.provider('CartoDB.DarkMatter', { className: "no-invert" }),
+      "Open Street Maps": L.tileLayer.provider('OpenStreetMap.Mapnik', { updateWhenIdle: false }),
+      "Esri Sat.": L.tileLayer.provider('Esri.WorldImagery', { className: "no-invert", maxNativeZoom: 19, maxZoom: 20, updateWhenIdle: false }),
+      "Esri Topo": L.tileLayer.provider('Esri.WorldTopoMap', { maxNativeZoom: 19, maxZoom: 20, updateWhenIdle: false }),
+      "USGS Topo": L.tileLayer.provider('USGS.USTopo', { maxNativeZoom: 16, maxZoom: 20, updateWhenIdle: false }),
+      "USGS Sat. w Topo": L.tileLayer.provider('USGS.USImageryTopo', { maxNativeZoom: 16, maxZoom: 20, className: "no-invert", updateWhenIdle: false }),
+      "USGS Sat.": L.tileLayer.provider('USGS.USImagery', { maxNativeZoom: 16, maxZoom: 20, className: "no-invert", updateWhenIdle: false }),
+      "Dark": L.tileLayer.provider('CartoDB.DarkMatter', { className: "no-invert", updateWhenIdle: false }),
     }
 
     // set displayed map
@@ -148,6 +188,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
   private configureUpdatesFromGps(): void {
     this.deviceSelectionService.gpsSensor.locationData
+      .pipe(takeUntil(this.destroy))
       .pipe(filter(locationData => !!locationData))
       .subscribe(location => {
         let distanceSinceLast: number
@@ -226,7 +267,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
           }
         },
         kind: 'line',
-        html: '\\/\\',
+        html: '<span class="material-icons">route</span>',
       }
     });
 
@@ -353,3 +394,5 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   }
 
 }
+
+export type ControlType = (new (...args: any[]) => { onAdd: () => HTMLDivElement; }) & typeof L.Control

@@ -1,21 +1,6 @@
-<div class="connect-container">
-  <div class="input-list">
-    <button *ngIf="!btConnected" mat-raised-button color="primary" (click)="initBluetooth()"
-      [disabled]="configService.config.remoteReceiverMode === RemoteReceiverMode.REMOTE">
-      {{configService.config.remoteReceiverMode !== RemoteReceiverMode.REMOTE ? "Connect" : "Remote Control" }}
-    </button>
-    <button mat-raised-button color="primary" (click)="toggleFullScreen()">
-      {{isInFullscreenMode() ? "Exit Full Screen" : "Full Screen" }}
-    </button>
-    <button mat-raised-button color="primary" (click)="blackoutScreen = true">Blackout</button>
-  </div>
+<div class="map-div">
+  <app-map></app-map>
 </div>
-
-<app-blackout *ngIf="blackoutScreen" (click)="blackoutScreen = false"></app-blackout>
-
-
-
-<app-map></app-map>
 
 
 <div>
@@ -40,14 +25,15 @@
 </div>
 
 
-<app-remote-control *ngIf="this.configService.config.remoteReceiverMode === RemoteReceiverMode.REMOTE">
-</app-remote-control>
-
-
-<div>
-  <app-display-stats [config]="displayStatsConfig"></app-display-stats>
+<div style="margin-bottom: 20px;">
+  <app-remote-control *ngIf="configService.config.remoteReceiverMode === RemoteReceiverMode.REMOTE">
+  </app-remote-control>
 </div>
 
+
+<div class="stats-container">
+  <app-display-stats-device-sensors></app-display-stats-device-sensors>
+</div>
 
 
 <div class="charts">

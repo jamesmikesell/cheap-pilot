@@ -61,7 +61,10 @@ export class ControllerPathService implements Controller<LatLon[]> {
 
           if (distanceToTarget < configService.config.waypointProximityMeters) {
             this.path.shift()
-            this.pathUpdated();
+            if (this.path.length === 0)
+              this.stop();
+            else
+              this.pathUpdated();
           }
 
           let correctedDestinationCompassHeading = CoordinateUtils.normalizeHeading(bearingToTarget + filteredDrift)
@@ -79,12 +82,16 @@ export class ControllerPathService implements Controller<LatLon[]> {
 
 
   private pathUpdated(): void {
-    this.pathSubscription.next(JSON.parse(JSON.stringify(this.path)));
+    if (this.path)
+      this.pathSubscription.next(JSON.parse(JSON.stringify(this.path)));
+    else
+      this.pathSubscription.next(undefined);
   }
 
 
   stop(): void {
     this.path = undefined;
+    this.enabled = false;
     this.pathUpdated();
   }
 

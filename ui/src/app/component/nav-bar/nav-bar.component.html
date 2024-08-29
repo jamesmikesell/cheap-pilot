@@ -2,42 +2,68 @@
   <mat-sidenav #drawer class="sidenav" fixedInViewport>
     <mat-toolbar>Menu</mat-toolbar>
     <mat-nav-list>
+      <a mat-list-item routerLink="/full-map" (click)="drawer.toggle()">
+        <mat-icon>
+          map
+        </mat-icon>
+        Main
+      </a>
+      <a mat-list-item routerLink="/config" (click)="drawer.toggle()">
+        <mat-icon>
+          settings
+        </mat-icon>
+        Config
+      </a>
       <a mat-list-item (click)="themeService.theme = AppThemeNames.LIGHT">
         Light Mode
-        <mat-icon *ngIf="(themeService.themeSubscription | async).name === AppThemeNames.LIGHT">
+        <mat-icon *ngIf="(themeService.themeSubscription | async).name === AppThemeNames.LIGHT" class="icon-suffix">
           check_box
         </mat-icon>
-        <mat-icon *ngIf="(themeService.themeSubscription | async).name !== AppThemeNames.LIGHT">
+        <mat-icon *ngIf="(themeService.themeSubscription | async).name !== AppThemeNames.LIGHT" class="icon-suffix">
           check_box_outline_blank
         </mat-icon>
       </a>
       <a mat-list-item (click)="themeService.theme = AppThemeNames.DARK">
         Dark Mode
-        <mat-icon *ngIf="(themeService.themeSubscription | async).name === AppThemeNames.DARK">
+        <mat-icon *ngIf="(themeService.themeSubscription | async).name === AppThemeNames.DARK" class="icon-suffix">
           check_box
         </mat-icon>
-        <mat-icon *ngIf="(themeService.themeSubscription | async).name !== AppThemeNames.DARK">
+        <mat-icon *ngIf="(themeService.themeSubscription | async).name !== AppThemeNames.DARK" class="icon-suffix">
           check_box_outline_blank
         </mat-icon>
       </a>
       <a mat-list-item (click)="themeService.theme = AppThemeNames.NIGHT">
         Night Mode
-        <mat-icon *ngIf="(themeService.themeSubscription | async).name === AppThemeNames.NIGHT">
+        <mat-icon *ngIf="(themeService.themeSubscription | async).name === AppThemeNames.NIGHT" class="icon-suffix">
           check_box
         </mat-icon>
-        <mat-icon *ngIf="(themeService.themeSubscription | async).name !== AppThemeNames.NIGHT">
+        <mat-icon *ngIf="(themeService.themeSubscription | async).name !== AppThemeNames.NIGHT" class="icon-suffix">
           check_box_outline_blank
         </mat-icon>
       </a>
       <a mat-list-item [disabled]="!(themeService.themeSubscription | async).theme.isDark" (click)="invertMap()">
         Allow Dark Maps
-        <mat-icon *ngIf="themeService.allowMapInversionSubscription | async">check_box</mat-icon>
-        <mat-icon *ngIf="!(themeService.allowMapInversionSubscription | async)">check_box_outline_blank</mat-icon>
+        <mat-icon *ngIf="themeService.allowMapInversionSubscription | async" class="icon-suffix">check_box</mat-icon>
+        <mat-icon *ngIf="!(themeService.allowMapInversionSubscription | async)" class="icon-suffix">
+          check_box_outline_blank
+        </mat-icon>
+      </a>
+      <a mat-list-item (click)="toggleFullScreen(); drawer.toggle()">
+        <mat-icon>
+          {{isInFullscreenMode() ? "close_fullscreen" : "fullscreen" }}
+        </mat-icon>
+        {{isInFullscreenMode() ? "Exit Full Screen" : "Full Screen" }}
+      </a>
+      <a mat-list-item (click)="blackoutScreen = true; drawer.toggle()">
+        <mat-icon>
+          visibility_off
+        </mat-icon>
+        Blackout
       </a>
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>
-    <mat-toolbar color="primary">
+    <mat-toolbar color="primary" *ngIf="navBarService.showNavBar">
       <button type="button" aria-label="Toggle sidenav" mat-icon-button (click)="drawer.toggle()">
         <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
       </button>
@@ -57,3 +83,5 @@
     </div>
   </mat-sidenav-content>
 </mat-sidenav-container>
+
+<app-blackout *ngIf="blackoutScreen" (click)="blackoutScreen = false"></app-blackout>

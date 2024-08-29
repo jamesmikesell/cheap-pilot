@@ -34,6 +34,8 @@ export class ReceiverService {
 
   private maintainHeading(_payload: string): void {
     if (this.configService.config.remoteReceiverMode === RemoteReceiverMode.RECEIVER) {
+      this.controllerPath.stop();
+
       this.controllerOrientation.enabled = true;
       this.controllerOrientation.maintainCurrentHeading();
       this.dataLog.clearLogData();
@@ -42,26 +44,34 @@ export class ReceiverService {
 
 
   private moveManually(level: number): void {
-    if (this.controllerOrientation.enabled) {
-      this.controllerOrientation.command((this.controllerOrientation.desired - (level * 5)) % 360);
-    } else {
-      this.controllerRotationRate.enabled = true;
-      this.controllerRotationRate.command(this.controllerRotationRate.desired + level);
+    if (this.configService.config.remoteReceiverMode === RemoteReceiverMode.RECEIVER) {
+      this.controllerPath.stop();
+
+      if (this.controllerOrientation.enabled) {
+        this.controllerOrientation.command((this.controllerOrientation.desired - (level * 5)) % 360);
+      } else {
+        this.controllerRotationRate.enabled = true;
+        this.controllerRotationRate.command(this.controllerRotationRate.desired + level);
+      }
     }
   }
 
 
   private stopManually(): void {
-    this.controllerRotationRate.cancelPidTune();
-    this.controllerOrientation.cancelPidTune();
+    if (this.configService.config.remoteReceiverMode === RemoteReceiverMode.RECEIVER) {
+      this.controllerPath.stop();
 
-    if (this.controllerOrientation.enabled)
-      this.controllerOrientation.enabled = false;
+      this.controllerRotationRate.cancelPidTune();
+      this.controllerOrientation.cancelPidTune();
 
-    if (this.controllerRotationRate.enabled && this.controllerRotationRate.desired === 0)
-      this.controllerRotationRate.enabled = false;
+      if (this.controllerOrientation.enabled)
+        this.controllerOrientation.enabled = false;
 
-    this.controllerRotationRate.command(0)
+      if (this.controllerRotationRate.enabled && this.controllerRotationRate.desired === 0)
+        this.controllerRotationRate.enabled = false;
+
+      this.controllerRotationRate.command(0)
+    }
   }
 
 

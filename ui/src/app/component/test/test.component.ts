@@ -1,5 +1,5 @@
-import { Component, HostListener, OnInit } from '@angular/core';
-import { filter, timer } from 'rxjs';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { filter, Subject, takeUntil, timer } from 'rxjs';
 import { ConfigService, RemoteReceiverMode } from 'src/app/service/config.service';
 import { Controller } from 'src/app/service/controller';
 import { ConnectableDevice } from 'src/app/service/controller-bt-motor.service';
@@ -10,18 +10,16 @@ import { DataLogService } from 'src/app/service/data-log.service';
 import { DeviceSelectService } from 'src/app/service/device-select.service';
 import { GpsSensor, GpsSensorData } from 'src/app/service/sensor-gps.service';
 import { OrientationSensor } from 'src/app/service/sensor-orientation.service';
-import { WakeLockService } from 'src/app/service/wake-lock.service';
 import { CoordinateUtils } from 'src/app/utils/coordinate-utils';
 import { UnitConverter } from 'src/app/utils/unit-converter';
 import { AppChartData } from '../chart/chart.component';
-import { DisplayStats } from '../display-stats/display-stats.component';
 
 @Component({
   selector: 'app-test',
   templateUrl: './test.component.html',
   styleUrls: ['./test.component.scss']
 })
-export class TestComponent implements OnInit {
+export class TestComponent implements OnInit, OnDestroy {
   chartOrientation: AppChartData[] = [];
   chartDataRotationRate: AppChartData[] = [];
   chartNavigation: AppChartData[] = [];
@@ -29,18 +27,14 @@ export class TestComponent implements OnInit {
   btConnected = false;
   sensorOrientation: OrientationSensor;
   sensorLocation: GpsSensor;
-  blackoutScreen = false;
   UnitConverter = UnitConverter;
   RemoteReceiverMode = RemoteReceiverMode;
-  speedKts = 0;
-  gpsHeading: number;
-  displayStatsConfig: DisplayStats;
 
   private motorControllerService: Controller<number> & ConnectableDevice;
+  private destroy = new Subject<void>();
 
 
   constructor(
-    private wakeLockService: WakeLockService,
     public controllerRotationRate: ControllerRotationRateService,
     public controllerOrientation: ControllerOrientationService,
     deviceSelectService: DeviceSelectService,
@@ -58,60 +52,31 @@ export class TestComponent implements OnInit {
   ngOnInit(): void {
     this.sensorLocation.locationData
       .pipe(filter(locationData => !!locationData))
+      .pipe(takeUntil(this.destroy))
       .subscribe(locationData => this.locationUpdated(locationData));
 
-    this.motorControllerService.connected.subscribe(isConnected => this.btConnected = isConnected);
+    this.motorControllerService.connected
+      .pipe(takeUntil(this.destroy))
+      .subscribe(isConnected => this.btConnected = isConnected);
 
 
     timer(0, 1 * 250)
+      .pipe(takeUntil(this.destroy))
       .subscribe(() => {
         this.updateCharts()
-        this.updateDisplayStats();
       });
   }
 
 
-  @HostListener('window:beforeunload')
-  onWindowReload(): void {
-    this.motorControllerService.disconnect();
+  ngOnDestroy(): void {
+    this.destroy.next();
+    this.destroy.complete();
   }
 
 
   clearGraphs(): void {
     this.dataLog.clearLogData();
     this.updateCharts();
-  }
-
-
-  toggleFullScreen(): void {
-    if (this.isInFullscreenMode())
-      document.exitFullscreen();
-    else
-      document.documentElement.requestFullscreen();
-  }
-
-
-  isInFullscreenMode(): boolean {
-    return !!document.fullscreenElement;
-  }
-
-
-  updateDisplayStats() {
-    this.displayStatsConfig = {
-      headingCurrentCompass: this.sensorOrientation.heading.value.heading,
-      headingCurrentGps: this.gpsHeading,
-      headingCurrentDrift: this.controllerPath.compassDriftDegrees,
-
-      headingDesiredCompass: this.controllerOrientation.desired,
-      headingDesiredGps: this.controllerPath.desiredHeadingToDestination,
-
-      speedKts: this.speedKts,
-
-      controllerRotationRate: this.controllerRotationRate.enabled,
-      controllerOrientation: this.controllerOrientation.enabled,
-      controllerPath: this.controllerPath.enabled,
-
-    }
   }
 
 
@@ -122,9 +87,6 @@ export class TestComponent implements OnInit {
       UnitConverter.mpsToKts(locationData.speedMps),
       locationData.heading,
     )
-
-    this.speedKts = UnitConverter.mpsToKts(locationData.speedMps);
-    this.gpsHeading = locationData.heading;
 
     this.dataLog.logLocation(logData);
   }
@@ -183,13 +145,6 @@ export class TestComponent implements OnInit {
     this.controllerOrientation.enabled = true;
     this.controllerOrientation.maintainCurrentHeading();
     this.dataLog.clearLogData();
-  }
-
-
-  async initBluetooth(): Promise<void> {
-    this.wakeLockService.wakeLock();
-
-    this.motorControllerService.connect();
   }
 
 
