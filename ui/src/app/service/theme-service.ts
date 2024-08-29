@@ -12,7 +12,10 @@ export class ThemeService {
   set theme(val: AppThemeNames) {
     let theme = this.getTheme(val);
     localStorage.setItem(this.THEME, "" + val);
-    localStorage.setItem("APP_RELOAD_BG_COLOR", theme.isDark ? "#171717" : "#fafafa");
+
+    let reloadBgColor = theme.isDark ? "#171717" : "#fafafa";
+    document.querySelector('meta[name="theme-color"]').setAttribute('content',  reloadBgColor);
+    localStorage.setItem("APP_RELOAD_BG_COLOR", reloadBgColor);
     this.themeSubscription.next({ name: val, theme: theme });
   }
 

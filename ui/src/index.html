@@ -23,8 +23,10 @@
 
 <script>
   let bgColor = localStorage.getItem("APP_RELOAD_BG_COLOR");
-  if (bgColor)
+  if (bgColor) {
     document.body.style.backgroundColor = bgColor;
+    document.querySelector('meta[name="theme-color"]').setAttribute('content', bgColor);
+  }
 </script>
 
 </html>
