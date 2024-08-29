@@ -104,7 +104,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
   private configureBroadcastUpdate(): void {
     this.messageService
-      .addMessageHandler(RemoteMessageTopics.BROADCAST_UPDATE,
+      .setMessageHandler(RemoteMessageTopics.BROADCAST_UPDATE,
         payload => {
           let message = plainToInstance(Update, payload);
           this.remoteUpdateReceived(message.path)

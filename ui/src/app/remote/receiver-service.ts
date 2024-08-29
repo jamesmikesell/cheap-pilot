@@ -22,11 +22,11 @@ export class ReceiverService {
     private controllerRotationRate: ControllerRotationRateService,
     private controllerPath: ControllerPathService,
   ) {
-    this.messageService.addMessageHandler(RemoteMessageTopics.MAINTAIN_CURRENT_HEADING, payload => this.maintainHeading(payload))
-    this.messageService.addMessageHandler(RemoteMessageTopics.MOVE_MANUALLY, payload => this.moveManually(payload))
-    this.messageService.addMessageHandler(RemoteMessageTopics.STOP_MANUALLY, () => this.stopManually())
-    this.messageService.addMessageHandler(RemoteMessageTopics.NAVIGATE_ROUTE, route => this.pathReceived(route))
-    this.messageService.addMessageHandler(RemoteMessageTopics.REQUEST_UPDATE, () => this.broadcastUpdate())
+    this.messageService.setMessageHandler(RemoteMessageTopics.MAINTAIN_CURRENT_HEADING, payload => this.maintainHeading(payload))
+    this.messageService.setMessageHandler(RemoteMessageTopics.MOVE_MANUALLY, payload => this.moveManually(payload))
+    this.messageService.setMessageHandler(RemoteMessageTopics.STOP_MANUALLY, () => this.stopManually())
+    this.messageService.setMessageHandler(RemoteMessageTopics.NAVIGATE_ROUTE, route => this.pathReceived(route))
+    this.messageService.setMessageHandler(RemoteMessageTopics.REQUEST_UPDATE, () => this.broadcastUpdate())
 
     this.controllerPath.pathSubscription.subscribe(() => this.broadcastUpdate());
   }

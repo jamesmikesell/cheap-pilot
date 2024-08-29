@@ -53,7 +53,7 @@ export class MessagingService {
   }
 
 
-  addMessageHandler(topic: string, handler: (payload: any) => void): void {
+  setMessageHandler(topic: string, handler: (payload: any) => void): void {
     this.clearTopicsHandlers.set(topic, handler)
     this.resetSubscriptions();
   }
