@@ -76,7 +76,7 @@ export class MessagingService {
 
   private async connectOrRepair(): Promise<void> {
     if (!this.client) {
-      this.client = mqtt.connect("wss://broker.hivemq.com:8884/mqtt");
+      this.client = mqtt.connect("wss://broker.hivemq.com:8884/mqtt", { queueQoSZero: false });
 
       this.client.on("message", async (hashedTopic, encryptedPayload) => {
         this.handleMessage(hashedTopic, encryptedPayload)
