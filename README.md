@@ -1,3 +1,3 @@
-# Tiller Pilot
+# Cheap Pilot
 
-Demo: <https://jamesmikesell.github.io/tiller-pilot/>
+Demo: <https://jamesmikesell.github.io/cheap-pilot/>
