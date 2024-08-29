@@ -6,14 +6,14 @@
 
 
 $color-config-light: (
-  color: (primary: mat.define-palette(mat.$indigo-palette),
-    accent: mat.define-palette(mat.$pink-palette, A200, A100, A400),
-    warn: mat.define-palette(mat.$red-palette),
+  color: (primary: mat.m2-define-palette(mat.$m2-indigo-palette),
+    accent: mat.m2-define-palette(mat.$m2-pink-palette, A200, A100, A400),
+    warn: mat.m2-define-palette(mat.$m2-red-palette),
   ),
-  typography: mat.define-typography-config(),
+  typography: mat.m2-define-typography-config(),
 );
 
-$light-theme: mat.define-light-theme($color-config-light);
+$light-theme: mat.m2-define-light-theme($color-config-light);
 @include mat.all-component-themes($light-theme);
 
 
@@ -30,8 +30,8 @@ $night-primary: (
 );
 
 .app-night-theme {
-  $app-night-primary: mat.define-palette($night-primary, 900, 800, 700);
-  $app-night-accent: mat.define-palette(mat.$pink-palette);
+  $app-night-primary: mat.m2-define-palette($night-primary, 900, 800, 700);
+  $app-night-accent: mat.m2-define-palette(mat.$m2-pink-palette);
 
   $app-night-theme: app.define-dark-theme((color: (primary: $app-night-primary,
           accent: $app-night-accent,
@@ -48,15 +48,15 @@ $night-primary: (
 
 
 $color-config-dark: (
-  color: (primary: mat.define-palette(mat.$indigo-palette),
-    accent: mat.define-palette(mat.$pink-palette, A200, A100, A400),
-    warn: mat.define-palette(mat.$red-palette),
+  color: (primary: mat.m2-define-palette(mat.$m2-indigo-palette),
+    accent: mat.m2-define-palette(mat.$m2-pink-palette, A200, A100, A400),
+    warn: mat.m2-define-palette(mat.$m2-red-palette),
   ),
-  typography: mat.define-typography-config(),
+  typography: mat.m2-define-typography-config(),
 );
 
 .app-dark-theme {
-  $dark-theme: mat.define-dark-theme($color-config-dark);
+  $dark-theme: mat.m2-define-dark-theme($color-config-dark);
   @include mat.all-component-colors($dark-theme);
 }
 

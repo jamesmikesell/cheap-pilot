@@ -4,7 +4,7 @@
 
 
 @function define-dark-theme($config) {
-  $theme: mat.define-dark-theme($config);
+  $theme: mat.m2-define-dark-theme($config);
   $color: map.get($theme, color);
   $color: map.merge($color,
       (background: palette.$dark-theme-background-palette,
