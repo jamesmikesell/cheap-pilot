@@ -21,6 +21,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BlackoutComponent } from './component/blackout/blackout.component';
 import { ChartComponent } from './component/chart/chart.component';
+import { ConfigPageComponent } from './component/config-page/config-page.component';
 import { ConfigComponent } from './component/config/config.component';
 import { DisplayStatsDeviceSensorsComponent } from './component/display-stats-device-sensors/display-stats-device-sensors.component';
 import { DisplayStatsRemoteComponent } from './component/display-stats-remote/display-stats-remote.component';
@@ -29,13 +30,12 @@ import { FullScreenMapComponent } from './component/full-screen-map/full-screen-
 import { MapComponent } from './component/map/map.component';
 import { NavBarComponent } from './component/nav-bar/nav-bar.component';
 import { RemoteControlComponent } from './component/remote-control/remote-control.component';
-import { TestComponent } from './component/test/test.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
-    TestComponent,
+    ConfigPageComponent,
     ChartComponent,
     ConfigComponent,
     BlackoutComponent,

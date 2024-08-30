@@ -16,11 +16,11 @@ import { UnitConverter } from 'src/app/utils/unit-converter';
 import { AppChartData } from '../chart/chart.component';
 
 @Component({
-  selector: 'app-test',
-  templateUrl: './test.component.html',
-  styleUrls: ['./test.component.scss']
+  selector: 'app-config-page',
+  templateUrl: './config-page.component.html',
+  styleUrls: ['./config-page.component.scss']
 })
-export class TestComponent implements OnInit, OnDestroy {
+export class ConfigPageComponent implements OnInit, OnDestroy {
   chartOrientation: AppChartData[] = [];
   chartDataRotationRate: AppChartData[] = [];
   chartNavigation: AppChartData[] = [];

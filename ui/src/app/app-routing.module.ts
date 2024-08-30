@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { ConfigPageComponent } from './component/config-page/config-page.component';
 import { FullScreenMapComponent } from './component/full-screen-map/full-screen-map.component';
-import { TestComponent } from './component/test/test.component';
 
 const routes: Routes = [
   {
@@ -10,7 +10,7 @@ const routes: Routes = [
   },
   {
     path: 'config',
-    component: TestComponent
+    component: ConfigPageComponent
   },
   {
     path: 'full-map',

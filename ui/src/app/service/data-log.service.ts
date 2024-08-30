@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Subject, timer } from 'rxjs';
-import { LocationLogData } from '../component/test/test.component';
+import { LocationLogData } from '../component/config-page/config-page.component';
 import { DownloadService } from '../download.service';
 
 @Injectable({
