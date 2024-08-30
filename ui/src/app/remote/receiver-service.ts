@@ -1,12 +1,15 @@
 import { Injectable } from "@angular/core";
 import { instanceToPlain } from "class-transformer";
+import { distinctUntilChanged, map, skip, takeUntil, timer } from "rxjs";
 import { ConfigService, RemoteReceiverMode } from "../service/config.service";
 import { ControllerOrientationService } from "../service/controller-orientation.service";
 import { ControllerPathService } from "../service/controller-path.service";
 import { ControllerRotationRateService } from "../service/controller-rotation-rate.service";
 import { DataLogService } from "../service/data-log.service";
+import { DeviceSelectService } from "../service/device-select.service";
+import { DisplayStatsService } from "../service/display-stats.service";
 import { LatLon } from "../utils/coordinate-utils";
-import { Update } from "./message-dtos";
+import { PathUpdate, StatsBroadcast } from "./message-dtos";
 import { MessagingService } from "./messaging-service";
 
 @Injectable({
@@ -21,14 +24,55 @@ export class ReceiverService {
     private dataLog: DataLogService,
     private controllerRotationRate: ControllerRotationRateService,
     private controllerPath: ControllerPathService,
+    private displayStatsService: DisplayStatsService,
+    private deviceSelectionService: DeviceSelectService,
   ) {
-    this.messageService.getMessagesForTopic(RemoteMessageTopics.MAINTAIN_CURRENT_HEADING).subscribe(payload => this.maintainHeading(payload))
-    this.messageService.getMessagesForTopic(RemoteMessageTopics.MOVE_MANUALLY).subscribe(payload => this.moveManually(payload))
-    this.messageService.getMessagesForTopic(RemoteMessageTopics.STOP_MANUALLY).subscribe(() => this.stopManually())
-    this.messageService.getMessagesForTopic(RemoteMessageTopics.NAVIGATE_ROUTE).subscribe(route => this.pathReceived(route))
-    this.messageService.getMessagesForTopic(RemoteMessageTopics.REQUEST_UPDATE).subscribe(() => this.broadcastUpdate())
 
-    this.controllerPath.pathSubscription.subscribe(() => this.broadcastUpdate());
+    let isReceiverModeChanges = timer(500)
+      .pipe(map(() => this.configService.config.remoteReceiverMode === RemoteReceiverMode.RECEIVER))
+      .pipe(distinctUntilChanged())
+
+    isReceiverModeChanges.subscribe(inReceiverMode => {
+      if (inReceiverMode) {
+        this.messageService.getMessagesForTopic(RemoteMessageTopics.MAINTAIN_CURRENT_HEADING)
+          .pipe(takeUntil(isReceiverModeChanges.pipe(skip(1))))
+          .subscribe(payload => this.maintainHeading(payload))
+
+        this.messageService.getMessagesForTopic(RemoteMessageTopics.MOVE_MANUALLY)
+          .pipe(takeUntil(isReceiverModeChanges.pipe(skip(1))))
+          .subscribe(payload => this.moveManually(payload))
+
+        this.messageService.getMessagesForTopic(RemoteMessageTopics.STOP_MANUALLY)
+          .pipe(takeUntil(isReceiverModeChanges.pipe(skip(1))))
+          .subscribe(() => this.stopManually())
+
+        this.messageService.getMessagesForTopic(RemoteMessageTopics.NAVIGATE_ROUTE)
+          .pipe(takeUntil(isReceiverModeChanges.pipe(skip(1))))
+          .subscribe(route => this.pathReceived(route))
+
+        this.messageService.getMessagesForTopic(RemoteMessageTopics.REQUEST_UPDATE)
+          .pipe(takeUntil(isReceiverModeChanges.pipe(skip(1))))
+          .subscribe(() => this.broadcastPathUpdate())
+      }
+    })
+
+    this.controllerPath.pathSubscription
+      .subscribe(() => this.broadcastPathUpdate());
+
+    timer(1000, 10 * 1000)
+      .subscribe(() => this.broadcastStats())
+  }
+
+
+  private broadcastStats(): void {
+    if (this.configService.config.remoteReceiverMode === RemoteReceiverMode.RECEIVER) {
+      let message: StatsBroadcast = {
+        displayStats: this.displayStatsService.displayStats.value,
+        currentPosition: this.deviceSelectionService.gpsSensor.locationData.value,
+      }
+
+      this.messageService.sendMessage(RemoteMessageTopics.BROADCAST_STATS, instanceToPlain(message))
+    }
   }
 
 
@@ -83,13 +127,13 @@ export class ReceiverService {
   }
 
 
-  private broadcastUpdate(): void {
+  private broadcastPathUpdate(): void {
     if (this.configService.config.remoteReceiverMode === RemoteReceiverMode.RECEIVER) {
-      let message: Update = {
+      let message: PathUpdate = {
         path: this.controllerPath.pathSubscription.value,
       }
 
-      this.messageService.sendMessage(RemoteMessageTopics.BROADCAST_UPDATE, instanceToPlain(message))
+      this.messageService.sendMessage(RemoteMessageTopics.BROADCAST_PATH_UPDATE, instanceToPlain(message))
     }
   }
 
@@ -101,5 +145,6 @@ export class RemoteMessageTopics {
   static readonly STOP_MANUALLY = "STOP_MANUALLY";
   static readonly NAVIGATE_ROUTE = "NAVIGATE_ROUTE";
   static readonly REQUEST_UPDATE = "REQUEST_UPDATE";
-  static readonly BROADCAST_UPDATE = "BROADCAST_UPDATE";
+  static readonly BROADCAST_PATH_UPDATE = "BROADCAST_PATH_UPDATE";
+  static readonly BROADCAST_STATS = "BROADCAST_STATS";
 }

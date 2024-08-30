@@ -23,6 +23,7 @@ import { BlackoutComponent } from './component/blackout/blackout.component';
 import { ChartComponent } from './component/chart/chart.component';
 import { ConfigComponent } from './component/config/config.component';
 import { DisplayStatsDeviceSensorsComponent } from './component/display-stats-device-sensors/display-stats-device-sensors.component';
+import { DisplayStatsRemoteComponent } from './component/display-stats-remote/display-stats-remote.component';
 import { DisplayStatsComponent } from './component/display-stats/display-stats.component';
 import { FullScreenMapComponent } from './component/full-screen-map/full-screen-map.component';
 import { MapComponent } from './component/map/map.component';
@@ -44,6 +45,7 @@ import { TestComponent } from './component/test/test.component';
     DisplayStatsComponent,
     FullScreenMapComponent,
     DisplayStatsDeviceSensorsComponent,
+    DisplayStatsRemoteComponent,
   ],
   imports: [
     BrowserModule,

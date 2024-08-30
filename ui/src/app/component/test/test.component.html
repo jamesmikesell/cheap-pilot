@@ -32,7 +32,10 @@
 
 
 <div class="stats-container">
-  <app-display-stats-device-sensors></app-display-stats-device-sensors>
+  <app-display-stats-device-sensors *ngIf="configService.config.remoteReceiverMode !== RemoteReceiverMode.REMOTE">
+  </app-display-stats-device-sensors>
+  <app-display-stats-remote *ngIf="configService.config.remoteReceiverMode === RemoteReceiverMode.REMOTE">
+  </app-display-stats-remote>
 </div>
 
 

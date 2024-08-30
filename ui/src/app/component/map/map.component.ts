@@ -1,17 +1,15 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
-import { plainToInstance } from 'class-transformer';
 import * as L from 'leaflet';
 import 'leaflet-editable';
 import 'leaflet-providers';
 import 'leaflet.locatecontrol';
-import { filter, Subject, takeUntil } from 'rxjs';
-import { Update } from 'src/app/remote/message-dtos';
-import { MessagingService } from 'src/app/remote/messaging-service';
-import { RemoteMessageTopics } from 'src/app/remote/receiver-service';
+import { filter, map, merge, Observable, Subject, takeUntil } from 'rxjs';
+import { RemoteService } from 'src/app/remote/remote-service';
 import { ConfigService, RemoteReceiverMode } from 'src/app/service/config.service';
 import { ControllerPathService } from 'src/app/service/controller-path.service';
 import { DeviceSelectService } from 'src/app/service/device-select.service';
 import { PathHistoryDedupeService } from 'src/app/service/path-history-dedupe-service';
+import { GpsSensorData } from 'src/app/service/sensor-gps.service';
 import { ThemeService } from 'src/app/service/theme-service';
 import { CoordinateUtils, LatLon } from 'src/app/utils/coordinate-utils';
 import { MapControlConnect } from './map-control-connect';
@@ -45,18 +43,17 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     private deviceSelectionService: DeviceSelectService,
     private configService: ConfigService,
     private controllerPath: ControllerPathService,
-    private messageService: MessagingService,
     public themeService: ThemeService,
     private pathHistoryService: PathHistoryDedupeService,
     private mapControlConnect: MapControlConnect,
     private mapControlMenu: MapControlMenu,
+    private remoteService: RemoteService,
   ) {
   }
 
 
   ngAfterViewInit(): void {
     this.map = L.map(this.uxMap.nativeElement, { editable: true, zoomControl: false, }).setView([0, 0], 0)
-    this.setCurrentLocation();
     this.configureZoomControl();
     this.configureAppMenuControl();
     this.configureUpdatesFromController();
@@ -64,21 +61,14 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     this.configureConnection();
     this.addEditControls();
     this.addLocateControl();
-    this.configureUpdatesFromGps();
-    this.configureBroadcastUpdate();
+    this.configureLocationUpdates();
+    this.configurePathUpdateFromRemoteReceipt();
   }
 
 
   ngOnDestroy(): void {
     this.destroy.next();
     this.destroy.complete();
-  }
-
-
-  private setCurrentLocation() {
-    let currentLocation = this.deviceSelectionService.gpsSensor.locationData.value
-    if (currentLocation)
-      this.currentLocation = new L.LatLng(currentLocation.coords.latitude, currentLocation.coords.longitude)
   }
 
 
@@ -101,12 +91,10 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   }
 
 
-  private configureBroadcastUpdate(): void {
-    this.messageService
-      .getMessagesForTopic(RemoteMessageTopics.BROADCAST_UPDATE)
+  private configurePathUpdateFromRemoteReceipt(): void {
+    this.remoteService.pathBroadcastReceived
       .pipe(takeUntil(this.destroy))
-      .subscribe(payload => {
-        let message = plainToInstance(Update, payload);
+      .subscribe(message => {
         this.remoteUpdateReceived(message.path)
       })
   }
@@ -186,10 +174,19 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   }
 
 
-  private configureUpdatesFromGps(): void {
-    this.deviceSelectionService.gpsSensor.locationData
+  private configureLocationUpdates(): void {
+    let remoteDevicePositions: Observable<GpsSensorData> = this.remoteService.statBroadcastReceived
+      .pipe(takeUntil(this.destroy))
+      .pipe(filter(update => !!update.currentPosition))
+      .pipe(map(message => message.currentPosition))
+      .pipe(filter(() => this.configService.config.remoteReceiverMode === RemoteReceiverMode.REMOTE))
+
+    let thisDevicePositions: Observable<GpsSensorData> = this.deviceSelectionService.gpsSensor.locationData
       .pipe(takeUntil(this.destroy))
       .pipe(filter(locationData => !!locationData))
+      .pipe(filter(() => this.configService.config.remoteReceiverMode !== RemoteReceiverMode.REMOTE))
+
+    merge(remoteDevicePositions, thisDevicePositions)
       .subscribe(location => {
         let distanceSinceLast: number
         if (this.pathPoints.length > 0) {
@@ -382,7 +379,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
     if (this.configService.config.remoteReceiverMode === RemoteReceiverMode.REMOTE) {
       this.pathHistoryService.addPathToHistory(navCoordinates);
-      this.messageService.sendMessage(RemoteMessageTopics.NAVIGATE_ROUTE, navCoordinates);
+      this.remoteService.sendNavigationPath(navCoordinates);
     }
 
     if (this.deviceSelectionService.motorController.connected.value) {
