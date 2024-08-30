@@ -8,6 +8,7 @@ import { ControllerPathService } from 'src/app/service/controller-path.service';
 import { ControllerRotationRateService } from 'src/app/service/controller-rotation-rate.service';
 import { DataLogService } from 'src/app/service/data-log.service';
 import { DeviceSelectService } from 'src/app/service/device-select.service';
+import { NavBarService } from 'src/app/service/nav-bar.service';
 import { GpsSensor, GpsSensorData } from 'src/app/service/sensor-gps.service';
 import { OrientationSensor } from 'src/app/service/sensor-orientation.service';
 import { CoordinateUtils } from 'src/app/utils/coordinate-utils';
@@ -41,6 +42,7 @@ export class TestComponent implements OnInit, OnDestroy {
     private dataLog: DataLogService,
     public configService: ConfigService,
     public controllerPath: ControllerPathService,
+    private navBarService: NavBarService,
   ) {
     this.motorControllerService = deviceSelectService.motorController;
     this.sensorOrientation = deviceSelectService.orientationSensor;
@@ -50,6 +52,8 @@ export class TestComponent implements OnInit, OnDestroy {
 
 
   ngOnInit(): void {
+    this.navBarService.showNavBar = false;
+
     this.sensorLocation.locationData
       .pipe(filter(locationData => !!locationData))
       .pipe(takeUntil(this.destroy))
@@ -69,6 +73,7 @@ export class TestComponent implements OnInit, OnDestroy {
 
 
   ngOnDestroy(): void {
+    this.navBarService.showNavBar = true;
     this.destroy.next();
     this.destroy.complete();
   }
