@@ -1,8 +1,7 @@
-import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatSidenav } from '@angular/material/sidenav';
 import { Subject, takeUntil } from 'rxjs';
 import { AppVersion } from 'src/app/app-version';
-import { ControllerBtMotorService } from 'src/app/service/controller-bt-motor.service';
 import { NavBarService } from 'src/app/service/nav-bar.service';
 import { AppThemeNames, ThemeService } from 'src/app/service/theme-service';
 
@@ -25,7 +24,6 @@ export class NavBarComponent implements OnInit, OnDestroy {
 
   constructor(
     public themeService: ThemeService,
-    private btMotorController: ControllerBtMotorService,
     public navBarService: NavBarService,
   ) { }
 
@@ -41,12 +39,6 @@ export class NavBarComponent implements OnInit, OnDestroy {
     this.navBarService.drawerToggle
       .pipe(takeUntil(this.destroy))
       .subscribe(() => this.drawer.toggle())
-  }
-
-
-  @HostListener('window:beforeunload')
-  onWindowReload(): void {
-    this.btMotorController.disconnect();
   }
 
 

@@ -15,6 +15,8 @@ export class ControllerBtMotorService implements Controller<number>, Connectable
 
   constructor(
   ) {
+    window.addEventListener("beforeunload", () => this.disconnect())
+
     timer(0, 200)
       .subscribe(() => {
         if (!this.connected.value)

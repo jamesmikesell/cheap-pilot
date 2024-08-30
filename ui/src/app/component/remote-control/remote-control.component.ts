@@ -1,4 +1,4 @@
-import { Component, HostListener } from '@angular/core';
+import { Component } from '@angular/core';
 import { MessagingService } from 'src/app/remote/messaging-service';
 import { RemoteMessageTopics } from 'src/app/remote/receiver-service';
 
@@ -13,15 +13,6 @@ export class RemoteControlComponent {
   constructor(
     private messagingService: MessagingService,
   ) { }
-
-
-  @HostListener('document:visibilitychange', ['$event'])
-  onVisibilityChange(_event: Event) {
-    if (!document.hidden) {
-      // This means the app regained focus / power back on etc
-      this.messagingService.sendMessage(RemoteMessageTopics.REQUEST_UPDATE, "")
-    }
-  }
 
 
   maintainCurrentHeading(): void {

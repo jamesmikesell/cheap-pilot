@@ -21,6 +21,12 @@ export class RemoteService {
     private configService: ConfigService,
     private messageService: MessagingService,
   ) {
+    document.addEventListener("visibilitychange", () => {
+      // This means the app regained focus / power back on etc
+      if (!document.hidden)
+        this.requestUpdate();
+    })
+
     let isRemoteModeChanges = timer(500)
       .pipe(map(() => this.configService.config.remoteReceiverMode === RemoteReceiverMode.REMOTE))
       .pipe(distinctUntilChanged())
@@ -38,6 +44,12 @@ export class RemoteService {
           .subscribe(message => this.statBroadcastReceived.next(message))
       }
     })
+  }
+
+
+  private requestUpdate() {
+    if (this.configService.config.remoteReceiverMode === RemoteReceiverMode.REMOTE)
+      this.messageService.sendMessage(RemoteMessageTopics.REQUEST_UPDATE, "")
   }
 
 
