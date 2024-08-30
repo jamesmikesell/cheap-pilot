@@ -57,7 +57,14 @@ export class ReceiverService {
     })
 
     this.controllerPath.pathSubscription
-      .subscribe(() => this.broadcastPathUpdate());
+      .subscribe(() => {
+        this.broadcastPathUpdate()
+        this.broadcastStats()
+      });
+
+    this.deviceSelectionService.motorController.connected
+      .pipe(distinctUntilChanged())
+      .subscribe(() => this.broadcastStats());
 
     timer(1000, 10 * 1000)
       .subscribe(() => this.broadcastStats())
@@ -67,7 +74,7 @@ export class ReceiverService {
   private broadcastStats(): void {
     if (this.configService.config.remoteReceiverMode === RemoteReceiverMode.RECEIVER) {
       let message: StatsBroadcast = {
-        displayStats: this.displayStatsService.displayStats.value,
+        displayStats: this.displayStatsService.currentStats(),
         currentPosition: this.deviceSelectionService.gpsSensor.locationData.value,
       }
 

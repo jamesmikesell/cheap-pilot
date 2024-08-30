@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, filter, timer } from 'rxjs';
+import { filter, Subject, timer } from 'rxjs';
 import { DisplayStats } from '../component/display-stats/display-stats.component';
 import { UnitConverter } from '../utils/unit-converter';
 import { Controller } from './controller';
@@ -16,7 +16,7 @@ import { OrientationSensor } from './sensor-orientation.service';
 })
 export class DisplayStatsService {
 
-  displayStats = new BehaviorSubject<DisplayStats>({} as DisplayStats);
+  displayStats = new Subject<DisplayStats>();
 
 
   private gpsHeading: number;
@@ -37,9 +37,7 @@ export class DisplayStatsService {
     this.motorController = deviceSelectService.motorController;
 
     timer(0, 1 * 250)
-      .subscribe(() => {
-        this.updateDisplayStats();
-      });
+      .subscribe(() => this.displayStats.next(this.currentStats()));
 
     this.sensorLocation.locationData
       .pipe(filter(locationData => !!locationData))
@@ -53,8 +51,8 @@ export class DisplayStatsService {
   }
 
 
-  private updateDisplayStats() {
-    this.displayStats.next({
+  currentStats(): DisplayStats {
+    return {
       headingCurrentCompass: this.sensorOrientation.heading.value.heading,
       headingCurrentGps: this.gpsHeading,
       headingCurrentDrift: this.controllerPath.compassDriftDegrees,
@@ -69,8 +67,7 @@ export class DisplayStatsService {
       controllerPath: this.controllerPath.enabled,
 
       bluetoothConnected: this.motorController.connected.value,
-    })
+    }
   }
-
 
 }
