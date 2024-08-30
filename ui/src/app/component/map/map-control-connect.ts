@@ -1,11 +1,12 @@
 import { Injectable } from "@angular/core";
 import * as L from "leaflet";
+import { distinctUntilChanged, interval, map, merge, Subject, takeUntil, tap } from "rxjs";
+import { RemoteService } from "src/app/remote/remote-service";
+import { ConfigService, RemoteReceiverMode } from "src/app/service/config.service";
 import { Controller } from "src/app/service/controller";
 import { ConnectableDevice } from "src/app/service/controller-bt-motor.service";
 import { DeviceSelectService } from "src/app/service/device-select.service";
 import { ControlType } from "./map.component";
-import { distinctUntilChanged, interval, map, merge, Subject, takeUntil } from "rxjs";
-import { ConfigService, RemoteReceiverMode } from "src/app/service/config.service";
 
 
 @Injectable({
@@ -19,6 +20,7 @@ export class MapControlConnect {
   constructor(
     deviceSelectService: DeviceSelectService,
     private configService: ConfigService,
+    private remoteService: RemoteService,
   ) {
     this.motorControllerService = deviceSelectService.motorController;
   }
@@ -32,17 +34,27 @@ export class MapControlConnect {
         button.href = '#';
 
         let remoteModeChangeListener = interval(100)
+          .pipe(takeUntil(destroy))
           .pipe(map(() => this.configService.config.remoteReceiverMode))
           .pipe(distinctUntilChanged());
+
+        let remoteBtConnected = false;
+        let remoteConnectionStatusChanged = this.remoteService.statBroadcastReceived
+          .pipe(takeUntil(destroy))
+          .pipe(map(stat => stat.displayStats.bluetoothConnected === true))
+          .pipe(tap(connected => remoteBtConnected = connected))
 
         merge(
           remoteModeChangeListener,
           this.motorControllerService.connected,
+          remoteConnectionStatusChanged,
         ).pipe(takeUntil(destroy))
           .subscribe(() => {
             button.style.backgroundColor = null;
             if (this.configService.config.remoteReceiverMode === RemoteReceiverMode.REMOTE) {
               button.innerHTML = '<span class="material-icons">settings_remote</span>';
+              if (!remoteBtConnected)
+                button.style.backgroundColor = "#ff5757";
             } else {
               if (this.motorControllerService.connected.value) {
                 button.innerHTML = '<span class="material-icons">bluetooth_connected</span>';
