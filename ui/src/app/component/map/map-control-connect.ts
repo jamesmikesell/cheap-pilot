@@ -50,16 +50,20 @@ export class MapControlConnect {
           remoteConnectionStatusChanged,
         ).pipe(takeUntil(destroy))
           .subscribe(() => {
+            container.classList.remove("no-dark")
             button.classList.remove("bg-warn")
             if (this.configService.config.remoteReceiverMode === RemoteReceiverMode.REMOTE) {
               button.innerHTML = '<span class="material-icons">settings_remote</span>';
-              if (!remoteBtConnected)
+              if (!remoteBtConnected) {
+                container.classList.add("no-dark")
                 button.classList.add("bg-warn")
+              }
             } else {
               if (this.motorControllerService.connected.value) {
                 button.innerHTML = '<span class="material-icons">bluetooth_connected</span>';
               } else {
                 button.innerHTML = '<span class="material-icons">bluetooth</span>';
+                container.classList.add("no-dark")
                 button.classList.add("bg-warn")
               }
             }

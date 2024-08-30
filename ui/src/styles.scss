@@ -26,7 +26,7 @@ $light-theme: mat.m2-define-light-theme($color-config-light);
 }
 
 .bg-warn {
-  background-color: #ff9e9e !important;
+  background-color: #f5263c !important;
 }
 
 
@@ -65,16 +65,29 @@ $night-primary: (
   }
 
   .bg-warn {
-    background-color: rgb(255, 183, 183) !important;
+    background-color: #8b0818 !important;
   }
 
-  .leaflet-control a {
-    color: rgb(120, 120, 120);
+
+  .leaflet-control:not(.no-dark),
+  .leaflet-control:not(.no-dark)>a,
+  .leaflet-control-attribution> :not(.leaflet-attribution-flag) {
+    color: #878787;
+    background-color: #000;
   }
 
-  .leaflet-div-icon {
-    background-color: #6d6d6d;
+  .leaflet-control {
+    border: 2px solid rgb(255 255 255 / 20%);
   }
+
+  .leaflet-control:not(.no-dark)>a.leaflet-control-layers-toggle {
+    opacity: 50%;
+  }
+
+  .leaflet-container {
+    background-color: #000;
+  }
+
 }
 
 
@@ -97,6 +110,21 @@ $color-config-dark: (
 
   .good-color {
     color: #02cc02;
+  }
+
+  .leaflet-control:not(.no-dark),
+  .leaflet-control:not(.no-dark)>a,
+  .leaflet-control-attribution> :not(.leaflet-attribution-flag) {
+    color: #ffffff;
+    background-color: #000;
+  }
+
+  .leaflet-control {
+    border: 2px solid rgb(255 255 255 / 20%);
+  }
+
+  .leaflet-container {
+    background-color: #000;
   }
 
 }
