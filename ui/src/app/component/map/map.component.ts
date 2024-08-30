@@ -317,6 +317,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       showCompass: false,
       setView: "untilPan",
       keepCurrentZoomLevel: true,
+      icon: "material-icons locate_now",
       clickBehavior: { inView: 'stop', outOfView: 'setView', inViewNotFollowing: 'setView' }
     }).addTo(this.map);
   }

@@ -25,6 +25,10 @@ $light-theme: mat.m2-define-light-theme($color-config-light);
   color: #0b8814;
 }
 
+.bg-warn {
+  background-color: #ff9e9e !important;
+}
+
 
 
 $night-primary: (
@@ -60,6 +64,17 @@ $night-primary: (
     color: #069806;
   }
 
+  .bg-warn {
+    background-color: rgb(255, 183, 183) !important;
+  }
+
+  .leaflet-control a {
+    color: rgb(120, 120, 120);
+  }
+
+  .leaflet-div-icon {
+    background-color: #6d6d6d;
+  }
 }
 
 
@@ -87,6 +102,16 @@ $color-config-dark: (
 }
 
 
+
+
+.locate_now {
+  position: relative;
+  display: inline-block;
+}
+
+.locate_now:after {
+  content: "gps_fixed";
+}
 
 
 html,
