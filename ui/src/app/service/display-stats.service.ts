@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, filter, timer } from 'rxjs';
 import { DisplayStats } from '../component/display-stats/display-stats.component';
 import { UnitConverter } from '../utils/unit-converter';
+import { Controller } from './controller';
+import { ConnectableDevice } from './controller-bt-motor.service';
 import { ControllerOrientationService } from './controller-orientation.service';
 import { ControllerPathService } from './controller-path.service';
 import { ControllerRotationRateService } from './controller-rotation-rate.service';
@@ -21,6 +23,7 @@ export class DisplayStatsService {
   private sensorOrientation: OrientationSensor;
   private sensorLocation: GpsSensor;
   private speedKts: number;
+  private motorController: Controller<number> & ConnectableDevice;
 
 
   constructor(
@@ -31,6 +34,7 @@ export class DisplayStatsService {
   ) {
     this.sensorOrientation = deviceSelectService.orientationSensor;
     this.sensorLocation = deviceSelectService.gpsSensor;
+    this.motorController = deviceSelectService.motorController;
 
     timer(0, 1 * 250)
       .subscribe(() => {
@@ -63,6 +67,8 @@ export class DisplayStatsService {
       controllerRotationRate: this.controllerRotationRate.enabled,
       controllerOrientation: this.controllerOrientation.enabled,
       controllerPath: this.controllerPath.enabled,
+
+      bluetoothConnected: this.motorController.connected.value,
     })
   }
 

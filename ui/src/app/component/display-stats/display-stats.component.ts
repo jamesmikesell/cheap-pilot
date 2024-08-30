@@ -20,4 +20,5 @@ export interface DisplayStats {
   headingCurrentDrift: number;
   headingCurrentGps: number;
   headingCurrentCompass: number;
+  bluetoothConnected: boolean;
 }

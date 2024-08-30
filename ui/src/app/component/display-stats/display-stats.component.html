@@ -39,13 +39,12 @@
 <br>
 
 &nbsp;
-&nbsp;
 
 <div class="double-line">
   <div>rot.</div>
   <div>ctrl.</div>
 </div>
-<mat-icon class="material-icons-outlined status-icon">
+<mat-icon class="material-icons-outlined status-icon" [class.good-color]="config?.controllerRotationRate">
   {{config?.controllerRotationRate ? "light_mode" : "motion_photos_off" }}
 </mat-icon>
 
@@ -55,7 +54,7 @@
   <div>orient.</div>
   <div>ctrl.</div>
 </div>
-<mat-icon class="material-icons-outlined status-icon">
+<mat-icon class="material-icons-outlined status-icon" [class.good-color]="config?.controllerOrientation">
   {{config?.controllerOrientation ? "light_mode" : "motion_photos_off" }}
 </mat-icon>
 
@@ -65,6 +64,17 @@
   <div>path</div>
   <div>ctrl.</div>
 </div>
-<mat-icon class="material-icons-outlined status-icon">
+<mat-icon class="material-icons-outlined status-icon" [class.good-color]="config?.controllerPath">
   {{config?.controllerPath ? "light_mode" : "motion_photos_off" }}
+</mat-icon>
+
+&nbsp;
+
+<div class="double-line">
+  <div>BT</div>
+  <div>Stat.</div>
+</div>
+<mat-icon class="material-icons-outlined status-icon" [class.warn-color]="!config?.bluetoothConnected"
+  [class.good-color]="config?.bluetoothConnected">
+  {{config?.bluetoothConnected ? "bluetooth_connected" : "warning" }}
 </mat-icon>
