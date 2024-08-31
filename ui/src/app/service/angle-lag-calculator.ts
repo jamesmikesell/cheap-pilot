@@ -8,7 +8,7 @@ export class AngleLagCalculator {
 
 
   constructor(
-    private maxLag: number,
+    private maxLagSeconds: number,
     private maxRecordsToRetain: number) { }
 
 
@@ -65,7 +65,7 @@ export class AngleLagCalculator {
     let signal1 = this.aSlope
     let signal2 = this.bSlope
 
-    const maxLag = Math.min(signal1.length, signal2.length, this.maxLag);
+    const maxLag = Math.min(signal1.length, signal2.length, this.maxLagSeconds);
     let minMSE = Infinity;
     let bestLag = 0;
 
