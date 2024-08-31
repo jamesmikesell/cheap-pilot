@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { instanceToPlain } from "class-transformer";
-import { distinctUntilChanged, map, skip, takeUntil, timer } from "rxjs";
+import { distinctUntilChanged, interval, map, skip, takeUntil, timer } from "rxjs";
 import { ConfigService, RemoteReceiverMode } from "../service/config.service";
 import { ControllerOrientationService } from "../service/controller-orientation.service";
 import { ControllerPathService } from "../service/controller-path.service";
@@ -9,7 +9,7 @@ import { DataLogService } from "../service/data-log.service";
 import { DeviceSelectService } from "../service/device-select.service";
 import { DisplayStatsService } from "../service/display-stats.service";
 import { LatLon } from "../utils/coordinate-utils";
-import { PathUpdate, StatsBroadcast } from "./message-dtos";
+import { StatsBroadcast } from "./message-dtos";
 import { MessagingService } from "./messaging-service";
 
 @Injectable({
@@ -52,33 +52,33 @@ export class ReceiverService {
 
         this.messageService.getMessagesForTopic(RemoteMessageTopics.REQUEST_UPDATE)
           .pipe(takeUntil(isReceiverModeChanges.pipe(skip(1))))
-          .subscribe(() => this.broadcastPathUpdate())
+          .subscribe(() => this.broadcastState())
       }
     })
 
     this.controllerPath.pathSubscription
       .subscribe(() => {
-        this.broadcastPathUpdate()
-        this.broadcastStats()
+        this.broadcastState()
       });
 
     this.deviceSelectionService.motorController.connected
       .pipe(distinctUntilChanged())
-      .subscribe(() => this.broadcastStats());
+      .subscribe(() => this.broadcastState());
 
     timer(1000, 10 * 1000)
-      .subscribe(() => this.broadcastStats())
+      .subscribe(() => this.broadcastState())
   }
 
 
-  private broadcastStats(): void {
+  private broadcastState(): void {
     if (this.configService.config.remoteReceiverMode === RemoteReceiverMode.RECEIVER) {
       let message: StatsBroadcast = {
         displayStats: this.displayStatsService.currentStats(),
         currentPosition: this.deviceSelectionService.gpsSensor.locationData.value,
+        path: this.controllerPath.pathSubscription.value,
       }
 
-      this.messageService.sendMessage(RemoteMessageTopics.BROADCAST_STATS, instanceToPlain(message))
+      this.messageService.sendMessage(RemoteMessageTopics.BROADCAST_STATE, instanceToPlain(message))
     }
   }
 
@@ -133,17 +133,6 @@ export class ReceiverService {
     }
   }
 
-
-  private broadcastPathUpdate(): void {
-    if (this.configService.config.remoteReceiverMode === RemoteReceiverMode.RECEIVER) {
-      let message: PathUpdate = {
-        path: this.controllerPath.pathSubscription.value,
-      }
-
-      this.messageService.sendMessage(RemoteMessageTopics.BROADCAST_PATH_UPDATE, instanceToPlain(message))
-    }
-  }
-
 }
 
 export class RemoteMessageTopics {
@@ -152,6 +141,5 @@ export class RemoteMessageTopics {
   static readonly STOP_MANUALLY = "STOP_MANUALLY";
   static readonly NAVIGATE_ROUTE = "NAVIGATE_ROUTE";
   static readonly REQUEST_UPDATE = "REQUEST_UPDATE";
-  static readonly BROADCAST_PATH_UPDATE = "BROADCAST_PATH_UPDATE";
-  static readonly BROADCAST_STATS = "BROADCAST_STATS";
+  static readonly BROADCAST_STATE = "BROADCAST_STATE";
 }

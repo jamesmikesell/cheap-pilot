@@ -27,13 +27,13 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
   private map: L.Map;
 
-  private pathPoints: L.LatLng[] = [];
-  private pathDrawn: L.Polyline;
+  private historyPathPoints: L.LatLng[] = [];
+  private navPathDrawn: L.Polyline;
   private currentLocation: L.LatLng;
   private waypointCircles: L.Circle[] = [];
   private MAP_BASE_LAYER = "MAP_BASE_LAYER";
   private pathEditInProgress = false;
-  private historyPath: L.Polyline;
+  private historyPathDrawn: L.Polyline;
   private currentNavSegmentStart: L.LatLng;
   private currentNavSegmentEnd: L.LatLng;
   private destroy = new Subject<void>();
@@ -92,7 +92,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
 
   private configurePathUpdateFromRemoteReceipt(): void {
-    this.remoteService.pathBroadcastReceived
+    this.remoteService.stateBroadcastReceived
       .pipe(takeUntil(this.destroy))
       .subscribe(message => {
         this.remoteUpdateReceived(message.path)
@@ -101,6 +101,9 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
 
   private async remoteUpdateReceived(path: LatLon[]): Promise<void> {
+    if (this.pathEditInProgress)
+      return;
+
     if (this.configService.config.remoteReceiverMode === RemoteReceiverMode.REMOTE) {
       // we sometimes receive rebound messages... IE draw a path on the remote, send it to the receiver,
       // the receiver then rebroadcasts "this is what i'm doing", at which point we try to update the map
@@ -123,12 +126,12 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       uiPath = path.map(single => new L.LatLng(single.latitude, single.longitude))
 
       if (!uiPath[0].equals(this.currentNavSegmentEnd)) {
-        this.currentNavSegmentStart = this.currentLocation;
-        this.currentNavSegmentEnd = uiPath[0];
+        this.currentNavSegmentStart = this.currentLocation.clone();
+        this.currentNavSegmentEnd = uiPath[0].clone();
       }
 
       if (this.currentNavSegmentStart)
-        uiPath.unshift(this.currentNavSegmentStart);
+        uiPath.unshift(this.currentNavSegmentStart.clone());
     } else {
       this.currentNavSegmentStart = undefined;
       this.currentNavSegmentEnd = undefined;
@@ -163,9 +166,9 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     else
       this.map.addLayer(baseMaps['Open Street Maps']);
 
-    this.historyPath = L.polyline([], { color: 'crimson' }).addTo(this.map);
+    this.historyPathDrawn = L.polyline([], { color: 'crimson' }).addTo(this.map);
     let layers: L.Control.LayersObject = {
-      "History": this.historyPath,
+      "History": this.historyPathDrawn,
     }
 
     L.control.layers(baseMaps, layers).addTo(this.map);
@@ -175,7 +178,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
 
   private configureLocationUpdates(): void {
-    let remoteDevicePositions: Observable<GpsSensorData> = this.remoteService.statBroadcastReceived
+    let remoteDevicePositions: Observable<GpsSensorData> = this.remoteService.stateBroadcastReceived
       .pipe(takeUntil(this.destroy))
       .pipe(filter(update => !!update.currentPosition))
       .pipe(map(message => message.currentPosition))
@@ -189,8 +192,8 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     merge(remoteDevicePositions, thisDevicePositions)
       .subscribe(location => {
         let distanceSinceLast: number
-        if (this.pathPoints.length > 0) {
-          let lastLocation = this.pathPoints[this.pathPoints.length - 1];
+        if (this.historyPathPoints.length > 0) {
+          let lastLocation = this.historyPathPoints[this.historyPathPoints.length - 1];
           distanceSinceLast = CoordinateUtils.distanceBetweenPointsInMeters(location.coords, { latitude: lastLocation.lat, longitude: lastLocation.lng })
         }
 
@@ -200,9 +203,9 @@ export class MapComponent implements AfterViewInit, OnDestroy {
           this.map.setView(this.currentLocation, 16)
 
         if (distanceSinceLast === undefined || distanceSinceLast > 3)
-          this.pathPoints.push(this.currentLocation);
+          this.historyPathPoints.push(this.currentLocation);
 
-        this.historyPath.setLatLngs(this.pathPoints);
+        this.historyPathDrawn.setLatLngs(this.historyPathPoints);
       })
   }
 
@@ -238,9 +241,9 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       options: {
         position: 'topleft',
         callback: () => {
-          if (this.pathDrawn || this.pathEditInProgress) {
-            let pathToRemove = this.pathDrawn
-            this.pathDrawn = undefined;
+          if (this.navPathDrawn || this.pathEditInProgress) {
+            let pathToRemove = this.navPathDrawn
+            this.navPathDrawn = undefined;
             if (pathToRemove)
               this.map.removeLayer(pathToRemove)
             this.redrawWaypointProximityCircles();
@@ -261,7 +264,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
             }
 
             this.pathEditInProgress = true;
-            this.pathDrawn = this.map.editTools.startPolyline(this.currentLocation, { color: "tomato", dashArray: '5, 15', dashOffset: '0' })
+            this.navPathDrawn = this.map.editTools.startPolyline(this.currentLocation.clone(), { color: "tomato", dashArray: '5, 15', dashOffset: '0' })
           }
         },
         kind: 'line',
@@ -293,11 +296,11 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
   private handlePathDrawingChanges = () => {
     if (!this.pathEditInProgress) {
-      if (this.pathDrawn) {
-        let navPoints = this.pathDrawn.getLatLngs() as L.LatLng[];
+      if (this.navPathDrawn) {
+        let navPoints = this.navPathDrawn.getLatLngs() as L.LatLng[];
         if (!navPoints[1].equals(this.currentNavSegmentEnd)) {
-          this.currentNavSegmentStart = this.currentLocation || navPoints[0].clone()
-          navPoints[0] = this.currentNavSegmentStart;
+          this.currentNavSegmentStart = this.currentLocation.clone() || navPoints[0].clone()
+          navPoints[0] = this.currentNavSegmentStart.clone();
           setTimeout(() => {
             this.clearAndDrawPath(navPoints);
           }, 0);
@@ -331,16 +334,16 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
 
   private clearAndDrawPath(path: L.LatLng[]): void {
-    if (this.pathDrawn)
-      this.map.removeLayer(this.pathDrawn)
+    if (this.navPathDrawn)
+      this.map.removeLayer(this.navPathDrawn)
 
-    this.pathDrawn = undefined;
+    this.navPathDrawn = undefined;
 
     if (path && path.length > 1) {
-      this.pathDrawn = L.polyline([]).addTo(this.map);
-      this.pathDrawn.setLatLngs(path);
-      this.pathDrawn.enableEdit();
-      this.pathDrawn.setStyle({ color: "rgb(51, 136, 255)", dashArray: "5 15" })
+      this.navPathDrawn = L.polyline([]).addTo(this.map);
+      this.navPathDrawn.setLatLngs(path);
+      this.navPathDrawn.enableEdit();
+      this.navPathDrawn.setStyle({ color: "rgb(51, 136, 255)", dashArray: "5 15" })
     }
     this.redrawWaypointProximityCircles();
   }
@@ -348,8 +351,8 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
   private redrawWaypointProximityCircles(): void {
     this.clearCircles();
-    if (this.pathDrawn) {
-      let mapCoordinates = (this.pathDrawn.getLatLngs() as L.LatLng[]);
+    if (this.navPathDrawn) {
+      let mapCoordinates = (this.navPathDrawn.getLatLngs() as L.LatLng[]);
       mapCoordinates
         .slice(1)
         .forEach(single => {
@@ -370,8 +373,8 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
   private sendPathToController(): void {
     let navCoordinates: LatLon[] = [];
-    if (this.pathDrawn) {
-      let mapCoordinates = (this.pathDrawn.getLatLngs() as L.LatLng[]);
+    if (this.navPathDrawn) {
+      let mapCoordinates = (this.navPathDrawn.getLatLngs() as L.LatLng[]);
       navCoordinates = mapCoordinates
         .slice(1)
         .map((single): LatLon => ({ latitude: single.lat, longitude: single.lng }))

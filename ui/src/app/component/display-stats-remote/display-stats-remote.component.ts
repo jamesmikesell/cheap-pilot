@@ -31,7 +31,7 @@ export class DisplayStatsRemoteComponent implements OnInit, OnDestroy {
 
 
   ngOnInit(): void {
-    this.messagingService.getMessagesForTopic(RemoteMessageTopics.BROADCAST_STATS)
+    this.messagingService.getMessagesForTopic(RemoteMessageTopics.BROADCAST_STATE)
       .pipe(takeUntil(this.destroy))
       .pipe(map(plain => plainToInstance(StatsBroadcast, plain)))
       .subscribe(stats => this.displayStats = stats.displayStats)

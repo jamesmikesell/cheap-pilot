@@ -1,9 +1,9 @@
 import { Injectable } from "@angular/core";
 import { plainToInstance } from "class-transformer";
-import { distinctUntilChanged, map, skip, Subject, takeUntil, timer } from "rxjs";
+import { distinctUntilChanged, interval, map, skip, Subject, takeUntil } from "rxjs";
 import { ConfigService, RemoteReceiverMode } from "../service/config.service";
 import { LatLon } from "../utils/coordinate-utils";
-import { PathUpdate, StatsBroadcast } from "./message-dtos";
+import { StatsBroadcast } from "./message-dtos";
 import { MessagingService } from "./messaging-service";
 import { RemoteMessageTopics } from "./receiver-service";
 
@@ -13,8 +13,7 @@ import { RemoteMessageTopics } from "./receiver-service";
 export class RemoteService {
 
 
-  pathBroadcastReceived = new Subject<PathUpdate>();
-  statBroadcastReceived = new Subject<StatsBroadcast>();
+  stateBroadcastReceived = new Subject<StatsBroadcast>();
 
 
   constructor(
@@ -33,15 +32,14 @@ export class RemoteService {
 
     isRemoteModeChanges.subscribe(inRemoteMode => {
       if (inRemoteMode) {
-        this.messageService.getMessagesForTopic(RemoteMessageTopics.BROADCAST_PATH_UPDATE)
-          .pipe(takeUntil(isRemoteModeChanges.pipe(skip(1))))
-          .pipe(map(plain => plainToInstance(PathUpdate, plain)))
-          .subscribe(message => this.pathBroadcastReceived.next(message))
-
-        this.messageService.getMessagesForTopic(RemoteMessageTopics.BROADCAST_STATS)
+        this.messageService.getMessagesForTopic(RemoteMessageTopics.BROADCAST_STATE)
           .pipe(takeUntil(isRemoteModeChanges.pipe(skip(1))))
           .pipe(map(plain => plainToInstance(StatsBroadcast, plain)))
-          .subscribe(message => this.statBroadcastReceived.next(message))
+          .subscribe(message => this.stateBroadcastReceived.next(message))
+
+        setTimeout(() => {
+          this.requestUpdate();
+        }, 100);
       }
     })
   }

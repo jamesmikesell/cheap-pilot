@@ -39,7 +39,7 @@ export class MapControlConnect {
           .pipe(distinctUntilChanged());
 
         let remoteBtConnected = false;
-        let remoteConnectionStatusChanged = this.remoteService.statBroadcastReceived
+        let remoteConnectionStatusChanged = this.remoteService.stateBroadcastReceived
           .pipe(takeUntil(destroy))
           .pipe(map(stat => stat.displayStats.bluetoothConnected === true))
           .pipe(tap(connected => remoteBtConnected = connected))
