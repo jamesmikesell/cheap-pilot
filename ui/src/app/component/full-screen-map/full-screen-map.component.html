@@ -1,5 +1,5 @@
 <div class="display-stats">
-  <mat-card class="mat-elevation-z2 stats-card">
+  <mat-card class="mat-elevation-z2 stats-card no-select">
     <app-display-stats-device-sensors *ngIf="configService.config.remoteReceiverMode !== RemoteReceiverMode.REMOTE">
     </app-display-stats-device-sensors>
     <app-display-stats-remote *ngIf="configService.config.remoteReceiverMode === RemoteReceiverMode.REMOTE">
