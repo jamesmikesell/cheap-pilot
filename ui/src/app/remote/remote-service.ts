@@ -27,7 +27,7 @@ export class RemoteService {
         this.requestUpdate();
     })
 
-    let isRemoteModeChanges = timer(500)
+    let isRemoteModeChanges = interval(500)
       .pipe(map(() => this.configService.config.remoteReceiverMode === RemoteReceiverMode.REMOTE))
       .pipe(distinctUntilChanged())
 

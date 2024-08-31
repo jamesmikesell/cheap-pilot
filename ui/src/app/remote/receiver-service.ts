@@ -28,7 +28,7 @@ export class ReceiverService {
     private deviceSelectionService: DeviceSelectService,
   ) {
 
-    let isReceiverModeChanges = timer(500)
+    let isReceiverModeChanges = interval(500)
       .pipe(map(() => this.configService.config.remoteReceiverMode === RemoteReceiverMode.RECEIVER))
       .pipe(distinctUntilChanged())
 
