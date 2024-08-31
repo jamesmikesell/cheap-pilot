@@ -1,7 +1,8 @@
-import { Component, HostBinding, OnDestroy, OnInit } from '@angular/core';
-import { ReceiverService } from './remote/receiver-service';
 import { OverlayContainer } from '@angular/cdk/overlay';
+import { Component, HostBinding, OnDestroy, OnInit } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
+import { ReceiverService } from './remote/receiver-service';
+import { AudioService } from './service/audio.service';
 import { ThemeService } from './service/theme-service';
 import { WakeLockService } from './service/wake-lock.service';
 
@@ -22,8 +23,10 @@ export class AppComponent implements OnDestroy, OnInit {
     public themeService: ThemeService,
     public overlayContainer: OverlayContainer,
     private wakeLockService: WakeLockService,
+    audioService: AudioService,
   ) {
     console.log("receiver registered", !!receiver)
+    console.log("audioService registered", !!audioService)
 
     this.themeService.themeSubscription
       .pipe(takeUntil(this.destroy))
