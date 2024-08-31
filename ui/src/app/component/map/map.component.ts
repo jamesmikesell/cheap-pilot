@@ -37,6 +37,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   private currentNavSegmentStart: L.LatLng;
   private currentNavSegmentEnd: L.LatLng;
   private destroy = new Subject<void>();
+  private remoteBtConnected = false;
 
 
   constructor(
@@ -95,6 +96,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     this.remoteService.stateBroadcastReceived
       .pipe(takeUntil(this.destroy))
       .subscribe(message => {
+        this.remoteBtConnected = message.displayStats.bluetoothConnected;
         this.remoteUpdateReceived(message.path)
       })
   }
@@ -250,8 +252,10 @@ export class MapComponent implements AfterViewInit, OnDestroy {
             this.pathEditInProgress = false;
             this.sendPathToController()
           } else {
-            if (!this.deviceSelectionService.motorController.connected.value
-              && this.configService.config.remoteReceiverMode !== RemoteReceiverMode.REMOTE) {
+            let connected = (this.configService.config.remoteReceiverMode == RemoteReceiverMode.REMOTE
+              && this.remoteBtConnected) || (this.deviceSelectionService.motorController.connected.value)
+
+            if (!connected) {
               let tooltip = L.tooltip({ direction: 'center' })
                 .setContent("Connect or set to Remote mode draw a route")
                 .setLatLng(this.map.getCenter())
