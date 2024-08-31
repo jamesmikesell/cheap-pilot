@@ -23,6 +23,7 @@ export class MapControlMenu {
         button.innerHTML = '<span class="material-icons">menu</span>';
         button.href = '#';
 
+        L.DomEvent.disableClickPropagation(button);
         L.DomEvent.on(button, 'click', (e) => {
           L.DomEvent.stop(e);
           this.navBarService.drawerToggle.next();

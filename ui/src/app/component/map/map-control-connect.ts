@@ -70,6 +70,7 @@ export class MapControlConnect {
           })
 
 
+        L.DomEvent.disableClickPropagation(button);
         L.DomEvent.on(button, 'click', (e) => {
           L.DomEvent.stop(e);
           this.handleButtonClick()

@@ -223,6 +223,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         link.href = '#';
         link.title = 'Create a new ' + this.options.kind;
         link.innerHTML = this.options.html;
+        L.DomEvent.disableClickPropagation(link);
         L.DomEvent.on(link, 'click', event => {
           L.DomEvent.stop(event);
           (window as any).LAYER = this.options.callback.call(map.editTools);
