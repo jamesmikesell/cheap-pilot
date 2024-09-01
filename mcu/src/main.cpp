@@ -80,7 +80,7 @@ void setup()
   BLEService *pService = pServer->createService(SERVICE_UUID);
 
   pCharacteristic = pService->createCharacteristic(
-      CHARACTERISTIC_UUID, BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_WRITE);
+      CHARACTERISTIC_UUID, BLECharacteristic::PROPERTY_WRITE_NR);
   pCharacteristic->setCallbacks(new MyCallbacks());
 
   pCharacteristic->addDescriptor(new BLE2902());

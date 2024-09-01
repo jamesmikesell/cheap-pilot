@@ -72,7 +72,7 @@ export class ControllerBtMotorService implements Controller<number>, Connectable
 
   private async move(direction: Direction, powerPercent: number): Promise<void> {
     let level = Math.round(powerPercent * 255);
-    await this.characteristic.writeValueWithResponse(new Uint8Array([level, direction]));
+    await this.characteristic.writeValueWithoutResponse(new Uint8Array([level, direction]));
   }
 
 
