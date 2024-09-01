@@ -63,6 +63,7 @@ export default tseslint.config(
         }
       ],
       "@typescript-eslint/switch-exhaustiveness-check": "error",
+      "@typescript-eslint/no-unnecessary-boolean-literal-compare": "off",
     },
   },
   {
