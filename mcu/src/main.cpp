@@ -72,7 +72,7 @@ void setup()
   ledcAttachPin(PIN_A, PMW_A);
   ledcAttachPin(PIN_B, PMW_B);
 
-  BLEDevice::init("Tiller Pilot");
+  BLEDevice::init("Cheap Pilot");
 
   pServer = BLEDevice::createServer();
   pServer->setCallbacks(new MyServerCallbacks());
