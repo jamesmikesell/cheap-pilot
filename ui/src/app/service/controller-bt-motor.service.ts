@@ -47,7 +47,7 @@ export class ControllerBtMotorService implements Controller<number>, Connectable
     let config: RequestDeviceOptions = {
       filters: [
         {
-          namePrefix: "Tiller Pilot"
+          services: [SERVICE_UUID],
         }
       ],
       optionalServices: [SERVICE_UUID]
