@@ -96,6 +96,9 @@ export class AppConfig {
   showGraphRotation = false;
   showGraphOrientation = false;
   showGraphGps = false;
+
+  alertOnBluetoothDisconnect = true;
+  alertOnNavigationEnd = true;
 }
 
 

@@ -369,6 +369,19 @@
     <mat-card-content>
       <div class="input-list">
 
+        <mat-slide-toggle [(ngModel)]="configService.config.alertOnBluetoothDisconnect">
+          Alert on Bluetooth Disconnect
+        </mat-slide-toggle>
+
+        <div class="flex-break"></div>
+
+        <mat-slide-toggle [(ngModel)]="configService.config.alertOnNavigationEnd">
+          Alert on Navigation End
+        </mat-slide-toggle>
+
+        <div class="flex-break"></div>
+
+
         <button mat-raised-button color="primary" (click)="downloadLog()">Download Log</button>
 
       </div>
@@ -391,8 +404,6 @@
         <mat-slide-toggle [(ngModel)]="configService.config.showGraphGps">
           Show GPS
         </mat-slide-toggle>
-
-        <div class="flex-break"></div>
 
         <div class="flex-break"></div>
 

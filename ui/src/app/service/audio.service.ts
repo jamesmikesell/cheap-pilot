@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { distinctUntilChanged, map, merge } from 'rxjs';
 import { RemoteService } from '../remote/remote-service';
+import { ConfigService } from './config.service';
 import { ControllerPathService } from './controller-path.service';
 import { DeviceSelectService } from './device-select.service';
 
@@ -17,6 +18,7 @@ export class AudioService {
     private deviceSelectService: DeviceSelectService,
     private remoteService: RemoteService,
     private pathController: ControllerPathService,
+    private configService: ConfigService,
   ) {
     this.initAudioFiles()
 
@@ -33,7 +35,7 @@ export class AudioService {
     merge(remoteConnected, this.deviceSelectService.motorController.connected)
       .pipe(distinctUntilChanged())
       .subscribe(connected => {
-        if (!connected && previouslyConnected) {
+        if (!connected && previouslyConnected && this.configService.config.alertOnBluetoothDisconnect) {
           navigator.vibrate([500, 50, 500, 50, 500, 50, 500, 50, 500, 50, 500])
           this.singleBeep.play();
         }
@@ -55,7 +57,7 @@ export class AudioService {
     merge(remotePathControllerOn, localPathControllerOn)
       .pipe(distinctUntilChanged())
       .subscribe(navigating => {
-        if (!navigating && previouslyNavigating) {
+        if (!navigating && previouslyNavigating && this.configService.config.alertOnNavigationEnd) {
           navigator.vibrate([200, 50, 200])
           this.doubleBeep.play();
         }
