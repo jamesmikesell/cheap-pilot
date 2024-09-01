@@ -8,7 +8,8 @@
     "build": "ng build --configuration production --base-href \"/cheap-pilot/\" ",
     "testOffline": "ng build --configuration production && npx http-server -p 8080 -c-1 dist/ui",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "lint": "ng lint"
   },
   "private": true,
   "dependencies": {
@@ -46,12 +47,15 @@
     "@types/leaflet-editable": "^1.2.6",
     "@types/leaflet-providers": "^1.2.4",
     "@types/leaflet.locatecontrol": "^0.74.5",
+    "angular-eslint": "18.3.0",
+    "eslint": "^9.9.0",
     "jasmine-core": "~4.6.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.0.0",
-    "typescript": "~5.4.5"
+    "typescript": "~5.4.5",
+    "typescript-eslint": "8.1.0"
   }
 }
