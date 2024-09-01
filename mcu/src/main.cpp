@@ -12,7 +12,7 @@
 #define PMW_LED 0
 #define PMW_A 1
 #define PMW_B 2
-#define PMW_HZ 1
+#define PMW_HZ 4
 
 BLEServer *pServer = NULL;
 BLECharacteristic *pCharacteristic = NULL;
