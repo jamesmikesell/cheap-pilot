@@ -1,3 +1,4 @@
+import { NumberProvider, ProviderConverter } from "../types/providers";
 import { CoordinateUtils } from "../utils/coordinate-utils";
 
 export class AngleLagCalculator {
@@ -5,11 +6,17 @@ export class AngleLagCalculator {
   private bSlope: number[] = [];
   private aAngleDegrees: number[] = [];
   private bAngleDegrees: number[] = [];
+  private maxLagRecords: NumberProvider;
+  private maxRetentionRecords: NumberProvider;
 
 
   constructor(
-    private maxLagSeconds: number,
-    private maxRecordsToRetain: number) { }
+    maxLagRecords: number | NumberProvider,
+    maxRetentionRecords: number | NumberProvider) {
+
+    this.maxLagRecords = ProviderConverter.ensureNumberProvider(maxLagRecords);
+    this.maxRetentionRecords = ProviderConverter.ensureNumberProvider(maxRetentionRecords);
+  }
 
 
   add(aAngleDegrees: number, bAngleDegrees: number) {
@@ -18,10 +25,10 @@ export class AngleLagCalculator {
     this.aAngleDegrees.push(aAngleDegrees)
     this.bAngleDegrees.push(bAngleDegrees)
 
-    this.aSlope.slice(-this.maxRecordsToRetain)
-    this.bSlope.slice(-this.maxRecordsToRetain)
-    this.aAngleDegrees.slice(-this.maxRecordsToRetain)
-    this.bAngleDegrees.slice(-this.maxRecordsToRetain)
+    this.aSlope.slice(-this.maxRetentionRecords.getNumber())
+    this.bSlope.slice(-this.maxRetentionRecords.getNumber())
+    this.aAngleDegrees.slice(-this.maxRetentionRecords.getNumber())
+    this.bAngleDegrees.slice(-this.maxRetentionRecords.getNumber())
   }
 
 
@@ -65,7 +72,7 @@ export class AngleLagCalculator {
     let signal1 = this.aSlope
     let signal2 = this.bSlope
 
-    const maxLag = Math.min(signal1.length, signal2.length, this.maxLagSeconds);
+    const maxLag = Math.min(signal1.length, signal2.length, this.maxLagRecords.getNumber());
     let minMSE = Infinity;
     let bestLag = 0;
 

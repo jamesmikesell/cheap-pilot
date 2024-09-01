@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, filter } from 'rxjs';
+import { BehaviorSubject, filter, interval, map } from 'rxjs';
 import { CoordinateUtils, LatLon } from '../utils/coordinate-utils';
 import { ConfigService } from './config.service';
 import { Controller } from './controller';
@@ -35,13 +35,14 @@ export class ControllerPathService implements Controller<LatLon[]> {
   constructor(
     deviceSelectService: DeviceSelectService,
     private orientationController: ControllerOrientationService,
-    configService: ConfigService,
+    private configService: ConfigService,
   ) {
     this.orientationSensor = deviceSelectService.orientationSensor;
-    const maxRecordTimeSeconds = 6 * 60;
-    let driftCalculator = new AngleLagCalculator(30, maxRecordTimeSeconds);
+    let driftCalculator = new AngleLagCalculator({ getNumber: () => this.configService.config.pathDriftLagMaxSeconds },
+      { getNumber: () => this.configService.config.pathDriftAverageMinutes * 60 });
 
-    deviceSelectService.gpsSensor.locationData
+    interval(1000)
+      .pipe(map(() => deviceSelectService.gpsSensor.locationData.value))
       .pipe(filter(data => !!data && data.heading != undefined))
       .subscribe(locationData => {
         // always calculate filtered drift, even if we're not navigating.
