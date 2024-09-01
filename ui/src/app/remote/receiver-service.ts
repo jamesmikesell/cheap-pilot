@@ -36,11 +36,11 @@ export class ReceiverService {
       if (inReceiverMode) {
         this.messageService.getMessagesForTopic(RemoteMessageTopics.MAINTAIN_CURRENT_HEADING)
           .pipe(takeUntil(isReceiverModeChanges.pipe(skip(1))))
-          .subscribe(payload => this.maintainHeading(payload))
+          .subscribe(() => this.maintainHeading())
 
         this.messageService.getMessagesForTopic(RemoteMessageTopics.MOVE_MANUALLY)
           .pipe(takeUntil(isReceiverModeChanges.pipe(skip(1))))
-          .subscribe(payload => this.moveManually(payload))
+          .subscribe(payload => this.moveManually(payload as number))
 
         this.messageService.getMessagesForTopic(RemoteMessageTopics.STOP_MANUALLY)
           .pipe(takeUntil(isReceiverModeChanges.pipe(skip(1))))
@@ -48,7 +48,7 @@ export class ReceiverService {
 
         this.messageService.getMessagesForTopic(RemoteMessageTopics.NAVIGATE_ROUTE)
           .pipe(takeUntil(isReceiverModeChanges.pipe(skip(1))))
-          .subscribe(route => this.pathReceived(route))
+          .subscribe(route => this.pathReceived(route as LatLon[]))
 
         this.messageService.getMessagesForTopic(RemoteMessageTopics.REQUEST_UPDATE)
           .pipe(takeUntil(isReceiverModeChanges.pipe(skip(1))))
@@ -78,12 +78,12 @@ export class ReceiverService {
         path: this.controllerPath.pathSubscription.value,
       }
 
-      this.messageService.sendMessage(RemoteMessageTopics.BROADCAST_STATE, instanceToPlain(message))
+      void this.messageService.sendMessage(RemoteMessageTopics.BROADCAST_STATE, instanceToPlain(message))
     }
   }
 
 
-  private maintainHeading(_payload: string): void {
+  private maintainHeading(): void {
     if (this.configService.config.remoteReceiverMode === RemoteReceiverMode.RECEIVER) {
       this.controllerPath.stop();
 

@@ -146,7 +146,7 @@ export class ConfigPageComponent implements OnInit, OnDestroy {
   }
 
 
-  async maintainCurrentHeading(): Promise<void> {
+  maintainCurrentHeading(): void {
     this.controllerOrientation.enabled = true;
     this.controllerOrientation.maintainCurrentHeading();
     this.dataLog.clearLogData();

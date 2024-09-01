@@ -130,21 +130,19 @@ export class MockBoatSensorAndTillerController {
 
 
   getOrientationSensor(): OrientationSensor {
-    let self = this;
     return {
-      heading: self.heading,
+      heading: this.heading,
     }
   }
 
 
   getMotorController(): Controller<number> & ConnectableDevice {
-    let self = this;
     return {
-      command(level: number) { self.command(level) },
-      connect(): Promise<void> { return self.connect() },
-      connected: self.connected,
-      disconnect() { self.disconnect() },
-      stop() { self.stop() },
+      command: (level: number) => { this.command(level) },
+      connect: () => { return this.connect() },
+      connected: this.connected,
+      disconnect: () => { this.disconnect() },
+      stop: () => { this.stop() },
     }
   }
 

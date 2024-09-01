@@ -97,7 +97,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       .pipe(takeUntil(this.destroy))
       .subscribe(message => {
         this.remoteBtConnected = message.displayStats.bluetoothConnected;
-        this.remoteUpdateReceived(message.path)
+        void this.remoteUpdateReceived(message.path)
       })
   }
 
@@ -231,6 +231,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         L.DomEvent.disableClickPropagation(link);
         L.DomEvent.on(link, 'click', event => {
           L.DomEvent.stop(event);
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
           (window as any).LAYER = this.options.callback.call(map.editTools);
         }, this);
 
@@ -280,16 +281,16 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     // as the new event gets fired even if the user is still dragging the vertex around.  so
     // a path update won't be triggered until the vertex is dragged
     // this.map.on('editable:vertex:new', (_event) => this.handlePathDrawingChanges());
-    this.map.on('editable:vertex:deleted', (_event) => this.handlePathDrawingChanges());
-    this.map.on('editable:vertex:dragend', (_event) => {
+    this.map.on('editable:vertex:deleted', () => this.handlePathDrawingChanges());
+    this.map.on('editable:vertex:dragend', () => {
       this.pathEditInProgress = false;
       this.handlePathDrawingChanges()
     });
-    this.map.on('editable:drawing:end', (_event) => {
+    this.map.on('editable:drawing:end', () => {
       this.pathEditInProgress = false;
       this.handlePathDrawingChanges()
     });
-    this.map.on('editable:drawing:move', (_event) => {
+    this.map.on('editable:drawing:move', () => {
       this.pathEditInProgress = true;
       this.handlePathDrawingChanges()
     });
@@ -387,7 +388,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     console.log("path updated, navigating", navCoordinates)
 
     if (this.configService.config.remoteReceiverMode === RemoteReceiverMode.REMOTE) {
-      this.pathHistoryService.addPathToHistory(navCoordinates);
+      void this.pathHistoryService.addPathToHistory(navCoordinates);
       this.remoteService.sendNavigationPath(navCoordinates);
     }
 

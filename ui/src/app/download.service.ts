@@ -5,8 +5,6 @@ import { Injectable } from '@angular/core';
 })
 export class DownloadService {
 
-  constructor() { }
-
 
   download(content: string, filename: string) {
     const blob = new Blob([content], { type: "text/plain" });

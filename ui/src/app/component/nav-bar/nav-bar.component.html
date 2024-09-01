@@ -14,7 +14,7 @@
         </mat-icon>
         Config
       </a>
-      <a mat-list-item (click)="themeService.theme = AppThemeNames.LIGHT">
+      <a mat-list-item [routerLink]="" (click)="themeService.theme = AppThemeNames.LIGHT">
         Light Mode
         <mat-icon *ngIf="(themeService.themeSubscription | async).name === AppThemeNames.LIGHT" class="icon-suffix">
           check_box
@@ -23,7 +23,7 @@
           check_box_outline_blank
         </mat-icon>
       </a>
-      <a mat-list-item (click)="themeService.theme = AppThemeNames.DARK">
+      <a mat-list-item [routerLink]="" (click)="themeService.theme = AppThemeNames.DARK">
         Dark Mode
         <mat-icon *ngIf="(themeService.themeSubscription | async).name === AppThemeNames.DARK" class="icon-suffix">
           check_box
@@ -32,7 +32,7 @@
           check_box_outline_blank
         </mat-icon>
       </a>
-      <a mat-list-item (click)="themeService.theme = AppThemeNames.NIGHT">
+      <a mat-list-item [routerLink]="" (click)="themeService.theme = AppThemeNames.NIGHT">
         Night Mode
         <mat-icon *ngIf="(themeService.themeSubscription | async).name === AppThemeNames.NIGHT" class="icon-suffix">
           check_box
@@ -41,20 +41,21 @@
           check_box_outline_blank
         </mat-icon>
       </a>
-      <a mat-list-item [disabled]="!(themeService.themeSubscription | async).theme.isDark" (click)="invertMap()">
+      <a mat-list-item [routerLink]="" [disabled]="!(themeService.themeSubscription | async).theme.isDark"
+        (click)="invertMap()">
         Allow Dark Maps
         <mat-icon *ngIf="themeService.allowMapInversionSubscription | async" class="icon-suffix">check_box</mat-icon>
-        <mat-icon *ngIf="!(themeService.allowMapInversionSubscription | async)" class="icon-suffix">
+        <mat-icon *ngIf="(themeService.allowMapInversionSubscription | async) === false" class="icon-suffix">
           check_box_outline_blank
         </mat-icon>
       </a>
-      <a mat-list-item (click)="toggleFullScreen(); drawer.toggle()">
+      <a mat-list-item [routerLink]="" (click)="toggleFullScreen(); drawer.toggle()">
         <mat-icon>
           {{isInFullscreenMode() ? "close_fullscreen" : "fullscreen" }}
         </mat-icon>
         {{isInFullscreenMode() ? "Exit Full Screen" : "Full Screen" }}
       </a>
-      <a mat-list-item (click)="blackoutScreen = true; drawer.toggle()">
+      <a mat-list-item [routerLink]="" (click)="blackoutScreen = true; drawer.toggle()">
         <mat-icon>
           visibility_off
         </mat-icon>

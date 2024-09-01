@@ -7,8 +7,6 @@ export class WakeLockService {
 
   screenWakeLocked = false;
 
-  constructor() { }
-
   wakeLock(): void {
     let response = (navigator as any as WakeLockNavigator).wakeLock.request('screen');
     response.then((result: WakeLockSentinel) => {

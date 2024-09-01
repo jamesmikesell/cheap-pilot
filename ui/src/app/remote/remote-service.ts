@@ -47,12 +47,12 @@ export class RemoteService {
 
   private requestUpdate() {
     if (this.configService.config.remoteReceiverMode === RemoteReceiverMode.REMOTE)
-      this.messageService.sendMessage(RemoteMessageTopics.REQUEST_UPDATE, "")
+      void this.messageService.sendMessage(RemoteMessageTopics.REQUEST_UPDATE, "")
   }
 
 
   sendNavigationPath(navCoordinates: LatLon[]) {
-    this.messageService.sendMessage(RemoteMessageTopics.NAVIGATE_ROUTE, navCoordinates);
+    void this.messageService.sendMessage(RemoteMessageTopics.NAVIGATE_ROUTE, navCoordinates);
   }
 
 }

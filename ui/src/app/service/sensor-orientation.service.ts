@@ -10,7 +10,7 @@ export class SensorOrientationService implements OrientationSensor {
 
 
   constructor() {
-    window.addEventListener('deviceorientationabsolute', (eventData) => this.orientationChanged(eventData as any));
+    window.addEventListener('deviceorientationabsolute', (eventData) => this.orientationChanged(eventData));
   }
 
   private orientationChanged(event: DeviceOrientationEvent): void {

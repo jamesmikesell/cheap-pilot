@@ -11,17 +11,17 @@ export class ThemeService {
   get theme(): AppThemeNames { return this.themeSubscription.value.name }
   set theme(val: AppThemeNames) {
     let theme = this.getTheme(val);
-    localStorage.setItem(this.THEME, "" + val);
+    localStorage.setItem(this.THEME, `${val}`);
 
     let reloadBgColor = theme.isDark ? "#171717" : "#fafafa";
-    document.querySelector('meta[name="theme-color"]').setAttribute('content',  reloadBgColor);
+    document.querySelector('meta[name="theme-color"]').setAttribute('content', reloadBgColor);
     localStorage.setItem("APP_RELOAD_BG_COLOR", reloadBgColor);
     this.themeSubscription.next({ name: val, theme: theme });
   }
 
   get allowMapInversion(): boolean { return this.allowMapInversionSubscription.value }
   set allowMapInversion(val: boolean) {
-    localStorage.setItem(this.ALLOW_MAP_INVERSION, "" + val);
+    localStorage.setItem(this.ALLOW_MAP_INVERSION, `${val}`);
     this.allowMapInversionSubscription.next(val);
   }
 
@@ -58,10 +58,6 @@ export class ThemeService {
           case AppThemeNames.NIGHT:
             this.themeMap.set(color, new AppTheme("app-night-theme", true))
             break;
-
-          default:
-            const exhaustiveCheck: never = color;
-            throw new Error(`Unhandled case: ${exhaustiveCheck}`);
         }
       }
     }

@@ -21,7 +21,7 @@ export class MessagingService {
     private configService: ConfigService,
   ) {
     timer(0, 1000)
-      .subscribe(async () => {
+      .subscribe(() => {
         this.purgeOldMessageKeys();
         if (this.configService.config.remoteReceiverMode != undefined) {
           this.connectOrRepair();
@@ -43,13 +43,14 @@ export class MessagingService {
   async sendMessage(topic: string, payload: any): Promise<void> {
     let currentPassword = this.configService.config.remotePassword;
     let wrappedMessage: MessageWrapper = {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       payload: payload,
       transmissionTime: Date.now(),
       messageKey: `${Date.now()}|${Math.random()}`
     }
     let encryptedDto = await this.encryption.encryptData(JSON.stringify(wrappedMessage), currentPassword);
     let hashedTopic = await this.hashTopic(currentPassword, topic)
-    this.client.publish(hashedTopic, encryptedDto as any);
+    this.client.publish(hashedTopic, encryptedDto as any as Buffer);
   }
 
 
@@ -59,7 +60,7 @@ export class MessagingService {
 
     let subject = new Subject<any>();
     this.clearTopicsHandlers.set(topic, subject)
-    this.resetSubscriptions();
+    void this.resetSubscriptions();
 
     return subject;
   }
@@ -67,26 +68,26 @@ export class MessagingService {
 
   private ensureDisconnected(): void {
     if (this.client) {
-      this.client.endAsync(true);
+      void this.client.endAsync(true);
       this.client = undefined;
       this.lastCheckPassword = undefined;
     }
   }
 
 
-  private async connectOrRepair(): Promise<void> {
+  private connectOrRepair(): void {
     if (!this.client) {
       this.client = mqtt.connect("wss://broker.hivemq.com:8884/mqtt", { queueQoSZero: false });
 
-      this.client.on("message", async (hashedTopic, encryptedPayload) => {
-        this.handleMessage(hashedTopic, encryptedPayload)
+      this.client.on("message", (hashedTopic, encryptedPayload) => {
+        void this.handleMessage(hashedTopic, encryptedPayload)
       });
     }
 
     let currentPassword = this.configService.config.remotePassword;
     if (currentPassword !== this.lastCheckPassword) {
       console.log("password changed, resubscribing to all topics")
-      this.resetSubscriptions();
+      void this.resetSubscriptions();
     }
 
     this.lastCheckPassword = this.configService.config.remotePassword;
@@ -101,10 +102,11 @@ export class MessagingService {
       this.client.unsubscribe([...this.hashedTopicsHandlers.keys()])
 
     this.hashedTopicsHandlers.clear()
-    let keyValuePairs = [...this.clearTopicsHandlers.entries()];
-    for (let i = 0; i < keyValuePairs.length; i++) {
-      const key = keyValuePairs[i][0];
-      const value = keyValuePairs[i][1];
+
+    let keyValuePairs = [...this.clearTopicsHandlers.entries()]
+    for (let singlePair of keyValuePairs) {
+      const key = singlePair[0];
+      const value = singlePair[1];
 
       this.hashedTopicsHandlers.set(await this.hashTopic(this.configService.config.remotePassword, key), value);
     }
@@ -115,7 +117,7 @@ export class MessagingService {
 
 
   private async handleMessage(hashedTopic: string, encryptedPayload: Uint8Array): Promise<void> {
-    let payload: MessageWrapper = JSON.parse(await this.encryption.decryptData(encryptedPayload, this.configService.config.remotePassword));
+    let payload: MessageWrapper = JSON.parse(await this.encryption.decryptData(encryptedPayload, this.configService.config.remotePassword)) as MessageWrapper;
     if ((Date.now() - payload.transmissionTime) > this.MAX_MESSAGE_AGE_SECONDS * 1000) {
       console.log("stale message received, ignoring")
       return;

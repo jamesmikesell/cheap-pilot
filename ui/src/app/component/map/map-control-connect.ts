@@ -41,7 +41,7 @@ export class MapControlConnect {
         let remoteBtConnected = false;
         let remoteConnectionStatusChanged = this.remoteService.stateBroadcastReceived
           .pipe(takeUntil(destroy))
-          .pipe(map(stat => stat.displayStats.bluetoothConnected === true))
+          .pipe(map(stat => stat.displayStats.bluetoothConnected))
           .pipe(tap(connected => remoteBtConnected = connected))
 
         merge(
@@ -89,7 +89,7 @@ export class MapControlConnect {
     if (this.motorControllerService.connected.value)
       this.motorControllerService.disconnect();
     else
-      this.motorControllerService.connect();
+      void this.motorControllerService.connect();
   }
 
 }

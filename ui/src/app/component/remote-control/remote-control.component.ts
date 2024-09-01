@@ -16,17 +16,17 @@ export class RemoteControlComponent {
 
 
   maintainCurrentHeading(): void {
-    this.messagingService.sendMessage(RemoteMessageTopics.MAINTAIN_CURRENT_HEADING, "")
+    void this.messagingService.sendMessage(RemoteMessageTopics.MAINTAIN_CURRENT_HEADING, "")
     this.vibrate()
   }
 
   moveManually(level: number): void {
-    this.messagingService.sendMessage(RemoteMessageTopics.MOVE_MANUALLY, level)
+    void this.messagingService.sendMessage(RemoteMessageTopics.MOVE_MANUALLY, level)
     this.vibrate()
   }
 
   stopManually(): void {
-    this.messagingService.sendMessage(RemoteMessageTopics.STOP_MANUALLY, undefined)
+    void this.messagingService.sendMessage(RemoteMessageTopics.STOP_MANUALLY, undefined)
     this.vibrate()
   }
 

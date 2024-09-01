@@ -21,7 +21,7 @@ export class FullScreenMapComponent implements OnInit, OnDestroy {
   RemoteReceiverMode = RemoteReceiverMode;
   showOverlay = false;
 
-  
+
   private destroy = new Subject<void>();
 
 
@@ -49,7 +49,7 @@ export class FullScreenMapComponent implements OnInit, OnDestroy {
   }
 
 
-  async maintainCurrentHeading(): Promise<void> {
+  maintainCurrentHeading(): void {
     this.controllerPath.stop()
     this.controllerOrientation.enabled = true;
     this.controllerOrientation.maintainCurrentHeading();

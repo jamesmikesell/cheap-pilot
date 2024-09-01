@@ -37,7 +37,7 @@ export class AudioService {
       .subscribe(connected => {
         if (!connected && previouslyConnected && this.configService.config.alertOnBluetoothDisconnect) {
           navigator.vibrate([500, 50, 500, 50, 500, 50, 500, 50, 500, 50, 500])
-          this.singleBeep.play();
+          void this.singleBeep.play();
         }
         previouslyConnected = connected;
       })
@@ -59,7 +59,7 @@ export class AudioService {
       .subscribe(navigating => {
         if (!navigating && previouslyNavigating && this.configService.config.alertOnNavigationEnd) {
           navigator.vibrate([200, 50, 200])
-          this.doubleBeep.play();
+          void this.doubleBeep.play();
         }
         previouslyNavigating = navigating;
       })

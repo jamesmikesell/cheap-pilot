@@ -59,6 +59,7 @@ export class ControllerOrientationService implements Controller<number> {
 
 
   private configurePidController(): void {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     let self = this;
     let config: PidConfig = {
       get kP(): number { return self.configService.config.orientationKp; },

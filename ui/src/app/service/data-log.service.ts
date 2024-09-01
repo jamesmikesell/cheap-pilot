@@ -32,7 +32,7 @@ export class DataLogService {
     this._logData = [];
   }
 
-  async downloadLog(): Promise<void> {
+  downloadLog() {
     this.downloadService.download(JSON.stringify(this._logData), `log-${(Date.now())}.txt`);
   }
 

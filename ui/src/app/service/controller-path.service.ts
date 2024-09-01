@@ -83,9 +83,14 @@ export class ControllerPathService implements Controller<LatLon[]> {
 
   private pathUpdated(): void {
     if (this.path)
-      this.pathSubscription.next(JSON.parse(JSON.stringify(this.path)));
+      this.pathSubscription.next(this.typeSafeClone(this.path));
     else
       this.pathSubscription.next(undefined);
+  }
+
+
+  private typeSafeClone<T>(object: T): T {
+    return JSON.parse(JSON.stringify(object)) as T;
   }
 
 

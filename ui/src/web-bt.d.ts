@@ -5,6 +5,7 @@
 //                    Rob Moran <https://github.com/thegecko>
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 
+
 type BluetoothServiceUUID = number | string;
 type BluetoothCharacteristicUUID = number | string;
 type BluetoothDescriptorUUID = number | string;
@@ -101,6 +102,7 @@ interface BluetoothRemoteGATTCharacteristic extends EventTarget, CharacteristicE
     getDescriptor(descriptor: BluetoothDescriptorUUID): Promise<BluetoothRemoteGATTDescriptor>;
     getDescriptors(descriptor?: BluetoothDescriptorUUID): Promise<BluetoothRemoteGATTDescriptor[]>;
     readValue(): Promise<DataView>;
+    /** @deprecated */
     writeValue(value: BufferSource): Promise<void>;
     writeValueWithResponse(value: BufferSource): Promise<void>;
     writeValueWithoutResponse(value: BufferSource): Promise<void>;
@@ -124,9 +126,7 @@ interface BluetoothRemoteGATTService extends EventTarget, CharacteristicEventHan
     getCharacteristics(characteristic?: BluetoothCharacteristicUUID): Promise<BluetoothRemoteGATTCharacteristic[]>;
     getIncludedService(service: BluetoothServiceUUID): Promise<BluetoothRemoteGATTService>;
     getIncludedServices(service?: BluetoothServiceUUID): Promise<BluetoothRemoteGATTService[]>;
-    addEventListener(type: "serviceadded", listener: (this: this, ev: Event) => any, useCapture?: boolean): void;
-    addEventListener(type: "servicechanged", listener: (this: this, ev: Event) => any, useCapture?: boolean): void;
-    addEventListener(type: "serviceremoved", listener: (this: this, ev: Event) => any, useCapture?: boolean): void;
+    addEventListener(type: "serviceadded" | "servicechanged" | "serviceremoved", listener: (this: this, ev: Event) => any, useCapture?: boolean): void;
     addEventListener(type: string, listener: EventListenerOrEventListenerObject, useCapture?: boolean): void;
 }
 
@@ -152,8 +152,7 @@ interface BluetoothDevice extends EventTarget, BluetoothDeviceEventHandlers, Cha
     watchAdvertisements(): Promise<void>;
     unwatchAdvertisements(): void;
     readonly watchingAdvertisements: boolean;
-    addEventListener(type: "gattserverdisconnected", listener: (this: this, ev: Event) => any, useCapture?: boolean): void;
-    addEventListener(type: "advertisementreceived", listener: (this: this, ev: Event) => any, useCapture?: boolean): void;
+    addEventListener(type: "gattserverdisconnected" | "advertisementreceived", listener: (this: this, ev: Event) => any, useCapture?: boolean): void;
     addEventListener(type: string, listener: EventListenerOrEventListenerObject, useCapture?: boolean): void;
 }
 

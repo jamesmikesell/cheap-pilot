@@ -23,7 +23,9 @@ export class ControllerBtMotorService implements Controller<number>, Connectable
           return;
 
         let direction = this.nextPowerLevel > 0 ? Direction.RIGHT : Direction.LEFT;
-        this.move(direction, Math.abs(this.nextPowerLevel))
+        // TODO: this should probably be awaited....
+        // TODO: if awaited, see if there are any circumstances where the await doesn't finish
+        void this.move(direction, Math.abs(this.nextPowerLevel))
       });
   }
 
@@ -70,7 +72,7 @@ export class ControllerBtMotorService implements Controller<number>, Connectable
 
   private async move(direction: Direction, powerPercent: number): Promise<void> {
     let level = Math.round(powerPercent * 255);
-    this.characteristic.writeValue(new Uint8Array([level, direction]));
+    await this.characteristic.writeValueWithResponse(new Uint8Array([level, direction]));
   }
 
 
@@ -83,7 +85,7 @@ export class ControllerBtMotorService implements Controller<number>, Connectable
   }
 
 
-  private bluetoothDisconnected(): any {
+  private bluetoothDisconnected(): void {
     this.characteristic = undefined;
     this.connected.next(false);
   }

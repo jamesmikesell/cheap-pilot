@@ -4,11 +4,10 @@ import { LocationHistory, LocationHistoryTracker } from './location-history-calc
 
 describe('Location History Speed Calculator', () => {
 
-  beforeEach(() => {
-  });
 
   it('track speed', () => {
     let tracker = new LocationHistoryTracker(7, 3);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     let trackerDeepState: TrackerDeepState = tracker as any;
 
     expect(trackerDeepState.locationHistory).toHaveSize(0);
@@ -92,7 +91,7 @@ describe('Location History Speed Calculator', () => {
 });
 
 
-type LocationAndAccuracy = {
+interface LocationAndAccuracy {
   accuracy: number;
   latitude: number;
   longitude: number;

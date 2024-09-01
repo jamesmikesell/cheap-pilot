@@ -13,11 +13,11 @@ export class Encryption {
 
 
   private async compress(uncompressed: Uint8Array, method: "deflate" | "gzip" | "deflate-raw"): Promise<ArrayBuffer> {
-    const stream = new (window as any).CompressionStream(method);
+    const stream = new window.CompressionStream(method);
     const writer = stream.writable.getWriter();
 
-    writer.write(uncompressed);
-    writer.close();
+    void writer.write(uncompressed);
+    void writer.close();
 
     const compressedArrayBuffer = await new Response(stream.readable).arrayBuffer();
 
@@ -26,7 +26,7 @@ export class Encryption {
 
 
   private async decompress(compressed: ArrayBuffer, method: "deflate" | "gzip" | "deflate-raw"): Promise<ArrayBuffer> {
-    const decompressionStream = new (window as any).DecompressionStream(method);
+    const decompressionStream = new window.DecompressionStream(method);
     const inputStream = new Response(compressed).body;
     const decompressedStream = inputStream.pipeThrough(decompressionStream);
     const decompressedArrayBuffer = await new Response(decompressedStream).arrayBuffer();
@@ -60,7 +60,7 @@ export class Encryption {
       buff.set(encryptedContentArr, salt.byteLength + iv.byteLength);
       return buff
     } catch (e) {
-      console.log(`Error - ${e}`);
+      console.log("Error", e);
       return undefined;
     }
   }
@@ -86,7 +86,7 @@ export class Encryption {
       let decompressed = await this.decompress(decryptedContent, "deflate-raw");
       return this.dec.decode(decompressed)
     } catch (e) {
-      console.log(`Error - ${e}`);
+      console.log("Error", e);
       return "";
     }
   }
@@ -113,6 +113,7 @@ export class Encryption {
     return window.crypto.subtle.deriveKey(
       {
         name: "PBKDF2",
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         salt: salt,
         iterations: 250000,
         hash: "SHA-256",

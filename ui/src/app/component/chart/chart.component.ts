@@ -31,7 +31,6 @@ export class ChartComponent {
     }
   };
 
-  constructor() { }
 
 
   configureData(val: AppChartData[]) {

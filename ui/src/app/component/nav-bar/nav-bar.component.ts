@@ -38,7 +38,7 @@ export class NavBarComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.navBarService.drawerToggle
       .pipe(takeUntil(this.destroy))
-      .subscribe(() => this.drawer.toggle())
+      .subscribe(() => void this.drawer.toggle())
   }
 
 
@@ -51,9 +51,9 @@ export class NavBarComponent implements OnInit, OnDestroy {
 
   toggleFullScreen(): void {
     if (this.isInFullscreenMode())
-      document.exitFullscreen();
+      void document.exitFullscreen();
     else
-      document.documentElement.requestFullscreen();
+      void document.documentElement.requestFullscreen();
   }
 
 
