@@ -14,35 +14,17 @@
   <mat-card class="mat-elevation-z2 bottom-overlay-card">
     <div>
       <button mat-mini-fab color="primary" class="mat-elevation-z2" (click)="showOverlay = !showOverlay">
-        <mat-icon>swipe_up</mat-icon>
+        <mat-icon>{{!showOverlay ? "explore" : "keyboard_double_arrow_down"}}</mat-icon>
       </button>
     </div>
 
 
-    <div *ngIf="showOverlay && motorControllerService.connected.value">
-      <div class="center-controls heading-button-container">
-        <button mat-raised-button color="primary" (click)="maintainCurrentHeading()">
-          Maintain Current Heading
-        </button>
+    <div *ngIf="showOverlay">
+      <div class="manual-controls">
+        <app-manual-controls
+          *ngIf="motorControllerService.connected.value || configService.config.remoteReceiverMode === RemoteReceiverMode.REMOTE">
+        </app-manual-controls>
       </div>
-
-      <div class="center-controls manual-controls">
-        <button mat-raised-button color="primary" (click)="moveManually(1)">
-          &lt;- {{controllerOrientation.enabled ? "5°" : "°/s"}}
-        </button>
-        <button mat-raised-button color="primary" (click)="stopManually()">
-          stop
-        </button>
-        <button mat-raised-button color="primary" (click)="moveManually(-1)">
-          {{controllerOrientation.enabled ? "5°" : "°/s"}} -&gt;
-        </button>
-      </div>
-    </div>
-
-
-    <div *ngIf="showOverlay && configService.config.remoteReceiverMode === RemoteReceiverMode.REMOTE" class="remote">
-      <app-remote-control>
-      </app-remote-control>
     </div>
 
   </mat-card>

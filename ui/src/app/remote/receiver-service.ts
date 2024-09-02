@@ -2,12 +2,10 @@ import { Injectable } from "@angular/core";
 import { instanceToPlain } from "class-transformer";
 import { distinctUntilChanged, interval, map, skip, takeUntil, timer } from "rxjs";
 import { ConfigService, RemoteReceiverMode } from "../service/config.service";
-import { ControllerOrientationService } from "../service/controller-orientation.service";
 import { ControllerPathService } from "../service/controller-path.service";
-import { ControllerRotationRateService } from "../service/controller-rotation-rate.service";
-import { DataLogService } from "../service/data-log.service";
 import { DeviceSelectService } from "../service/device-select.service";
 import { DisplayStatsService } from "../service/display-stats.service";
+import { ManualControlService } from "../service/manual-control.service";
 import { LatLon } from "../utils/coordinate-utils";
 import { StatsBroadcast } from "./message-dtos";
 import { MessagingService } from "./messaging-service";
@@ -20,12 +18,10 @@ export class ReceiverService {
   constructor(
     private configService: ConfigService,
     private messageService: MessagingService,
-    private controllerOrientation: ControllerOrientationService,
-    private dataLog: DataLogService,
-    private controllerRotationRate: ControllerRotationRateService,
     private controllerPath: ControllerPathService,
     private displayStatsService: DisplayStatsService,
     private deviceSelectionService: DeviceSelectService,
+    private manualControlService: ManualControlService,
   ) {
 
     let isReceiverModeChanges = interval(500)
@@ -85,43 +81,24 @@ export class ReceiverService {
 
   private maintainHeading(): void {
     if (this.configService.config.remoteReceiverMode === RemoteReceiverMode.RECEIVER) {
-      this.controllerPath.stop();
-
-      this.controllerOrientation.enabled = true;
-      this.controllerOrientation.maintainCurrentHeading();
-      this.dataLog.clearLogData();
+      this.manualControlService.maintainCurrentHeadingLocal();
+      this.broadcastState();
     }
   }
 
 
   private moveManually(level: number): void {
     if (this.configService.config.remoteReceiverMode === RemoteReceiverMode.RECEIVER) {
-      this.controllerPath.stop();
-
-      if (this.controllerOrientation.enabled) {
-        this.controllerOrientation.command((this.controllerOrientation.desired - (level * 5)) % 360);
-      } else {
-        this.controllerRotationRate.enabled = true;
-        this.controllerRotationRate.command(this.controllerRotationRate.desired + level);
-      }
+      this.manualControlService.moveManuallyLocal(level);
+      this.broadcastState();
     }
   }
 
 
   private stopManually(): void {
     if (this.configService.config.remoteReceiverMode === RemoteReceiverMode.RECEIVER) {
-      this.controllerPath.stop();
-
-      this.controllerRotationRate.cancelPidTune();
-      this.controllerOrientation.cancelPidTune();
-
-      if (this.controllerOrientation.enabled)
-        this.controllerOrientation.enabled = false;
-
-      if (this.controllerRotationRate.enabled && this.controllerRotationRate.desired === 0)
-        this.controllerRotationRate.enabled = false;
-
-      this.controllerRotationRate.command(0)
+      this.manualControlService.stopManuallyLocal();
+      this.broadcastState();
     }
   }
 

@@ -3,32 +3,11 @@
 </div>
 
 
-<div>
-  <div class="center-controls heading-button-container">
-    <button *ngIf="btConnected" mat-raised-button color="primary" (click)="maintainCurrentHeading()">
-      Maintain Current Heading
-    </button>
-  </div>
+<div class="manual-controls">
+  <app-manual-controls *ngIf="btConnected || configService.config.remoteReceiverMode === RemoteReceiverMode.REMOTE">
+  </app-manual-controls>
 </div>
 
-
-<div *ngIf="btConnected" class="center-controls manual-controls">
-  <button mat-raised-button color="primary" (click)="moveManually(1)">
-    &lt;- {{controllerOrientation.enabled ? "5°" : "°/s"}}
-  </button>
-  <button mat-raised-button color="primary" (click)="stopManually()">
-    stop
-  </button>
-  <button mat-raised-button color="primary" (click)="moveManually(-1)">
-    {{controllerOrientation.enabled ? "5°" : "°/s"}} -&gt;
-  </button>
-</div>
-
-
-<div style="margin-bottom: 20px;">
-  <app-remote-control *ngIf="configService.config.remoteReceiverMode === RemoteReceiverMode.REMOTE">
-  </app-remote-control>
-</div>
 
 
 <div class="stats-container">

@@ -3,15 +3,11 @@ import { filter, Subject, takeUntil, timer } from 'rxjs';
 import { ConfigService, RemoteReceiverMode } from 'src/app/service/config.service';
 import { Controller } from 'src/app/service/controller';
 import { ConnectableDevice } from 'src/app/service/controller-bt-motor.service';
-import { ControllerOrientationService } from 'src/app/service/controller-orientation.service';
-import { ControllerPathService } from 'src/app/service/controller-path.service';
-import { ControllerRotationRateService } from 'src/app/service/controller-rotation-rate.service';
 import { DataLogService } from 'src/app/service/data-log.service';
 import { DeviceSelectService } from 'src/app/service/device-select.service';
 import { NavBarService } from 'src/app/service/nav-bar.service';
 import { GpsSensor, GpsSensorData } from 'src/app/service/sensor-gps.service';
 import { OrientationSensor } from 'src/app/service/sensor-orientation.service';
-import { CoordinateUtils } from 'src/app/utils/coordinate-utils';
 import { UnitConverter } from 'src/app/utils/unit-converter';
 import { AppChartData } from '../chart/chart.component';
 
@@ -36,12 +32,9 @@ export class ConfigPageComponent implements OnInit, OnDestroy {
 
 
   constructor(
-    public controllerRotationRate: ControllerRotationRateService,
-    public controllerOrientation: ControllerOrientationService,
     deviceSelectService: DeviceSelectService,
     private dataLog: DataLogService,
     public configService: ConfigService,
-    public controllerPath: ControllerPathService,
     private navBarService: NavBarService,
   ) {
     this.motorControllerService = deviceSelectService.motorController;
@@ -144,45 +137,6 @@ export class ConfigPageComponent implements OnInit, OnDestroy {
     this.chartNavigation = chartNavigation;
     this.chartGpsHeading = chartGpsHeading;
   }
-
-
-  maintainCurrentHeading(): void {
-    this.controllerOrientation.enabled = true;
-    this.controllerOrientation.maintainCurrentHeading();
-    this.dataLog.clearLogData();
-  }
-
-
-  moveManually(level: number): void {
-    this.vibrate();
-    if (this.controllerOrientation.enabled) {
-      this.controllerOrientation.command(CoordinateUtils.normalizeHeading(this.controllerOrientation.desired - (level * 5)));
-    } else {
-      this.controllerRotationRate.enabled = true;
-      this.controllerRotationRate.command(this.controllerRotationRate.desired + level);
-    }
-  }
-
-  stopManually(): void {
-    this.controllerRotationRate.cancelPidTune();
-    this.controllerOrientation.cancelPidTune();
-
-    if (this.controllerOrientation.enabled)
-      this.controllerOrientation.enabled = false;
-
-    if (this.controllerRotationRate.enabled && this.controllerRotationRate.desired === 0)
-      this.controllerRotationRate.enabled = false;
-
-    this.controllerRotationRate.command(0)
-
-    this.vibrate();
-  }
-
-  private vibrate(): void {
-    navigator.vibrate([50]);
-  }
-
-
 
 }
 

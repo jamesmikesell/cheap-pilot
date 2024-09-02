@@ -1,0 +1,17 @@
+<div class="center-controls heading-button-container">
+  <button mat-raised-button color="primary" (click)="maintainCurrentHeading()" [disabled]="!deviceConnected">
+    Maintain Current Heading
+  </button>
+</div>
+
+<div class="center-controls manual-controls">
+  <button mat-raised-button color="primary" (click)="moveManually(MoveDirection.LEFT)" [disabled]="!deviceConnected">
+    &lt;- {{orientationControllerEnabled ? "5°" : "°/s"}}
+  </button>
+  <button mat-raised-button color="primary" (click)="moveManually(MoveDirection.STOP)" [disabled]="!deviceConnected">
+    stop
+  </button>
+  <button mat-raised-button color="primary" (click)="moveManually(MoveDirection.RIGHT)" [disabled]="!deviceConnected">
+    {{orientationControllerEnabled ? "5°" : "°/s"}} -&gt;
+  </button>
+</div>

@@ -27,9 +27,9 @@ import { DisplayStatsDeviceSensorsComponent } from './component/display-stats-de
 import { DisplayStatsRemoteComponent } from './component/display-stats-remote/display-stats-remote.component';
 import { DisplayStatsComponent } from './component/display-stats/display-stats.component';
 import { FullScreenMapComponent } from './component/full-screen-map/full-screen-map.component';
+import { ManualControlsComponent } from './component/manual-controls/manual-controls.component';
 import { MapComponent } from './component/map/map.component';
 import { NavBarComponent } from './component/nav-bar/nav-bar.component';
-import { RemoteControlComponent } from './component/remote-control/remote-control.component';
 
 
 @NgModule({
@@ -40,12 +40,12 @@ import { RemoteControlComponent } from './component/remote-control/remote-contro
     ConfigComponent,
     BlackoutComponent,
     MapComponent,
-    RemoteControlComponent,
     NavBarComponent,
     DisplayStatsComponent,
     FullScreenMapComponent,
     DisplayStatsDeviceSensorsComponent,
     DisplayStatsRemoteComponent,
+    ManualControlsComponent,
   ],
   imports: [
     BrowserModule,

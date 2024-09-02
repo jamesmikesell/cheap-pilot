@@ -1,14 +1,15 @@
+
 .center-controls {
   display: flex;
   place-content: space-around;
-  max-width: 532px;
 }
 
-.manual-controls {
-  margin-top: 34px !important;
+.heading-button-container {
+  margin-bottom: 15px;
 }
 
 .manual-controls>button {
   padding-top: 30px;
   padding-bottom: 28px;
+  margin-top: 10px;
 }

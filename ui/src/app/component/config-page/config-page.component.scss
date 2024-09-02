@@ -15,28 +15,13 @@
 }
 
 .manual-controls {
-  margin-top: 10px !important;
-  margin-bottom: 29px;
+  margin-top: 20px;
+  margin-bottom: 20px;
 }
 
-.manual-controls>button {
-  padding-top: 30px;
-  padding-bottom: 28px;
-}
 
 .map-div {
   height: 65vh;
-}
-
-.center-controls {
-  margin-top: 20px;
-  display: flex;
-  place-content: space-around;
-  max-width: 532px;
-}
-
-.heading-button-container>* {
-  margin-bottom: 20px;
 }
 
 .charts {
