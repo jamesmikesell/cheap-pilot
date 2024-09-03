@@ -7,6 +7,7 @@ import { ConfigService, RemoteReceiverMode } from 'src/app/service/config.servic
 import { ControllerOrientationService } from 'src/app/service/controller-orientation.service';
 import { DeviceSelectService } from 'src/app/service/device-select.service';
 import { ManualControlService } from 'src/app/service/manual-control.service';
+import { DialogSightHeadingLauncher } from '../dialog-sight-heading/dialog-sight-heading.component';
 
 @Component({
   selector: 'app-manual-controls',
@@ -18,10 +19,10 @@ export class ManualControlsComponent implements OnInit, OnDestroy {
   orientationControllerEnabled = false;
   deviceConnected = false;
   MoveDirection = MoveDirection;
+  remoteMode = false;
 
 
   private destroy = new Subject<void>();
-  private remoteMode = false;
 
 
   constructor(
@@ -31,6 +32,7 @@ export class ManualControlsComponent implements OnInit, OnDestroy {
     private remoteService: RemoteService,
     private messagingService: MessagingService,
     private manualControlService: ManualControlService,
+    private sightHeadingDialog: DialogSightHeadingLauncher,
   ) {
   }
 
@@ -91,6 +93,14 @@ export class ManualControlsComponent implements OnInit, OnDestroy {
         else
           this.manualControlService.stopManuallyLocal();
         break;
+    }
+  }
+
+
+  async launchSightHeading(): Promise<void> {
+    let headingOffset = await this.sightHeadingDialog.launch();
+    if (headingOffset !== undefined) {
+      void this.messagingService.sendMessage(RemoteMessageTopics.OFFSET_MANUALLY, headingOffset)
     }
   }
 

@@ -42,6 +42,10 @@ export class ReceiverService {
           .pipe(takeUntil(isReceiverModeChanges.pipe(skip(1))))
           .subscribe(() => this.stopManually())
 
+        this.messageService.getMessagesForTopic(RemoteMessageTopics.OFFSET_MANUALLY)
+          .pipe(takeUntil(isReceiverModeChanges.pipe(skip(1))))
+          .subscribe(payload => this.offsetCurrentHeading(payload as number))
+
         this.messageService.getMessagesForTopic(RemoteMessageTopics.NAVIGATE_ROUTE)
           .pipe(takeUntil(isReceiverModeChanges.pipe(skip(1))))
           .subscribe(route => this.pathReceived(route as LatLon[]))
@@ -103,6 +107,14 @@ export class ReceiverService {
   }
 
 
+  private offsetCurrentHeading(offset: number): void {
+    if (this.configService.config.remoteReceiverMode === RemoteReceiverMode.RECEIVER) {
+      this.manualControlService.offsetCurrentHeading(offset);
+      this.broadcastState();
+    }
+  }
+
+
   private pathReceived(route: LatLon[]): void {
     if (this.configService.config.remoteReceiverMode === RemoteReceiverMode.RECEIVER) {
       this.controllerPath.enabled = route.length > 0;
@@ -116,6 +128,7 @@ export class RemoteMessageTopics {
   static readonly MAINTAIN_CURRENT_HEADING = "MAINTAIN_CURRENT_HEADING";
   static readonly MOVE_MANUALLY = "MOVE_MANUALLY";
   static readonly STOP_MANUALLY = "STOP_MANUALLY";
+  static readonly OFFSET_MANUALLY = "OFFSET_MANUALLY";
   static readonly NAVIGATE_ROUTE = "NAVIGATE_ROUTE";
   static readonly REQUEST_UPDATE = "REQUEST_UPDATE";
   static readonly BROADCAST_STATE = "BROADCAST_STATE";

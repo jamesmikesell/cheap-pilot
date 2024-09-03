@@ -125,6 +125,37 @@ export class CoordinateUtils {
     return meanDegrees;
   }
 
+
+  static getCompassHeadingDeviceIsFacing(alpha: number, beta: number, gama: number): number {
+    // https://w3c.github.io/deviceorientation/spec-source-orientation.html#worked-example
+
+    let alphaRad = this.toRadians(alpha);
+    let betaRad = this.toRadians(beta);
+    let gammaRad = this.toRadians(gama);
+
+    let cA = Math.cos(alphaRad);
+    let sA = Math.sin(alphaRad);
+    let sB = Math.sin(betaRad);
+    let cG = Math.cos(gammaRad);
+    let sG = Math.sin(gammaRad);
+
+    let rA = - cA * sG - sA * sB * cG;
+    let rB = - sA * sG + cA * sB * cG;
+
+    let compassHeadingRad = Math.atan(rA / rB);
+
+    // Convert from half unit circle to whole unit circle
+    if (rB < 0) {
+      compassHeadingRad += Math.PI;
+    } else if (rA < 0) {
+      compassHeadingRad += 2 * Math.PI;
+    }
+
+    let correctedHeadingDeg = this.toDegrees(compassHeadingRad)
+    return this.normalizeHeading(correctedHeadingDeg);
+  }
+
+
 }
 
 

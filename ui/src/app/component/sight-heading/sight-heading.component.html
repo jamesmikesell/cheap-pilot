@@ -1,0 +1,27 @@
+<div class="video-container">
+  <video class="video-element" autoplay #uxVideo></video>
+
+  <div class="heading-overlay">
+    <mat-card class="mat-elevation-z2 no-select heading-card">
+      <div>
+        <span class="heading-degrees">{{heading | number:'1.0-0'}}</span>°
+      </div>
+    </mat-card>
+  </div>
+
+  <div *ngIf="stream" class="crosshairs"></div>
+
+  <div class="button-overlay">
+    <button mat-raised-button color="primary" (click)="handleButtonClick()">
+      <mat-icon>
+        {{destination === undefined ? "place" : "arrow_upward"}}
+      </mat-icon>
+
+      {{destination === undefined ? "Destination" : "Front of Vehicle"}}
+    </button>
+
+    <button mat-raised-button color="secondary" style="margin-left: 10px;" (click)="cancelButton()">
+      Cancel
+    </button>
+  </div>
+</div>

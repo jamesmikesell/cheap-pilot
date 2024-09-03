@@ -50,4 +50,11 @@ export class ManualControlService {
     this.controllerRotationRate.command(0)
   }
 
+
+  offsetCurrentHeading(offset: number) {
+    this.maintainCurrentHeadingLocal()
+    let current = this.controllerOrientation.desired;
+    this.controllerOrientation.command(current + offset)
+  }
+
 }

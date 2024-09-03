@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCardModule } from '@angular/material/card';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -30,6 +31,8 @@ import { FullScreenMapComponent } from './component/full-screen-map/full-screen-
 import { ManualControlsComponent } from './component/manual-controls/manual-controls.component';
 import { MapComponent } from './component/map/map.component';
 import { NavBarComponent } from './component/nav-bar/nav-bar.component';
+import { SightHeadingComponent } from './component/sight-heading/sight-heading.component';
+import { DialogSightHeadingComponent } from './component/dialog-sight-heading/dialog-sight-heading.component';
 
 
 @NgModule({
@@ -46,6 +49,8 @@ import { NavBarComponent } from './component/nav-bar/nav-bar.component';
     DisplayStatsDeviceSensorsComponent,
     DisplayStatsRemoteComponent,
     ManualControlsComponent,
+    SightHeadingComponent,
+    DialogSightHeadingComponent,
   ],
   imports: [
     BrowserModule,
@@ -65,6 +70,7 @@ import { NavBarComponent } from './component/nav-bar/nav-bar.component';
     MatSidenavModule,
     MatIconModule,
     MatListModule,
+    MatDialogModule,
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: !isDevMode(),
       // Register the ServiceWorker as soon as the application is stable

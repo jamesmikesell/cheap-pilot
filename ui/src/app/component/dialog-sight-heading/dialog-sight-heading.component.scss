@@ -1,0 +1,14 @@
+.sight-wrapper {
+  display: flex;
+  min-height: 100px;
+}
+
+::ng-deep {
+  .mat-mdc-dialog-container .mat-mdc-dialog-content {
+    padding: unset;
+  }
+
+  .mat-mdc-dialog-content {
+    max-height: unset;
+  }
+}

@@ -1,8 +1,16 @@
+<button *ngIf="remoteMode" mat-raised-button color="primary" class="head-there" (click)="launchSightHeading()"
+  [disabled]="!deviceConnected">
+  <mat-icon>terrain</mat-icon>
+  Head Over There
+</button>
+
+
 <div class="center-controls heading-button-container">
   <button mat-raised-button color="primary" (click)="maintainCurrentHeading()" [disabled]="!deviceConnected">
     Maintain Current Heading
   </button>
 </div>
+
 
 <div class="center-controls manual-controls">
   <button mat-raised-button color="primary" (click)="moveManually(MoveDirection.LEFT)" [disabled]="!deviceConnected">

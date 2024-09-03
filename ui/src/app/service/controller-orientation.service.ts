@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Subject, firstValueFrom } from 'rxjs';
+import { CoordinateUtils } from '../utils/coordinate-utils';
 import { ConfigService, PidTuneSaver } from './config.service';
 import { Controller } from './controller';
 import { ControllerRotationRateService } from './controller-rotation-rate.service';
@@ -49,7 +50,7 @@ export class ControllerOrientationService implements Controller<number> {
 
 
   command(level: number): void {
-    this._desired = level;
+    this._desired = CoordinateUtils.normalizeHeading(level);
   }
 
 
