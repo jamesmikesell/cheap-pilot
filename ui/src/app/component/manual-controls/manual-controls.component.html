@@ -1,8 +1,10 @@
-<button *ngIf="remoteMode" mat-raised-button color="primary" class="head-there" (click)="launchSightHeading()"
-  [disabled]="!deviceConnected">
-  <mat-icon>terrain</mat-icon>
-  Head Over There
-</button>
+<div *ngIf="remoteMode" class="center-controls">
+  <button mat-raised-button color="primary" class=" head-there" (click)="launchSightHeading()"
+    [disabled]="!deviceConnected">
+    <mat-icon>terrain</mat-icon>
+    Head Over There
+  </button>
+</div>
 
 
 <div class="center-controls heading-button-container">

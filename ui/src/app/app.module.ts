@@ -10,6 +10,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
@@ -24,6 +25,7 @@ import { BlackoutComponent } from './component/blackout/blackout.component';
 import { ChartComponent } from './component/chart/chart.component';
 import { ConfigPageComponent } from './component/config-page/config-page.component';
 import { ConfigComponent } from './component/config/config.component';
+import { DialogSightHeadingComponent } from './component/dialog-sight-heading/dialog-sight-heading.component';
 import { DisplayStatsDeviceSensorsComponent } from './component/display-stats-device-sensors/display-stats-device-sensors.component';
 import { DisplayStatsRemoteComponent } from './component/display-stats-remote/display-stats-remote.component';
 import { DisplayStatsComponent } from './component/display-stats/display-stats.component';
@@ -32,7 +34,6 @@ import { ManualControlsComponent } from './component/manual-controls/manual-cont
 import { MapComponent } from './component/map/map.component';
 import { NavBarComponent } from './component/nav-bar/nav-bar.component';
 import { SightHeadingComponent } from './component/sight-heading/sight-heading.component';
-import { DialogSightHeadingComponent } from './component/dialog-sight-heading/dialog-sight-heading.component';
 
 
 @NgModule({
@@ -71,6 +72,7 @@ import { DialogSightHeadingComponent } from './component/dialog-sight-heading/di
     MatIconModule,
     MatListModule,
     MatDialogModule,
+    MatProgressSpinnerModule,
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: !isDevMode(),
       // Register the ServiceWorker as soon as the application is stable

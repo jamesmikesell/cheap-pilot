@@ -1,4 +1,7 @@
 <div class="video-container">
+  <div *ngIf="!stream" class="spinner">
+    <mat-spinner></mat-spinner>
+  </div>
   <video class="video-element" autoplay #uxVideo></video>
 
   <div class="heading-overlay">
