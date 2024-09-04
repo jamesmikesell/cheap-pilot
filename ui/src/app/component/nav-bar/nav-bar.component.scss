@@ -10,6 +10,15 @@
   background: inherit;
 }
 
+::ng-deep {
+  .mat-drawer-inner-container::after {
+    content: '';
+    display: block;
+    height: 50px;
+    /* Set same as footer's height */
+  }
+}
+
 
 .page {
   display: flex;
@@ -25,15 +34,16 @@
   justify-content: space-between;
 }
 
-.version {
-  margin-top: 50px;
-  display: flex;
-  justify-content: flex-end;
-  margin-right: 10px;
-  margin-bottom: 5px;
+.version-container {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
   font-size: .8em;
 }
 
+.version-display {
+  margin: 6px;
+}
 
 .icon-suffix {
   margin-left: 9px;
