@@ -38,26 +38,52 @@ export class MapControlConnect {
           .pipe(map(() => this.configService.config.remoteReceiverMode))
           .pipe(distinctUntilChanged());
 
+        let lastMessageReceiptTime: number = undefined;
         let remoteBtConnected = false;
         let remoteConnectionStatusChanged = this.remoteService.stateBroadcastReceived
           .pipe(takeUntil(destroy))
-          .pipe(map(stat => stat.displayStats.bluetoothConnected))
-          .pipe(tap(connected => remoteBtConnected = connected))
+          .pipe(tap(state => {
+            lastMessageReceiptTime = Date.now();
+            remoteBtConnected = state.displayStats.bluetoothConnected
+          }))
 
         merge(
           remoteModeChangeListener,
           this.motorControllerService.connected,
           remoteConnectionStatusChanged,
+          interval(1000),
         ).pipe(takeUntil(destroy))
           .subscribe(() => {
             container.classList.remove("no-dark")
             button.classList.remove("bg-warn")
+            button.style.height = null
+            button.style.lineHeight = null
             if (this.configService.config.remoteReceiverMode === RemoteReceiverMode.REMOTE) {
-              button.innerHTML = '<span class="material-icons">settings_remote</span>';
-              if (!remoteBtConnected) {
+              let timeAgo = "∞";
+              let lastReceiptSecAgoRounded: number;
+              if (lastMessageReceiptTime) {
+                lastReceiptSecAgoRounded = Math.round((Date.now() - lastMessageReceiptTime) / 1000);
+                let minAgo = Math.floor(lastReceiptSecAgoRounded / 60)
+                let hourAgo = Math.floor(lastReceiptSecAgoRounded / 60 / 60)
+
+                if (minAgo >= 60)
+                  timeAgo = `${hourAgo}h`
+                else if (lastReceiptSecAgoRounded >= 60)
+                  timeAgo = `${minAgo}m`
+                else if (lastReceiptSecAgoRounded >= 15)
+                  timeAgo = `${lastReceiptSecAgoRounded}s`
+                else
+                  timeAgo = "now"
+              }
+
+              button.innerHTML = `<span class="material-icons">settings_remote</span> ${timeAgo}`;
+              button.style.height = "46px"
+              button.style.lineHeight = "1em"
+              if (!remoteBtConnected || lastReceiptSecAgoRounded >= 15) {
                 container.classList.add("no-dark")
                 button.classList.add("bg-warn")
               }
+
             } else {
               if (this.motorControllerService.connected.value) {
                 button.innerHTML = '<span class="material-icons">bluetooth_connected</span>';
