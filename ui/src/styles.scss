@@ -185,3 +185,7 @@ body {
 .no-select {
   user-select: none;
 }
+
+.overscroll:not(:has(.no-overscroll)) {
+  margin-bottom: 50vh;
+}

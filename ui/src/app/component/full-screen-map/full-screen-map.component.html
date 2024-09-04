@@ -1,37 +1,39 @@
-<div class="display-stats">
-  <mat-card class="mat-elevation-z2 stats-card no-select">
-    <app-display-stats-device-sensors *ngIf="configService.config.remoteReceiverMode !== RemoteReceiverMode.REMOTE">
-    </app-display-stats-device-sensors>
-    <app-display-stats-remote *ngIf="configService.config.remoteReceiverMode === RemoteReceiverMode.REMOTE">
-    </app-display-stats-remote>
-  </mat-card>
-</div>
+<div class="no-overscroll">
+  <div class="display-stats">
+    <mat-card class="mat-elevation-z2 stats-card no-select">
+      <app-display-stats-device-sensors *ngIf="configService.config.remoteReceiverMode !== RemoteReceiverMode.REMOTE">
+      </app-display-stats-device-sensors>
+      <app-display-stats-remote *ngIf="configService.config.remoteReceiverMode === RemoteReceiverMode.REMOTE">
+      </app-display-stats-remote>
+    </mat-card>
+  </div>
 
 
 
-<div class="manual-control-overlay"
-  *ngIf="configService.config.remoteReceiverMode === RemoteReceiverMode.REMOTE || motorControllerService.connected.value">
-  <mat-card class="mat-elevation-z2 bottom-overlay-card">
-    <div>
-      <button mat-mini-fab color="primary" class="mat-elevation-z2" (click)="showOverlay = !showOverlay">
-        <mat-icon>{{!showOverlay ? "explore" : "keyboard_double_arrow_down"}}</mat-icon>
-      </button>
-    </div>
-
-
-    <div *ngIf="showOverlay">
-      <div class="manual-controls">
-        <app-manual-controls
-          *ngIf="motorControllerService.connected.value || configService.config.remoteReceiverMode === RemoteReceiverMode.REMOTE">
-        </app-manual-controls>
+  <div class="manual-control-overlay"
+    *ngIf="configService.config.remoteReceiverMode === RemoteReceiverMode.REMOTE || motorControllerService.connected.value">
+    <mat-card class="mat-elevation-z2 bottom-overlay-card">
+      <div>
+        <button mat-mini-fab color="primary" class="mat-elevation-z2" (click)="showOverlay = !showOverlay">
+          <mat-icon>{{!showOverlay ? "explore" : "keyboard_double_arrow_down"}}</mat-icon>
+        </button>
       </div>
-    </div>
-
-  </mat-card>
-</div>
 
 
+      <div *ngIf="showOverlay">
+        <div class="manual-controls">
+          <app-manual-controls
+            *ngIf="motorControllerService.connected.value || configService.config.remoteReceiverMode === RemoteReceiverMode.REMOTE">
+          </app-manual-controls>
+        </div>
+      </div>
 
-<div class="map-div">
-  <app-map></app-map>
+    </mat-card>
+  </div>
+
+
+
+  <div class="map-div">
+    <app-map></app-map>
+  </div>
 </div>
