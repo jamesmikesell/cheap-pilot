@@ -128,17 +128,17 @@
       <div class="input-list">
         <mat-form-field>
           <mat-label>Proportional</mat-label>
-          <input matInput type="number" [(ngModel)]="configService.config.rotationKp">
+          <input matInput type="number" [(ngModel)]="configService.config.rotationKp" step="0.05">
         </mat-form-field>
 
         <mat-form-field>
           <mat-label>Integral</mat-label>
-          <input matInput type="number" [(ngModel)]="configService.config.rotationKi">
+          <input matInput type="number" [(ngModel)]="configService.config.rotationKi" step="0.05">
         </mat-form-field>
 
         <mat-form-field>
           <mat-label>Derivative</mat-label>
-          <input matInput type="number" [(ngModel)]="configService.config.rotationKd">
+          <input matInput type="number" [(ngModel)]="configService.config.rotationKd" step="0.05">
         </mat-form-field>
 
         <div class="flex-break"></div>
@@ -237,17 +237,17 @@
       <div class="input-list">
         <mat-form-field>
           <mat-label>Proportional</mat-label>
-          <input matInput type="number" [(ngModel)]="configService.config.orientationKp">
+          <input matInput type="number" [(ngModel)]="configService.config.orientationKp" step="0.05">
         </mat-form-field>
 
         <mat-form-field>
           <mat-label>Integral</mat-label>
-          <input matInput type="number" [(ngModel)]="configService.config.orientationKi">
+          <input matInput type="number" [(ngModel)]="configService.config.orientationKi" step="0.05">
         </mat-form-field>
 
         <mat-form-field>
           <mat-label>Derivative</mat-label>
-          <input matInput type="number" [(ngModel)]="configService.config.orientationKd">
+          <input matInput type="number" [(ngModel)]="configService.config.orientationKd" step="0.05">
         </mat-form-field>
 
 
