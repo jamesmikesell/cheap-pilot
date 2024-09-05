@@ -66,7 +66,7 @@ export class AppConfig {
   rotationKi = 0;
   rotationKd = 0;
   rotationPidDerivativeLowPassFrequency = 1 / 10;
-  rotationLowPassFrequency = 1 / 8;
+  rotationLowPassFrequency = .5;
   rotationTuneSpeedKts: number;
   rotationTuneNoiseBand = 1;
   rotationTuneAllowedVariance = 10;
