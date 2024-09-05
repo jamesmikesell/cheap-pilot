@@ -7,6 +7,7 @@ import { ConfigService, RemoteReceiverMode } from 'src/app/service/config.servic
 import { ControllerOrientationService } from 'src/app/service/controller-orientation.service';
 import { DeviceSelectService } from 'src/app/service/device-select.service';
 import { ManualControlService } from 'src/app/service/manual-control.service';
+import { SensorOrientationService } from 'src/app/service/sensor-orientation.service';
 import { DialogSightHeadingLauncher } from '../dialog-sight-heading/dialog-sight-heading.component';
 
 @Component({
@@ -98,6 +99,8 @@ export class ManualControlsComponent implements OnInit, OnDestroy {
 
 
   async launchSightHeading(): Promise<void> {
+    SensorOrientationService.requestOrientationPermission();
+
     let headingOffset = await this.sightHeadingDialog.launch();
     if (headingOffset !== undefined) {
       void this.messagingService.sendMessage(RemoteMessageTopics.OFFSET_MANUALLY, headingOffset)
