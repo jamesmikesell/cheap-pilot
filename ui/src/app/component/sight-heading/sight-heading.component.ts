@@ -79,7 +79,8 @@ export class SightHeadingComponent implements OnInit, OnDestroy {
 
 
   private vibrate(): void {
-    navigator.vibrate([50]);
+    if (navigator.vibrate)
+      navigator.vibrate([50]);
   }
 
 
