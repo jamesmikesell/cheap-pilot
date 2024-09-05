@@ -57,13 +57,13 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     this.map = L.map(this.uxMap.nativeElement, { editable: true, zoomControl: false, }).setView([0, 0], 0)
     this.configureZoomControl();
     this.configureAppMenuControl();
-    this.configureUpdatesFromController();
     this.configureBaseMaps();
     this.configureConnection();
     this.addEditControls();
     this.addLocateControl();
     this.configureLocationUpdates();
     this.configurePathUpdateFromRemoteReceipt();
+    this.configureUpdatesFromController();
   }
 
 
@@ -93,8 +93,9 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
 
   private configurePathUpdateFromRemoteReceipt(): void {
-    this.remoteService.stateBroadcastReceived
+    this.remoteService.lastStateBroadcastReceived
       .pipe(takeUntil(this.destroy))
+      .pipe(filter(update => !!update))
       .subscribe(message => {
         this.remoteBtConnected = message.displayStats.bluetoothConnected;
         void this.remoteUpdateReceived(message.path)
@@ -180,9 +181,9 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
 
   private configureLocationUpdates(): void {
-    let remoteDevicePositions: Observable<GpsSensorData> = this.remoteService.stateBroadcastReceived
+    let remoteDevicePositions: Observable<GpsSensorData> = this.remoteService.lastStateBroadcastReceived
       .pipe(takeUntil(this.destroy))
-      .pipe(filter(update => !!update.currentPosition))
+      .pipe(filter(update => update && !!update.currentPosition))
       .pipe(map(message => message.currentPosition))
       .pipe(filter(() => this.configService.config.remoteReceiverMode === RemoteReceiverMode.REMOTE))
 

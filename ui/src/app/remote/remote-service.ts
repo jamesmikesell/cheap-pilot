@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { plainToInstance } from "class-transformer";
-import { BehaviorSubject, distinctUntilChanged, interval, map, skip, Subject, takeUntil } from "rxjs";
+import { BehaviorSubject, distinctUntilChanged, interval, map, skip, takeUntil } from "rxjs";
 import { ConfigService, RemoteReceiverMode } from "../service/config.service";
 import { LatLon } from "../utils/coordinate-utils";
 import { StatsBroadcast } from "./message-dtos";
@@ -13,7 +13,6 @@ import { RemoteMessageTopics } from "./receiver-service";
 export class RemoteService {
 
 
-  stateBroadcastReceived = new Subject<StatsBroadcast>();
   lastStateBroadcastReceived = new BehaviorSubject<StatsBroadcast>(undefined);
 
 
@@ -27,7 +26,6 @@ export class RemoteService {
         this.requestUpdate();
     })
 
-    this.stateBroadcastReceived.subscribe(this.lastStateBroadcastReceived)
 
     let isRemoteModeChanges = interval(500)
       .pipe(map(() => this.configService.config.remoteReceiverMode === RemoteReceiverMode.REMOTE))
@@ -38,7 +36,7 @@ export class RemoteService {
         this.messageService.getMessagesForTopic(RemoteMessageTopics.BROADCAST_STATE)
           .pipe(takeUntil(isRemoteModeChanges.pipe(skip(1))))
           .pipe(map(plain => plainToInstance(StatsBroadcast, plain)))
-          .subscribe(message => this.stateBroadcastReceived.next(message))
+          .subscribe(message => this.lastStateBroadcastReceived.next(message))
 
         setTimeout(() => {
           this.requestUpdate();

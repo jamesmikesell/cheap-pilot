@@ -9,4 +9,6 @@ export class StatsBroadcast {
   currentPosition: GpsSensorData;
   @Type(() => LatLonInst)
   path: LatLon[];
+  @Type(() => Date)
+  timestamp: Date;
 }

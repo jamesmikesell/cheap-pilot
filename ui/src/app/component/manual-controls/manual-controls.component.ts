@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { interval, merge, Subject, takeUntil } from 'rxjs';
+import { filter, interval, merge, Subject, takeUntil } from 'rxjs';
 import { MessagingService } from 'src/app/remote/messaging-service';
 import { RemoteMessageTopics } from 'src/app/remote/receiver-service';
 import { RemoteService } from 'src/app/remote/remote-service';
@@ -47,7 +47,7 @@ export class ManualControlsComponent implements OnInit, OnDestroy {
     merge(
       interval(100),
       this.deviceSelectService.motorController.connected,
-      this.remoteService.stateBroadcastReceived
+      this.remoteService.lastStateBroadcastReceived.pipe(filter(state => !!state))
     ).pipe(takeUntil(this.destroy))
       .subscribe(() => {
         this.remoteMode = this.configService.config.remoteReceiverMode === RemoteReceiverMode.REMOTE

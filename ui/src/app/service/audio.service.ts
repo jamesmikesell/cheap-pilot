@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { distinctUntilChanged, map, merge } from 'rxjs';
+import { distinctUntilChanged, filter, map, merge } from 'rxjs';
 import { RemoteService } from '../remote/remote-service';
 import { ConfigService } from './config.service';
 import { ControllerPathService } from './controller-path.service';
@@ -28,7 +28,8 @@ export class AudioService {
 
 
   private listenForBtDisconnect(): void {
-    let remoteConnected = this.remoteService.stateBroadcastReceived
+    let remoteConnected = this.remoteService.lastStateBroadcastReceived
+      .pipe(filter(state => !!state))
       .pipe(map(state => state.displayStats.bluetoothConnected))
 
     let previouslyConnected = false;
@@ -45,7 +46,8 @@ export class AudioService {
 
 
   private listenForRouteFinished(): void {
-    let remotePathControllerOn = this.remoteService.stateBroadcastReceived
+    let remotePathControllerOn = this.remoteService.lastStateBroadcastReceived
+      .pipe(filter(state => !!state))
       .pipe(map(state => state.path && !!state.path.length))
       .pipe(distinctUntilChanged())
 

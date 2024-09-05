@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import * as L from "leaflet";
-import { distinctUntilChanged, interval, map, merge, Subject, takeUntil, tap } from "rxjs";
+import { distinctUntilChanged, filter, interval, map, merge, Subject, takeUntil, tap } from "rxjs";
 import { RemoteService } from "src/app/remote/remote-service";
 import { ConfigService, RemoteReceiverMode } from "src/app/service/config.service";
 import { Controller } from "src/app/service/controller";
@@ -40,10 +40,11 @@ export class MapControlConnect {
 
         let lastMessageReceiptTime: number = undefined;
         let remoteBtConnected = false;
-        let remoteConnectionStatusChanged = this.remoteService.stateBroadcastReceived
+        let remoteConnectionStatusChanged = this.remoteService.lastStateBroadcastReceived
           .pipe(takeUntil(destroy))
+          .pipe(filter(state => !!state))
           .pipe(tap(state => {
-            lastMessageReceiptTime = Date.now();
+            lastMessageReceiptTime = state.timestamp.getTime();
             remoteBtConnected = state.displayStats.bluetoothConnected
           }))
 

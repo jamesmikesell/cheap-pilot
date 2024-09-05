@@ -76,6 +76,7 @@ export class ReceiverService {
         displayStats: this.displayStatsService.currentStats(),
         currentPosition: this.deviceSelectionService.gpsSensor.locationData.value,
         path: this.controllerPath.pathSubscription.value,
+        timestamp: new Date(),
       }
 
       void this.messageService.sendMessage(RemoteMessageTopics.BROADCAST_STATE, instanceToPlain(message))

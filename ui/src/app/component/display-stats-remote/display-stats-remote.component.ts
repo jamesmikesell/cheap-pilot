@@ -1,9 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { plainToInstance } from 'class-transformer';
-import { map, Subject, takeUntil } from 'rxjs';
-import { StatsBroadcast } from 'src/app/remote/message-dtos';
-import { MessagingService } from 'src/app/remote/messaging-service';
-import { RemoteMessageTopics } from 'src/app/remote/receiver-service';
+import { filter, Subject, takeUntil } from 'rxjs';
+import { RemoteService } from 'src/app/remote/remote-service';
 import { DisplayStats } from '../display-stats/display-stats.component';
 
 @Component({
@@ -20,7 +17,7 @@ export class DisplayStatsRemoteComponent implements OnInit, OnDestroy {
 
 
   constructor(
-    private messagingService: MessagingService,
+    private remoteService: RemoteService,
   ) { }
 
 
@@ -31,9 +28,9 @@ export class DisplayStatsRemoteComponent implements OnInit, OnDestroy {
 
 
   ngOnInit(): void {
-    this.messagingService.getMessagesForTopic(RemoteMessageTopics.BROADCAST_STATE)
+    this.remoteService.lastStateBroadcastReceived
       .pipe(takeUntil(this.destroy))
-      .pipe(map(plain => plainToInstance(StatsBroadcast, plain)))
+      .pipe(filter(state => !!state))
       .subscribe(stats => this.displayStats = stats.displayStats)
   }
 }
