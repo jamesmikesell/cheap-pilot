@@ -40,6 +40,13 @@ export class DialogSightHeadingComponent {
 
 
   @HostListener('window:resize')
+  windowResizeHandler(): void {
+    setTimeout(() => {
+      this.resizeWindow()
+    }, 500);
+  }
+
+
   private resizeWindow(): void {
     const maxWidth = window.innerWidth * 0.9; // 90dvw
     const maxHeight = window.innerHeight * 0.9; // 90dvh
