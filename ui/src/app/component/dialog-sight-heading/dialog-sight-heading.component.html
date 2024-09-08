@@ -1,6 +1,7 @@
 <mat-dialog-content>
-  <div class="sight-wrapper">
-    <app-sight-heading (canceled)="closeDialog()" (headingChange)="headingSelected($event)">
+  <div class="sight-wrapper" [style.width]="width+'px'" [style.height]="height+'px'">
+    <app-sight-heading (canceled)="closeDialog()" (headingChange)="headingSelected($event)"
+      (videoSizeChange)="videoSizeChange($event)">
     </app-sight-heading>
   </div>
 </mat-dialog-content>

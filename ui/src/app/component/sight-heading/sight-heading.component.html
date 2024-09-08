@@ -2,7 +2,7 @@
   <div *ngIf="!stream" class="spinner">
     <mat-spinner></mat-spinner>
   </div>
-  <video class="video-element" autoplay #uxVideo></video>
+  <video class="video-element" autoplay #uxVideo (loadedmetadata)="videoInfoChange($event)"></video>
 
   <div class="heading-overlay">
     <mat-card class="mat-elevation-z2 no-select heading-card">

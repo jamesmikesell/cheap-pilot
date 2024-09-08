@@ -18,6 +18,8 @@ export class SightHeadingComponent implements OnInit, OnDestroy {
 
   @Output() canceled = new EventEmitter<void>()
   @Output() headingChange = new EventEmitter<number>()
+  @Output() videoSizeChange = new EventEmitter<VideoSize>()
+
 
   @ViewChild("uxVideo")
   private uxVideo: ElementRef<HTMLVideoElement>;
@@ -60,6 +62,15 @@ export class SightHeadingComponent implements OnInit, OnDestroy {
   }
 
 
+  videoInfoChange(event: any): void {
+    if (event)
+      this.videoSizeChange.next({ height: this.uxVideo.nativeElement.videoHeight, width: this.uxVideo.nativeElement.videoWidth })
+    else
+      this.videoSizeChange.next(undefined)
+  }
+
+
+
   handleButtonClick(): void {
     if (this.destination === undefined) {
       this.vibrate()
@@ -90,4 +101,10 @@ export class SightHeadingComponent implements OnInit, OnDestroy {
     this.canceled.next();
   }
 
+}
+
+
+export interface VideoSize {
+  height: number;
+  width: number;
 }
