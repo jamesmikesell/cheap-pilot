@@ -7,7 +7,7 @@ if [ -z "$(git status --porcelain)" ]; then
 
   rm -rf ../docs
   rm -rf dist
-  echo "export class AppVersion { static readonly VERSION = \""$(git rev-parse --short HEAD)"\"; }">src/app/app-version.ts
+  echo "export class AppVersion { static readonly VERSION = \""$(git rev-parse --short HEAD)-$(date +%m%d%y%H%M)"\"; }">src/app/app-version.ts
   npm run build
   mv dist/ui/browser ../docs
 
