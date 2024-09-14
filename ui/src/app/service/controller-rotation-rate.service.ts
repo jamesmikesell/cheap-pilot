@@ -1,15 +1,16 @@
 import { Injectable } from '@angular/core';
 import { Subject, firstValueFrom } from 'rxjs';
-import { ConfigService, PidTuneSaver, RotationControllerConfig } from './config.service';
+import { CoordinateUtils } from '../utils/coordinate-utils';
+import { UnitConverter } from '../utils/unit-converter';
+import { ConfigService, PidTuneSaver } from './config.service';
 import { Controller } from './controller';
 import { ControllerRotationRateLogData, DataLogService } from './data-log.service';
 import { DeviceSelectService } from './device-select.service';
-import { Filter, LowPassFilter } from './filter';
+import { Filter, HeadingFilter, LowPassFilter } from './filter';
 import { PidConfig, PidController } from './pid-controller';
 import { PidTuner, PidTuningSuggestedValues, TuneConfig, TuningResult } from './pid-tuner';
-import { HeadingAndTime } from './sensor-orientation.service';
-import { UnitConverter } from '../utils/unit-converter';
 import { GpsSensor } from './sensor-gps.service';
+import { HeadingAndTime } from './sensor-orientation.service';
 
 @Injectable({
   providedIn: 'root'
@@ -36,7 +37,8 @@ export class ControllerRotationRateService implements Controller<number> {
 
   private _desired = 0;
   private pidController: PidController;
-  private filter = this.getFilter();
+  private filterHeading: Filter;
+  private filterRotationRate: Filter;
   private _enabled = false;
   private tuner: PidTuner;
   private motorService: Controller<number>;
@@ -52,12 +54,13 @@ export class ControllerRotationRateService implements Controller<number> {
   ) {
     this.motorService = deviceSelectService.motorController;
     this.sensorLocation = deviceSelectService.gpsSensor;
-
+    this.filterRotationRate = new LowPassFilter({ getNumber: () => this.configService.config.rotationLowPassFrequency });
+    this.filterHeading = new HeadingFilter({ getNumber: () => this.configService.config.rotationPreFilterHeadingLowPassFrequency })
 
     this.configurePidController();
 
     let sensorOrientation = deviceSelectService.orientationSensor;
-    sensorOrientation.heading.subscribe(heading => this.updateReceived(heading))
+    sensorOrientation.heading.subscribe(heading => this.updateReceived(heading));
   }
 
 
@@ -98,7 +101,12 @@ export class ControllerRotationRateService implements Controller<number> {
   }
 
 
-  private updateReceived(heading: HeadingAndTime): void {
+  private updateReceived(headingRaw: HeadingAndTime): void {
+    let filteredHeading = new HeadingAndTime(
+      headingRaw.time,
+      this.filterHeading.process(headingRaw.heading, headingRaw.time),
+    )
+
     try {
       if (!this.previousHeading)
         return;
@@ -108,23 +116,23 @@ export class ControllerRotationRateService implements Controller<number> {
       if (this.getCurrentSpeedMps() > 0.01)
         speedMps = this.getCurrentSpeedMps();
 
-      let timeDeltaSeconds = (heading.time - this.previousHeading.time) / 1000;
-      let rawRotationRate = this.getGetRotationAmount(heading.heading, this.previousHeading.heading) / timeDeltaSeconds;
+      let timeDeltaSeconds = (filteredHeading.time - this.previousHeading.time) / 1000;
+      let rawRotationRate = this.getGetRotationAmount(filteredHeading.heading, this.previousHeading.heading) / timeDeltaSeconds;
 
       if (!this.enabled && !this.tuner)
         this._desired = rawRotationRate; //this prevents a buildup of error if the controller isn't enabled
 
-      let filteredRotationRate = this.filter.process(rawRotationRate, heading.time);
+      let filteredRotationRate = this.filterRotationRate.process(rawRotationRate, filteredHeading.time);
       let command: number;
       if (this.tuner) {
-        command = this.tuner.sensorValueUpdated(filteredRotationRate, heading.time);
+        command = this.tuner.sensorValueUpdated(filteredRotationRate, filteredHeading.time);
       } else {
         let maxRotationRate = UnitConverter.ktToMps(this.configService.config.maxTurnRateDegreesPerSecondPerKt) * speedMps;
         let limitedDesired = Math.min(this._desired, maxRotationRate);
         limitedDesired = Math.max(limitedDesired, -maxRotationRate);
         let error = filteredRotationRate - limitedDesired;
 
-        command = this.pidController.update(error, heading.time);
+        command = this.pidController.update(error, filteredHeading.time);
         this.pidController.saturationReached = Math.abs(command) >= 1;
         command = Math.max(command, -1)
         command = Math.min(command, 1)
@@ -143,14 +151,9 @@ export class ControllerRotationRateService implements Controller<number> {
 
       this.dataLog.logControllerRotationRate(logData);
     } finally {
-      this.previousHeading = heading;
+      this.previousHeading = filteredHeading;
     }
 
-  }
-
-
-  private getFilter(): Filter {
-    return new LowPassFilter({ getNumber: () => this.configService.config.rotationLowPassFrequency });
   }
 
 
