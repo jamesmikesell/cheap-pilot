@@ -20,6 +20,7 @@ export class ChartComponent {
 
   lineChartOptions: ChartOptions<'scatter'> = {
     responsive: true,
+    maintainAspectRatio: false,
     animation: false,
     hover: { mode: null },
     plugins: {

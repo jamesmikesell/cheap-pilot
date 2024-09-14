@@ -19,15 +19,18 @@
 
 
 <div class="charts">
-  <app-chart *ngIf="configService.config.showGraphGps" [data]="chartGpsHeading" title="GPS Heading"
-    (dblclick)="clearGraphs()">
-  </app-chart>
-  <app-chart *ngIf="configService.config.showGraphOrientation" [data]="chartOrientation"
-    title="Orientation Controller (Zero is Set Point)" (dblclick)="clearGraphs()">
-  </app-chart>
-  <app-chart *ngIf="configService.config.showGraphRotation" [data]="chartDataRotationRate"
-    title="Rotation Rate Controller" (dblclick)="clearGraphs()">
-  </app-chart>
+  <div class="chart-container" *ngIf="configService.config.showGraphGps">
+    <app-chart [data]="chartGpsHeading" title="GPS Heading" (dblclick)="clearGraphs()">
+    </app-chart>
+  </div>
+  <div class="chart-container" *ngIf="configService.config.showGraphOrientation">
+    <app-chart [data]="chartOrientation" title="Orientation Controller (Zero is Set Point)" (dblclick)="clearGraphs()">
+    </app-chart>
+  </div>
+  <div class="chart-container" *ngIf="configService.config.showGraphRotation">
+    <app-chart [data]="chartDataRotationRate" title="Rotation Rate Controller" (dblclick)="clearGraphs()">
+    </app-chart>
+  </div>
 </div>
 
 
