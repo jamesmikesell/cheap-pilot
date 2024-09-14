@@ -134,9 +134,9 @@ export class ControllerRotationRateService implements Controller<number> {
           this.motorService.command(command);
       }
 
-
+      let loggedSetPoint = this.enabled ? this._desired : 0;
       let logData = new ControllerRotationRateLogData(
-        this._desired,
+        loggedSetPoint,
         filteredRotationRate,
         this.deviceSelectService.mockBoat.rotationRateReal(),
         command,
