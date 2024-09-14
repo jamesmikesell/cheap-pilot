@@ -11,34 +11,36 @@ export class SensorOrientationService implements OrientationSensor {
   deviceFacingHeading = new BehaviorSubject<HeadingAndTime>(new HeadingAndTime(0, 0));
 
 
-  private absoluteSupported = false;
-
-
   constructor() {
-    window.addEventListener('deviceorientationabsolute', (eventData) => this.orientationChanged(eventData, true));
-    window.addEventListener('deviceorientation', (eventData) => this.orientationChanged(eventData, false));
+    if (SensorOrientationService.supportsAbsoluteOrientation())
+      window.addEventListener('deviceorientationabsolute', (eventData) => this.orientationChanged(eventData));
+    else
+      window.addEventListener('deviceorientation', (eventData) => this.orientationChanged(eventData));
   }
 
-  private orientationChanged(event: DeviceOrientationEvent, absolute: boolean): void {
-    if (absolute && !this.absoluteSupported)
-      this.absoluteSupported = true;
+  private orientationChanged(event: DeviceOrientationEvent): void {
+    this.heading.next(new HeadingAndTime(event.timeStamp, 360 - event.alpha));
 
-    if ((this.absoluteSupported && absolute) || (!this.absoluteSupported)) {
-      this.heading.next(new HeadingAndTime(event.timeStamp, 360 - event.alpha));
+    let deviceFaceHeadingRaw = CoordinateUtils.getCompassHeadingDeviceIsFacing(event.alpha, event.beta, event.gamma)
+    this.deviceFacingHeading.next(new HeadingAndTime(event.timeStamp, deviceFaceHeadingRaw));
+  }
 
-      let deviceFaceHeadingRaw = CoordinateUtils.getCompassHeadingDeviceIsFacing(event.alpha, event.beta, event.gamma)
-      this.deviceFacingHeading.next(new HeadingAndTime(event.timeStamp, deviceFaceHeadingRaw));
-    }
+
+  /** This is a hack... ios has a method which is required to request permission to the orientation sensor.  ios doesn't currently
+   * support absolute orientation.  therefore if the method to request orientation permission exists, assume device can't
+   * provide absolute orientation.
+   */
+  static supportsAbsoluteOrientation(): boolean {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    return !(DeviceOrientationEvent as any).requestPermission;
   }
 
 
   // This has to be triggered from a click event
   static requestOrientationPermission(): void {
-    try {
+    if (!this.supportsAbsoluteOrientation()) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       void (DeviceOrientationEvent as any).requestPermission()
-    } catch (error) {
-      console.error(error)
     }
   }
 
