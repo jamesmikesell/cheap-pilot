@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { instanceToPlain, plainToInstance } from 'class-transformer';
 import { PidConfig } from './pid-controller';
 import { PidTuningSuggestedValues } from './pid-tuner';
-import { UnitConverter } from '../utils/unit-converter';
 
 @Injectable({
   providedIn: 'root'
@@ -49,7 +48,6 @@ export class ConfigService {
       title: title,
       derivativeLowPassFrequency: cfg.rotationPidDerivativeLowPassFrequency,
       lowPassFrequency: cfg.rotationLowPassFrequency,
-      rotationTuneSpeedMps: UnitConverter.ktToMps(cfg.rotationTuneSpeedKts),
     })
   }
 
@@ -68,11 +66,10 @@ export class AppConfig {
   rotationPidDerivativeLowPassFrequency = 1 / 10;
   rotationLowPassFrequency = .5;
   rotationTuneStepPowerPercent = 100;
-  rotationTuneSpeedKts: number;
   rotationTuneNoiseBand = 1;
   rotationTuneAllowedVariance = 10;
   rotationTuneDisableNoiseBandCycles = 2;
-  rotationConfigs: RotationControllerConfig[] = [];
+  rotationConfigs: ControllerConfig[] = [];
   maxTurnRateDegreesPerSecondPerKt = 4;
   
   
@@ -115,10 +112,6 @@ export interface ControllerConfig {
   lowPassFrequency: number;
 }
 
-
-export interface RotationControllerConfig extends ControllerConfig {
-  rotationTuneSpeedMps: number;
-}
 
 
 export class PidTuneSaver {

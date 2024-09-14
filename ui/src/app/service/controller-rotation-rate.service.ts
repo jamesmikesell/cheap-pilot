@@ -125,11 +125,7 @@ export class ControllerRotationRateService implements Controller<number> {
         limitedDesired = Math.max(limitedDesired, -maxRotationRate);
         let error = filteredRotationRate - limitedDesired;
 
-        let speedMultiplier = 1;
-        if (this.configService.config.rotationTuneSpeedKts)
-          speedMultiplier = UnitConverter.ktToMps(this.configService.config.rotationTuneSpeedKts) / speedMps;
-
-        command = this.pidController.update(error * speedMultiplier, heading.time);
+        command = this.pidController.update(error, heading.time);
         this.pidController.saturationReached = Math.abs(command) >= 1;
         command = Math.max(command, -1)
         command = Math.min(command, 1)
@@ -192,18 +188,10 @@ export class ControllerRotationRateService implements Controller<number> {
     this.configService.config.rotationKp = +tuningMethod.kP.toPrecision(4);
     this.configService.config.rotationKi = +tuningMethod.kI.toPrecision(4);
     this.configService.config.rotationKd = +tuningMethod.kD.toPrecision(4);
-    this.configService.config.rotationTuneSpeedKts = +UnitConverter
-      .mpsToKts(this.getCurrentSpeedMps())
-      .toPrecision(3);
 
     let configValues = PidTuneSaver.convert(suggestedPidValues,
       this.configService.config.rotationLowPassFrequency,
       this.configService.config.rotationPidDerivativeLowPassFrequency)
-      .map(singleConfig => {
-        let cast = (singleConfig as RotationControllerConfig);
-        cast.rotationTuneSpeedMps = +this.getCurrentSpeedMps().toPrecision(3);
-        return cast;
-      })
 
     let existing = this.configService.config.rotationConfigs || []
     this.configService.config.rotationConfigs = [...configValues, ...existing]

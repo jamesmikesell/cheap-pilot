@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { ConfigService, ControllerConfig, RemoteReceiverMode, RotationControllerConfig } from 'src/app/service/config.service';
+import { ConfigService, ControllerConfig, RemoteReceiverMode } from 'src/app/service/config.service';
 import { Controller } from 'src/app/service/controller';
 import { ConnectableDevice } from 'src/app/service/controller-bt-motor.service';
 import { ControllerOrientationService } from 'src/app/service/controller-orientation.service';
@@ -9,7 +9,6 @@ import { ControllerRotationRateService } from 'src/app/service/controller-rotati
 import { DataLogService } from 'src/app/service/data-log.service';
 import { DeviceSelectService } from 'src/app/service/device-select.service';
 import { TuningResult } from 'src/app/service/pid-tuner';
-import { UnitConverter } from 'src/app/utils/unit-converter';
 
 @Component({
   selector: 'app-config',
@@ -19,7 +18,7 @@ import { UnitConverter } from 'src/app/utils/unit-converter';
 export class ConfigComponent implements OnInit {
 
   btConnected = false;
-  selectedRotationConfig: RotationControllerConfig[];
+  selectedRotationConfig: ControllerConfig[];
   selectedOrientationConfig: ControllerConfig[];
   RemoteReceiverMode = RemoteReceiverMode;
   motorSliderPower = 0;
@@ -73,7 +72,6 @@ export class ConfigComponent implements OnInit {
     this.configService.config.rotationKd = selected.kD;
     this.configService.config.rotationPidDerivativeLowPassFrequency = selected.derivativeLowPassFrequency;
     this.configService.config.rotationLowPassFrequency = selected.lowPassFrequency;
-    this.configService.config.rotationTuneSpeedKts = UnitConverter.mpsToKts(selected.rotationTuneSpeedMps);
 
     this.selectedRotationConfig = undefined;
   }
