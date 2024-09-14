@@ -11,24 +11,26 @@ export class SensorOrientationService implements OrientationSensor {
   deviceFacingHeading = new BehaviorSubject<HeadingAndTime>(new HeadingAndTime(0, 0));
 
 
-  private absoluteSupported = false;
+  private relativeListener: (eventData: DeviceOrientationEvent) => void;
 
 
   constructor() {
     window.addEventListener('deviceorientationabsolute', (eventData) => this.orientationChanged(eventData, true));
-    window.addEventListener('deviceorientation', (eventData) => this.orientationChanged(eventData, false));
+
+    this.relativeListener = (eventData: DeviceOrientationEvent) => this.orientationChanged(eventData, false);
+    window.addEventListener('deviceorientation', this.relativeListener);
   }
 
+
   private orientationChanged(event: DeviceOrientationEvent, absolute: boolean): void {
-    if (absolute && !this.absoluteSupported)
-      this.absoluteSupported = true;
-
-    if ((this.absoluteSupported && absolute) || (!this.absoluteSupported)) {
-      this.heading.next(new HeadingAndTime(event.timeStamp, 360 - event.alpha));
-
-      let deviceFaceHeadingRaw = CoordinateUtils.getCompassHeadingDeviceIsFacing(event.alpha, event.beta, event.gamma)
-      this.deviceFacingHeading.next(new HeadingAndTime(event.timeStamp, deviceFaceHeadingRaw));
+    if (absolute) {
+      window.removeEventListener('deviceorientation', this.relativeListener);
     }
+
+    this.heading.next(new HeadingAndTime(event.timeStamp, 360 - event.alpha));
+
+    let deviceFaceHeadingRaw = CoordinateUtils.getCompassHeadingDeviceIsFacing(event.alpha, event.beta, event.gamma)
+    this.deviceFacingHeading.next(new HeadingAndTime(event.timeStamp, deviceFaceHeadingRaw));
   }
 
 
