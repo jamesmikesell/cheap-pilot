@@ -88,10 +88,9 @@ export class ControllerOrientationService implements Controller<number> {
 
   private getError(currentHeading: number): number {
     let delta = currentHeading - this._desired;
+    delta = CoordinateUtils.normalizeHeading(delta);
     if (delta > 180)
-      delta = delta - 360;
-    if (delta < -180)
-      delta = delta + 360;
+      delta = delta - 360
 
     return -delta;
   }

@@ -90,10 +90,9 @@ export class ControllerRotationRateService implements Controller<number> {
 
   private getGetRotationAmount(currentAngle: number, previousAngle: number): number {
     let delta = currentAngle - previousAngle;
+    delta = CoordinateUtils.normalizeHeading(delta);
     if (delta > 180)
-      delta = delta - 360;
-    if (delta < -180)
-      delta = delta + 360;
+      delta = delta - 360
 
     return -delta;
   }
