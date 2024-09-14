@@ -67,19 +67,21 @@ export class AppConfig {
   rotationKd = 0;
   rotationPidDerivativeLowPassFrequency = 1 / 10;
   rotationLowPassFrequency = .5;
+  rotationTuneStepPowerPercent = 100;
   rotationTuneSpeedKts: number;
   rotationTuneNoiseBand = 1;
   rotationTuneAllowedVariance = 10;
   rotationTuneDisableNoiseBandCycles = 2;
   rotationConfigs: RotationControllerConfig[] = [];
   maxTurnRateDegreesPerSecondPerKt = 4;
-
-
+  
+  
   orientationKp = 0;
   orientationKi = 0;
   orientationKd = 0;
   orientationPidDerivativeLowPassFrequency = 1;
   orientationLowPassFrequency = 1;
+  orientationTuneStepDegreesPerSecond = 1;
   orientationTuneNoiseBand = 0.5;
   orientationTuneAllowedVariance = 10;
   orientationTuneDisableNoiseBandCycles = 2;

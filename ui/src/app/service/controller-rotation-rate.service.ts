@@ -216,7 +216,7 @@ export class ControllerRotationRateService implements Controller<number> {
     let tuneConfig = new TuneConfig();
     this._desired = 0;
     tuneConfig.setPoint = 0;
-    tuneConfig.step = 1;
+    tuneConfig.step = this.configService.config.rotationTuneStepPowerPercent / 100;
     tuneConfig.maxCycleCount = 20;
     tuneConfig.noiseBand = this.configService.config.rotationTuneNoiseBand;
     tuneConfig.allowedAmplitudeVariance = this.configService.config.rotationTuneAllowedVariance / 100;

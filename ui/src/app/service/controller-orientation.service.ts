@@ -179,7 +179,7 @@ export class ControllerOrientationService implements Controller<number> {
   async startPidTune(): Promise<TuningResult> {
     let tuneConfig = new TuneConfig();
     tuneConfig.setPoint = 0;
-    tuneConfig.step = 1;
+    tuneConfig.step = this.configService.config.orientationTuneStepDegreesPerSecond;
     tuneConfig.maxCycleCount = 20;
     tuneConfig.noiseBand = this.configService.config.orientationTuneNoiseBand;
     tuneConfig.allowedAmplitudeVariance = this.configService.config.orientationTuneAllowedVariance / 100;
