@@ -7,14 +7,12 @@ mat-slide-toggle {
   margin-bottom: 15px;
 }
 
-.manual-controls {
-  margin-top: 29px !important;
+
+.motor-slider {
+  width: 100%;
+  max-width: 400px;
 }
 
-.manual-controls>button {
-  padding-top: 30px;
-  padding-bottom: 28px;
-}
 
 .center-controls {
   display: flex;

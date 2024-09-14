@@ -4,6 +4,7 @@ import { ConfigService, ControllerConfig, RemoteReceiverMode, RotationController
 import { Controller } from 'src/app/service/controller';
 import { ConnectableDevice } from 'src/app/service/controller-bt-motor.service';
 import { ControllerOrientationService } from 'src/app/service/controller-orientation.service';
+import { ControllerPathService } from 'src/app/service/controller-path.service';
 import { ControllerRotationRateService } from 'src/app/service/controller-rotation-rate.service';
 import { DataLogService } from 'src/app/service/data-log.service';
 import { DeviceSelectService } from 'src/app/service/device-select.service';
@@ -21,6 +22,7 @@ export class ConfigComponent implements OnInit {
   selectedRotationConfig: RotationControllerConfig[];
   selectedOrientationConfig: ControllerConfig[];
   RemoteReceiverMode = RemoteReceiverMode;
+  motorSliderPower = 0;
 
   private motorControllerService: Controller<number> & ConnectableDevice;
 
@@ -28,8 +30,9 @@ export class ConfigComponent implements OnInit {
   constructor(
     public configService: ConfigService,
     private dataLog: DataLogService,
-    public controllerRotationRate: ControllerRotationRateService,
-    public controllerOrientation: ControllerOrientationService,
+    private controllerRotationRate: ControllerRotationRateService,
+    private controllerOrientation: ControllerOrientationService,
+    private controllerPath: ControllerPathService,
     private snackBar: MatSnackBar,
     deviceSelectService: DeviceSelectService,
   ) {
@@ -153,36 +156,29 @@ export class ConfigComponent implements OnInit {
 
 
   private disableAllControllers(): void {
-    this.controllerOrientation.enabled = false;
-    this.controllerRotationRate.enabled = false;
-  }
-
-
-  private eStop(): void {
-    this.controllerOrientation.cancelPidTune();
-    this.controllerRotationRate.cancelPidTune();
-
+    if (this.controllerPath.enabled)
+      this.controllerPath.enabled = false;
     if (this.controllerOrientation.enabled)
       this.controllerOrientation.enabled = false;
-
     if (this.controllerRotationRate.enabled)
       this.controllerRotationRate.enabled = false;
   }
 
 
-  motor(power: number): void {
-    if (power === 0)
-      this.eStop();
-
-
-    this.motorControllerService.command(power);
-    this.vibrate();
+  sliderDragEnd(): void {
+    setTimeout(() => {
+      this.motorSliderPower = 0;
+      this.sliderMoved();
+    }, 0);
   }
 
+  sliderMoved(): void {
+    this.disableAllControllers();
+    this.motorControllerService.command(this.motorSliderPower / 100);
+  }
 
-  private vibrate(): void {
-    if (navigator.vibrate)
-      navigator.vibrate([50]);
+  sliderFormatLabel(value: number): string {
+    return value.toFixed(1) + "%";
   }
 
 }
