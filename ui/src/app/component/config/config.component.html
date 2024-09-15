@@ -1,469 +1,497 @@
 <div class="config-container">
-  <h2>Notes:</h2>
-  <ul>
-    <li>
-      Changes to any of the following config values (including auto tune results) will not be persisted after a refresh,
-      unless the <code>save</code> button at the bottom is clicked.
-    </li>
-    <li>
-      Connect to bluetooth motor controller to enable PID tuning, and manual controls.
-    </li>
-    <li>
-      Graphs can be cleared by double clicking them.
-    </li>
-  </ul>
-  <br>
+
+  <div>
+    <mat-accordion>
+      <mat-expansion-panel [expanded]="false">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            Notes
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <ul>
+          <li>
+            Changes to any of the following config values (including auto tune results) will not be persisted after a
+            refresh,
+            unless the <code>save</code> button at the bottom is clicked.
+          </li>
+          <li>
+            Connect to bluetooth motor controller to enable PID tuning, and manual controls.
+          </li>
+          <li>
+            Graphs can be cleared by double clicking them.
+          </li>
+        </ul>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>
 
 
+  <div>
+    <mat-accordion *ngIf="btConnected">
+      <mat-expansion-panel [expanded]="false">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            Motor Manual Controls
+          </mat-panel-title>
+        </mat-expansion-panel-header>
 
-
-  <mat-accordion *ngIf="btConnected">
-    <mat-expansion-panel [expanded]="false">
-      <mat-expansion-panel-header>
-        <mat-panel-title>
-          Motor Manual Controls
-        </mat-panel-title>
-      </mat-expansion-panel-header>
-
-      <div *ngIf="btConnected && showMotorPowerSlider" class="center-controls">
-        <mat-slider color="primary" class="motor-slider" [min]="-100" [max]="100" [step]="0.01" [discrete]="true"
-          [displayWith]="sliderFormatLabel">
-          <input matSliderThumb [ngModel]="motorSliderPower" (ngModelChange)="motorSliderPower = $event; sliderMoved()"
-            (dragEnd)="sliderDragEnd()">
-        </mat-slider>
-      </div>
-
-    </mat-expansion-panel>
-  </mat-accordion>
-
-
-
-
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>Simulator</mat-card-title>
-    </mat-card-header>
-
-    <mat-card-content>
-      <div class="input-list">
-        <mat-slide-toggle [(ngModel)]="configService.config.simulation">
-          Simulation Mode (save and refresh page after changing to take effect)
-        </mat-slide-toggle>
-
-        <div class="flex-break"></div>
-
-        <mat-form-field *ngIf="configService.config.simulation">
-          <mat-label>Boat Speed</mat-label>
-          <input matInput type="number" [(ngModel)]="configService.config.simulationSpeedKt">
-        </mat-form-field>
-
-        <mat-form-field *ngIf="configService.config.simulation">
-          <mat-label>Heading Sensor Noise Amplitude</mat-label>
-          <input matInput type="number" [(ngModel)]="configService.config.simulationNoiseAmplitude">
-        </mat-form-field>
-
-        <mat-form-field *ngIf="configService.config.simulation">
-          <mat-label>Compass Drift from GPS</mat-label>
-          <input matInput type="number" [(ngModel)]="configService.config.simulationCompassDrift">
-        </mat-form-field>
-      </div>
-    </mat-card-content>
-  </mat-card>
-
-
-
-
-
-
-
-
-
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>Remote Control</mat-card-title>
-    </mat-card-header>
-
-    <mat-card-content>
-      <div class="input-list">
-
-        <div>
-          <mat-button-toggle-group multiple>
-            <mat-button-toggle value="left"
-              [checked]="configService.config.remoteReceiverMode === RemoteReceiverMode.REMOTE"
-              (change)="remoteModeChange(RemoteReceiverMode.REMOTE)">
-              Remote
-            </mat-button-toggle>
-            <mat-button-toggle value="center" checked="true"
-              [checked]="configService.config.remoteReceiverMode === RemoteReceiverMode.RECEIVER"
-              (change)="remoteModeChange(RemoteReceiverMode.RECEIVER)">
-              Receiver
-            </mat-button-toggle>
-          </mat-button-toggle-group>
+        <div *ngIf="btConnected && showMotorPowerSlider" class="center-controls">
+          <mat-slider color="primary" class="motor-slider" [min]="-100" [max]="100" [step]="0.01" [discrete]="true"
+            [displayWith]="sliderFormatLabel">
+            <input matSliderThumb [ngModel]="motorSliderPower"
+              (ngModelChange)="motorSliderPower = $event; sliderMoved()" (dragEnd)="sliderDragEnd()">
+          </mat-slider>
         </div>
 
-        <mat-form-field *ngIf="configService.config.remoteReceiverMode !== undefined">
-          <mat-label>Remote Password</mat-label>
-          <input matInput type="text" [(ngModel)]="configService.config.remotePassword">
-        </mat-form-field>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>
+
+
+  <div>
+    <mat-accordion>
+      <mat-expansion-panel [expanded]="false">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            Simulator
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+
+
+        <div class="input-list">
+          <mat-slide-toggle [(ngModel)]="configService.config.simulation">
+            Simulation Mode (save and refresh page after changing to take effect)
+          </mat-slide-toggle>
+
+          <div class="flex-break"></div>
+
+          <mat-form-field *ngIf="configService.config.simulation">
+            <mat-label>Boat Speed</mat-label>
+            <input matInput type="number" [(ngModel)]="configService.config.simulationSpeedKt">
+          </mat-form-field>
+
+          <mat-form-field *ngIf="configService.config.simulation">
+            <mat-label>Heading Sensor Noise Amplitude</mat-label>
+            <input matInput type="number" [(ngModel)]="configService.config.simulationNoiseAmplitude">
+          </mat-form-field>
+
+          <mat-form-field *ngIf="configService.config.simulation">
+            <mat-label>Compass Drift from GPS</mat-label>
+            <input matInput type="number" [(ngModel)]="configService.config.simulationCompassDrift">
+          </mat-form-field>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>
 
-      </div>
-    </mat-card-content>
-  </mat-card>
-
-
-
-
-
-
-
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>Rotation Rate PID Controller</mat-card-title>
-    </mat-card-header>
-
-    <mat-card-content>
-      <div class="input-list">
-        <mat-form-field>
-          <mat-label>Proportional</mat-label>
-          <input matInput type="number" [(ngModel)]="configService.config.rotationKp" step="0.05">
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>Integral</mat-label>
-          <input matInput type="number" [(ngModel)]="configService.config.rotationKi" step="0.05">
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>Derivative</mat-label>
-          <input matInput type="number" [(ngModel)]="configService.config.rotationKd" step="0.05">
-        </mat-form-field>
-
-        <div class="flex-break"></div>
-
-        <mat-form-field>
-          <mat-label>Heading Noise Pre-Filter</mat-label>
-          <input matInput type="number" [(ngModel)]="configService.config.rotationPreFilterHeadingLowPassFrequency">
-          <mat-hint>Low Pass Freq. HZ</mat-hint>
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>Rotation Rate Noise Pre-Filter</mat-label>
-          <input matInput type="number" [(ngModel)]="configService.config.rotationLowPassFrequency">
-          <mat-hint>Low Pass Freq. HZ</mat-hint>
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>PID Ctrl Derivative Noise Filter</mat-label>
-          <input matInput type="number" [(ngModel)]="configService.config.rotationPidDerivativeLowPassFrequency">
-          <mat-hint>Low Pass Freq. HZ</mat-hint>
-        </mat-form-field>
-
-
-        <mat-form-field>
-          <mat-label>Tune Noise Band</mat-label>
-          <input matInput type="number" [(ngModel)]="configService.config.rotationTuneNoiseBand">
-          <mat-hint>Degrees per second</mat-hint>
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>Tune Allowed Variance</mat-label>
-          <input matInput type="number" [(ngModel)]="configService.config.rotationTuneAllowedVariance">
-          <mat-hint>Percent</mat-hint>
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>Disable Noise Band Cycles</mat-label>
-          <input matInput type="number" [(ngModel)]="configService.config.rotationTuneDisableNoiseBandCycles">
-          <mat-hint></mat-hint>
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>Tune Step Amount</mat-label>
-          <input matInput type="number" [(ngModel)]="configService.config.rotationTuneStepPowerPercent">
-          <mat-hint>Motor Power %</mat-hint>
-        </mat-form-field>
-
-        <div class="flex-break"></div>
-
-        <mat-form-field>
-          <mat-label>Spd. Depd. Max Turning Rt.</mat-label>
-          <input matInput type="number" [(ngModel)]="configService.config.maxTurnRateDegreesPerSecondPerKt">
-          <mat-hint>Degrees / Second / KT</mat-hint>
-        </mat-form-field>
-
-        <div class="flex-break"></div>
-
-        <mat-form-field>
-          <mat-label>Config</mat-label>
-          <mat-select [(value)]="selectedRotationConfig" multiple>
-            <mat-option *ngFor="let single of configService.config.rotationConfigs" [value]="single">
-              {{single.title}}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <button *ngIf="selectedRotationConfig && selectedRotationConfig.length === 1" mat-raised-button color="primary"
-          (click)="loadSelectedRotation()">
-          Load Selected
-        </button>
-
-        <button *ngIf="selectedRotationConfig" mat-raised-button color="primary" (click)="deleteSelectedRotation()">
-          Delete Selected
-        </button>
-
-        <button mat-raised-button color="primary" (click)="addCurrentRotation()">
-          Add Current Values
-        </button>
-
-        <div class="flex-break"></div>
-
-        <button *ngIf="btConnected" mat-raised-button color="primary" (click)="tuneRotationOnly()">
-          Tune Rotation Rate Controller
-        </button>
-
-      </div>
-    </mat-card-content>
-  </mat-card>
-
-
-
-
-
-
-
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>Orientation PID Controller</mat-card-title>
-    </mat-card-header>
-
-    <mat-card-content>
-      <div class="input-list">
-        <mat-form-field>
-          <mat-label>Proportional</mat-label>
-          <input matInput type="number" [(ngModel)]="configService.config.orientationKp" step="0.05">
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>Integral</mat-label>
-          <input matInput type="number" [(ngModel)]="configService.config.orientationKi" step="0.05">
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>Derivative</mat-label>
-          <input matInput type="number" [(ngModel)]="configService.config.orientationKd" step="0.05">
-        </mat-form-field>
-
-
-
-        <div class="flex-break"></div>
-
-        <mat-form-field>
-          <mat-label>Sensor Noise Pre-Filter</mat-label>
-          <input matInput type="number" [(ngModel)]="configService.config.orientationLowPassFrequency">
-          <mat-hint>Low Pass Freq. HZ</mat-hint>
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>PID Ctrl Derivative Noise Filter</mat-label>
-          <input matInput type="number" [(ngModel)]="configService.config.orientationPidDerivativeLowPassFrequency">
-          <mat-hint>Low Pass Freq. HZ</mat-hint>
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>Tune Noise Band</mat-label>
-          <input matInput type="number" [(ngModel)]="configService.config.orientationTuneNoiseBand">
-          <mat-hint>Degrees</mat-hint>
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>Tune Allowed Variance</mat-label>
-          <input matInput type="number" [(ngModel)]="configService.config.orientationTuneAllowedVariance">
-          <mat-hint>Percent</mat-hint>
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>Disable Noise Band Cycles</mat-label>
-          <input matInput type="number" [(ngModel)]="configService.config.orientationTuneDisableNoiseBandCycles">
-          <mat-hint></mat-hint>
-        </mat-form-field>
-
-
-        <mat-form-field>
-          <mat-label>Tune Step Amount</mat-label>
-          <input matInput type="number" [(ngModel)]="configService.config.orientationTuneStepDegreesPerSecond">
-          <mat-hint>Degrees / Sec</mat-hint>
-        </mat-form-field>
-
-        <div class="flex-break"></div>
-
-        <mat-form-field>
-          <mat-label>Config</mat-label>
-          <mat-select [(value)]="selectedOrientationConfig" multiple>
-            <mat-option *ngFor="let single of configService.config.orientationConfigs" [value]="single">
-              {{single.title}}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <button *ngIf="selectedOrientationConfig && selectedOrientationConfig.length === 1" mat-raised-button
-          color="primary" (click)="loadSelectedOrientation()">
-          Load Selected
-        </button>
-
-        <button *ngIf="selectedOrientationConfig" mat-raised-button color="primary"
-          (click)="deleteSelectedOrientation()">
-          Delete Selected
-        </button>
-
-        <button mat-raised-button color="primary" (click)="addCurrentOrientation()">
-          Add Current Values
-        </button>
-
-        <div class="flex-break"></div>
-
-        <button *ngIf="btConnected" mat-raised-button color="primary" (click)="tuneOrientationOnly()">
-          Tune Orientation Controller
-        </button>
-
-
-      </div>
-    </mat-card-content>
-  </mat-card>
-
-
-
-
-
-
-
-
-
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>GPS Path Controller</mat-card-title>
-    </mat-card-header>
-
-    <mat-card-content>
-      <div class="input-list">
-
-        <mat-form-field>
-          <mat-label>Waypoint Reached Proximity</mat-label>
-          <input matInput type="number" [(ngModel)]="configService.config.waypointProximityMeters">
-          <mat-hint>Meters</mat-hint>
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>Minimum GPS Accuracy</mat-label>
-          <input matInput type="number" [(ngModel)]="configService.config.minimumRequiredGpsAccuracyMeters">
-          <mat-hint>Meters</mat-hint>
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>Drift Avgd. Over Time</mat-label>
-          <input matInput type="number" [(ngModel)]="configService.config.pathDriftAverageMinutes">
-          <mat-hint>Minutes</mat-hint>
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>Drift Max Allowed Lag</mat-label>
-          <input matInput type="number" [(ngModel)]="configService.config.pathDriftLagMaxSeconds">
-          <mat-hint>Seconds</mat-hint>
-        </mat-form-field>
-
-      </div>
-    </mat-card-content>
-  </mat-card>
-
-
-
-
-
-
-
-
-
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>General</mat-card-title>
-    </mat-card-header>
-
-    <mat-card-content>
-      <div class="input-list">
-
-        <mat-slide-toggle [(ngModel)]="configService.config.alertOnBluetoothDisconnect">
-          Alert on Bluetooth Disconnect
-        </mat-slide-toggle>
-
-        <div class="flex-break"></div>
-
-        <mat-slide-toggle [(ngModel)]="configService.config.alertOnNavigationEnd">
-          Alert on Navigation End
-        </mat-slide-toggle>
-
-        <div class="flex-break"></div>
-
-
-        <button mat-raised-button color="primary" (click)="downloadLog()">Download Log</button>
-
-      </div>
-    </mat-card-content>
-  </mat-card>
-
-
-
-
-
-
-
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>Graphs</mat-card-title>
-    </mat-card-header>
-
-    <mat-card-content>
-      <div class="input-list">
-        <mat-slide-toggle [(ngModel)]="configService.config.showGraphGps">
-          Show GPS
-        </mat-slide-toggle>
-
-        <div class="flex-break"></div>
-
-        <mat-slide-toggle [(ngModel)]="configService.config.showGraphOrientation">
-          Show Orientation
-        </mat-slide-toggle>
-
-        <div class="flex-break"></div>
-
-        <mat-slide-toggle [(ngModel)]="configService.config.showGraphRotation">
-          Show Rotation
-        </mat-slide-toggle>
-
-        <div class="flex-break"></div>
-
-        <button mat-raised-button color="primary" (click)="clearGraphs()">Clear Charts</button>
-
-
-      </div>
-    </mat-card-content>
-  </mat-card>
 
 
 
 
   <div>
-    <br>
-    <br>
-    <h3>Note:</h3>
-    <p>
-      Any changes made above (including auto tune results) will not be persisted after a refresh unless
-      <code>save</code> is clicked.
-    </p>
-    <br>
+    <mat-accordion>
+      <mat-expansion-panel [expanded]="false">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            Remote Control
+          </mat-panel-title>
+        </mat-expansion-panel-header>
 
-    <button mat-raised-button color="primary" (click)="configService.save()">
-      Save
-    </button>
+        <div class="input-list">
+          <div>
+            <mat-button-toggle-group multiple>
+              <mat-button-toggle value="left"
+                [checked]="configService.config.remoteReceiverMode === RemoteReceiverMode.REMOTE"
+                (change)="remoteModeChange(RemoteReceiverMode.REMOTE)">
+                Remote
+              </mat-button-toggle>
+              <mat-button-toggle value="center" checked="true"
+                [checked]="configService.config.remoteReceiverMode === RemoteReceiverMode.RECEIVER"
+                (change)="remoteModeChange(RemoteReceiverMode.RECEIVER)">
+                Receiver
+              </mat-button-toggle>
+            </mat-button-toggle-group>
+          </div>
+
+          <mat-form-field *ngIf="configService.config.remoteReceiverMode !== undefined">
+            <mat-label>Remote Password</mat-label>
+            <input matInput type="text" [(ngModel)]="configService.config.remotePassword">
+          </mat-form-field>
+
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
   </div>
 
+
+
+
+
+  <div>
+    <mat-accordion>
+      <mat-expansion-panel [expanded]="false">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            Rotation Rate PID Controller
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <div class="input-list">
+          <mat-form-field>
+            <mat-label>Proportional</mat-label>
+            <input matInput type="number" [(ngModel)]="configService.config.rotationKp" step="0.05">
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Integral</mat-label>
+            <input matInput type="number" [(ngModel)]="configService.config.rotationKi" step="0.05">
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Derivative</mat-label>
+            <input matInput type="number" [(ngModel)]="configService.config.rotationKd" step="0.05">
+          </mat-form-field>
+
+          <div class="flex-break"></div>
+
+          <mat-form-field>
+            <mat-label>Heading Noise Pre-Filter</mat-label>
+            <input matInput type="number" [(ngModel)]="configService.config.rotationPreFilterHeadingLowPassFrequency">
+            <mat-hint>Low Pass Freq. HZ</mat-hint>
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Rotation Rate Noise Pre-Filter</mat-label>
+            <input matInput type="number" [(ngModel)]="configService.config.rotationLowPassFrequency">
+            <mat-hint>Low Pass Freq. HZ</mat-hint>
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>PID Ctrl Derivative Noise Filter</mat-label>
+            <input matInput type="number" [(ngModel)]="configService.config.rotationPidDerivativeLowPassFrequency">
+            <mat-hint>Low Pass Freq. HZ</mat-hint>
+          </mat-form-field>
+
+
+          <mat-form-field>
+            <mat-label>Tune Noise Band</mat-label>
+            <input matInput type="number" [(ngModel)]="configService.config.rotationTuneNoiseBand">
+            <mat-hint>Degrees per second</mat-hint>
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Tune Allowed Variance</mat-label>
+            <input matInput type="number" [(ngModel)]="configService.config.rotationTuneAllowedVariance">
+            <mat-hint>Percent</mat-hint>
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Disable Noise Band Cycles</mat-label>
+            <input matInput type="number" [(ngModel)]="configService.config.rotationTuneDisableNoiseBandCycles">
+            <mat-hint></mat-hint>
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Tune Step Amount</mat-label>
+            <input matInput type="number" [(ngModel)]="configService.config.rotationTuneStepPowerPercent">
+            <mat-hint>Motor Power %</mat-hint>
+          </mat-form-field>
+
+          <div class="flex-break"></div>
+
+          <mat-form-field>
+            <mat-label>Spd. Depd. Max Turning Rt.</mat-label>
+            <input matInput type="number" [(ngModel)]="configService.config.maxTurnRateDegreesPerSecondPerKt">
+            <mat-hint>Degrees / Second / KT</mat-hint>
+          </mat-form-field>
+
+          <div class="flex-break"></div>
+
+          <mat-form-field>
+            <mat-label>Config</mat-label>
+            <mat-select [(value)]="selectedRotationConfig" multiple>
+              <mat-option *ngFor="let single of configService.config.rotationConfigs" [value]="single">
+                {{single.title}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <button *ngIf="selectedRotationConfig && selectedRotationConfig.length === 1" mat-raised-button
+            color="primary" (click)="loadSelectedRotation()">
+            Load Selected
+          </button>
+
+          <button *ngIf="selectedRotationConfig" mat-raised-button color="primary" (click)="deleteSelectedRotation()">
+            Delete Selected
+          </button>
+
+          <button mat-raised-button color="primary" (click)="addCurrentRotation()">
+            Add Current Values
+          </button>
+
+          <div class="flex-break"></div>
+
+          <button *ngIf="btConnected" mat-raised-button color="primary" (click)="tuneRotationOnly()">
+            Tune Rotation Rate Controller
+          </button>
+
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>
+
+
+
+
+
+
+  <div>
+    <mat-accordion>
+      <mat-expansion-panel [expanded]="false">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            Orientation PID Controller
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <div class="input-list">
+          <mat-form-field>
+            <mat-label>Proportional</mat-label>
+            <input matInput type="number" [(ngModel)]="configService.config.orientationKp" step="0.05">
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Integral</mat-label>
+            <input matInput type="number" [(ngModel)]="configService.config.orientationKi" step="0.05">
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Derivative</mat-label>
+            <input matInput type="number" [(ngModel)]="configService.config.orientationKd" step="0.05">
+          </mat-form-field>
+
+
+
+          <div class="flex-break"></div>
+
+          <mat-form-field>
+            <mat-label>Sensor Noise Pre-Filter</mat-label>
+            <input matInput type="number" [(ngModel)]="configService.config.orientationLowPassFrequency">
+            <mat-hint>Low Pass Freq. HZ</mat-hint>
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>PID Ctrl Derivative Noise Filter</mat-label>
+            <input matInput type="number" [(ngModel)]="configService.config.orientationPidDerivativeLowPassFrequency">
+            <mat-hint>Low Pass Freq. HZ</mat-hint>
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Tune Noise Band</mat-label>
+            <input matInput type="number" [(ngModel)]="configService.config.orientationTuneNoiseBand">
+            <mat-hint>Degrees</mat-hint>
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Tune Allowed Variance</mat-label>
+            <input matInput type="number" [(ngModel)]="configService.config.orientationTuneAllowedVariance">
+            <mat-hint>Percent</mat-hint>
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Disable Noise Band Cycles</mat-label>
+            <input matInput type="number" [(ngModel)]="configService.config.orientationTuneDisableNoiseBandCycles">
+            <mat-hint></mat-hint>
+          </mat-form-field>
+
+
+          <mat-form-field>
+            <mat-label>Tune Step Amount</mat-label>
+            <input matInput type="number" [(ngModel)]="configService.config.orientationTuneStepDegreesPerSecond">
+            <mat-hint>Degrees / Sec</mat-hint>
+          </mat-form-field>
+
+          <div class="flex-break"></div>
+
+          <mat-form-field>
+            <mat-label>Config</mat-label>
+            <mat-select [(value)]="selectedOrientationConfig" multiple>
+              <mat-option *ngFor="let single of configService.config.orientationConfigs" [value]="single">
+                {{single.title}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <button *ngIf="selectedOrientationConfig && selectedOrientationConfig.length === 1" mat-raised-button
+            color="primary" (click)="loadSelectedOrientation()">
+            Load Selected
+          </button>
+
+          <button *ngIf="selectedOrientationConfig" mat-raised-button color="primary"
+            (click)="deleteSelectedOrientation()">
+            Delete Selected
+          </button>
+
+          <button mat-raised-button color="primary" (click)="addCurrentOrientation()">
+            Add Current Values
+          </button>
+
+          <div class="flex-break"></div>
+
+          <button *ngIf="btConnected" mat-raised-button color="primary" (click)="tuneOrientationOnly()">
+            Tune Orientation Controller
+          </button>
+
+
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>
+
+
+
+
+
+
+
+  <div>
+    <mat-accordion>
+      <mat-expansion-panel [expanded]="false">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            GPS Path Controller
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <div class="input-list">
+
+          <mat-form-field>
+            <mat-label>Waypoint Reached Proximity</mat-label>
+            <input matInput type="number" [(ngModel)]="configService.config.waypointProximityMeters">
+            <mat-hint>Meters</mat-hint>
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Minimum GPS Accuracy</mat-label>
+            <input matInput type="number" [(ngModel)]="configService.config.minimumRequiredGpsAccuracyMeters">
+            <mat-hint>Meters</mat-hint>
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Drift Avgd. Over Time</mat-label>
+            <input matInput type="number" [(ngModel)]="configService.config.pathDriftAverageMinutes">
+            <mat-hint>Minutes</mat-hint>
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Drift Max Allowed Lag</mat-label>
+            <input matInput type="number" [(ngModel)]="configService.config.pathDriftLagMaxSeconds">
+            <mat-hint>Seconds</mat-hint>
+          </mat-form-field>
+
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>
+
+
+
+
+
+
+
+  <div>
+    <mat-accordion>
+      <mat-expansion-panel [expanded]="false">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            General
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <div class="input-list">
+
+          <mat-slide-toggle [(ngModel)]="configService.config.alertOnBluetoothDisconnect">
+            Alert on Bluetooth Disconnect
+          </mat-slide-toggle>
+
+          <div class="flex-break"></div>
+
+          <mat-slide-toggle [(ngModel)]="configService.config.alertOnNavigationEnd">
+            Alert on Navigation End
+          </mat-slide-toggle>
+
+          <div class="flex-break"></div>
+
+
+          <button mat-raised-button color="primary" (click)="downloadLog()">Download Log</button>
+
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>
+
+
+
+
+
+
+  <div>
+    <mat-accordion>
+      <mat-expansion-panel [expanded]="false">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            Graphs
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <div class="input-list">
+          <mat-slide-toggle [(ngModel)]="configService.config.showGraphGps">
+            Show GPS
+          </mat-slide-toggle>
+
+          <div class="flex-break"></div>
+
+          <mat-slide-toggle [(ngModel)]="configService.config.showGraphOrientation">
+            Show Orientation
+          </mat-slide-toggle>
+
+          <div class="flex-break"></div>
+
+          <mat-slide-toggle [(ngModel)]="configService.config.showGraphRotation">
+            Show Rotation
+          </mat-slide-toggle>
+
+          <div class="flex-break"></div>
+
+          <button mat-raised-button color="primary" (click)="clearGraphs()">Clear Charts</button>
+
+
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>
+
+
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Save</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div>
+        <p>
+          Note: Any changes made above (including auto tune results) will not be persisted after a refresh unless
+          <code>save</code> is clicked.
+        </p>
+        <br>
+
+        <button mat-raised-button color="primary" (click)="configService.save()">
+          Save
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
 
 </div>
