@@ -49,41 +49,7 @@
   </div>
 
 
-  <div>
-    <mat-accordion>
-      <mat-expansion-panel [expanded]="false">
-        <mat-expansion-panel-header>
-          <mat-panel-title>
-            Simulator
-          </mat-panel-title>
-        </mat-expansion-panel-header>
 
-
-        <div class="input-list">
-          <mat-slide-toggle [(ngModel)]="configService.config.simulation">
-            Simulation Mode (save and refresh page after changing to take effect)
-          </mat-slide-toggle>
-
-          <div class="flex-break"></div>
-
-          <mat-form-field *ngIf="configService.config.simulation">
-            <mat-label>Boat Speed</mat-label>
-            <input matInput type="number" [(ngModel)]="configService.config.simulationSpeedKt">
-          </mat-form-field>
-
-          <mat-form-field *ngIf="configService.config.simulation">
-            <mat-label>Heading Sensor Noise Amplitude</mat-label>
-            <input matInput type="number" [(ngModel)]="configService.config.simulationNoiseAmplitude">
-          </mat-form-field>
-
-          <mat-form-field *ngIf="configService.config.simulation">
-            <mat-label>Compass Drift from GPS</mat-label>
-            <input matInput type="number" [(ngModel)]="configService.config.simulationCompassDrift">
-          </mat-form-field>
-        </div>
-      </mat-expansion-panel>
-    </mat-accordion>
-  </div>
 
 
 
@@ -472,6 +438,50 @@
       </mat-expansion-panel>
     </mat-accordion>
   </div>
+
+
+
+
+
+
+  <div>
+    <mat-accordion>
+      <mat-expansion-panel [expanded]="false">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            Simulator
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+
+
+        <div class="input-list">
+          <mat-slide-toggle [(ngModel)]="configService.config.simulation">
+            Simulation Mode (save and refresh page after changing to take effect)
+          </mat-slide-toggle>
+
+          <div class="flex-break"></div>
+
+          <mat-form-field *ngIf="configService.config.simulation">
+            <mat-label>Boat Speed</mat-label>
+            <input matInput type="number" [(ngModel)]="configService.config.simulationSpeedKt">
+          </mat-form-field>
+
+          <mat-form-field *ngIf="configService.config.simulation">
+            <mat-label>Heading Sensor Noise Amplitude</mat-label>
+            <input matInput type="number" [(ngModel)]="configService.config.simulationNoiseAmplitude">
+          </mat-form-field>
+
+          <mat-form-field *ngIf="configService.config.simulation">
+            <mat-label>Compass Drift from GPS</mat-label>
+            <input matInput type="number" [(ngModel)]="configService.config.simulationCompassDrift">
+          </mat-form-field>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>
+
+
+
 
 
   <mat-card>
