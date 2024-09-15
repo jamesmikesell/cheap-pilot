@@ -185,7 +185,7 @@ export class ConfigComponent implements OnInit {
 
   sliderMoved(): void {
     this.disableAllControllers();
-    this.motorControllerService.command(this.motorSliderPower / 100);
+    this.motorControllerService.command(-this.motorSliderPower / 100);
   }
 
   sliderFormatLabel(value: number): string {
