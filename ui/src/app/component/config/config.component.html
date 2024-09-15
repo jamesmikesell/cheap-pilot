@@ -17,12 +17,14 @@
 
 
 
-  <mat-card *ngIf="btConnected">
-    <mat-card-header>
-      <mat-card-title>Motor Manual Controls</mat-card-title>
-    </mat-card-header>
+  <mat-accordion *ngIf="btConnected">
+    <mat-expansion-panel [expanded]="false">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Motor Manual Controls
+        </mat-panel-title>
+      </mat-expansion-panel-header>
 
-    <mat-card-content>
       <div *ngIf="btConnected && showMotorPowerSlider" class="center-controls">
         <mat-slider color="primary" class="motor-slider" [min]="-100" [max]="100" [step]="0.01" [discrete]="true"
           [displayWith]="sliderFormatLabel">
@@ -30,8 +32,9 @@
             (dragEnd)="sliderDragEnd()">
         </mat-slider>
       </div>
-    </mat-card-content>
-  </mat-card>
+
+    </mat-expansion-panel>
+  </mat-accordion>
 
 
 
