@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ConfigService, ControllerConfig, RemoteReceiverMode } from 'src/app/service/config.service';
 import { Controller } from 'src/app/service/controller';
@@ -22,6 +22,7 @@ export class ConfigComponent implements OnInit {
   selectedOrientationConfig: ControllerConfig[];
   RemoteReceiverMode = RemoteReceiverMode;
   motorSliderPower = 0;
+  showMotorPowerSlider = true;
 
   private motorControllerService: Controller<number> & ConnectableDevice;
 
@@ -163,11 +164,23 @@ export class ConfigComponent implements OnInit {
   }
 
 
-  sliderDragEnd(): void {
-    setTimeout(() => {
+  @HostListener("touchend")
+  async screenScrolledWhileSliderMovedHackWorkAround(): Promise<void> {
+    await new Promise<void>(r => setTimeout(() => r(), 10))
+    if (this.motorSliderPower !== 0) {
       this.motorSliderPower = 0;
       this.sliderMoved();
-    }, 0);
+      this.showMotorPowerSlider = false
+      await new Promise<void>(r => setTimeout(() => r(), 0))
+      this.showMotorPowerSlider = true
+    }
+  }
+
+
+  async sliderDragEnd(): Promise<void> {
+    await new Promise<void>(r => setTimeout(() => r(), 0))
+    this.motorSliderPower = 0;
+    this.sliderMoved();
   }
 
   sliderMoved(): void {
