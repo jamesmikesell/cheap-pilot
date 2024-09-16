@@ -1,0 +1,91 @@
+{
+  "configVersion": 1,
+  "timestamp": 1726458117586,
+  "index": "/cheap-pilot/index.html",
+  "assetGroups": [
+    {
+      "name": "app",
+      "installMode": "prefetch",
+      "updateMode": "prefetch",
+      "cacheQueryOptions": {
+        "ignoreVary": true
+      },
+      "urls": [
+        "/cheap-pilot/favicon.ico",
+        "/cheap-pilot/index.html",
+        "/cheap-pilot/main-4QYKRAR2.js",
+        "/cheap-pilot/manifest.webmanifest",
+        "/cheap-pilot/polyfills-SCHOHYNV.js",
+        "/cheap-pilot/styles-VPPP2HBF.css"
+      ],
+      "patterns": []
+    },
+    {
+      "name": "assets",
+      "installMode": "lazy",
+      "updateMode": "prefetch",
+      "cacheQueryOptions": {
+        "ignoreVary": true
+      },
+      "urls": [
+        "/cheap-pilot/assets/beep.mp3",
+        "/cheap-pilot/assets/double-beep.mp3",
+        "/cheap-pilot/assets/icons/icon-120x120.png",
+        "/cheap-pilot/assets/icons/icon-144x144.png",
+        "/cheap-pilot/assets/icons/icon-152x152.png",
+        "/cheap-pilot/assets/icons/icon-192x192.png",
+        "/cheap-pilot/assets/icons/icon-310x310.png",
+        "/cheap-pilot/assets/icons/icon-72x72.png",
+        "/cheap-pilot/assets/icons/icon-96x96.png",
+        "/cheap-pilot/assets/layers-2x.png",
+        "/cheap-pilot/assets/layers.png",
+        "/cheap-pilot/assets/marker-icon-2x.png",
+        "/cheap-pilot/assets/marker-icon.png",
+        "/cheap-pilot/assets/marker-shadow.png"
+      ],
+      "patterns": []
+    }
+  ],
+  "dataGroups": [],
+  "hashTable": {
+    "/cheap-pilot/assets/beep.mp3": "d805cdce55bf0ff5db14cbb746ae13cbd8fba376",
+    "/cheap-pilot/assets/double-beep.mp3": "ff58c4fd98633edffbfeeb6d19fed3f8a52e3fa7",
+    "/cheap-pilot/assets/icons/icon-120x120.png": "541dd313ffe348ba3c4b3b4388b8a6db0e0ef920",
+    "/cheap-pilot/assets/icons/icon-144x144.png": "622a6e24e8031ff7182ae53ce2ecd5314294e589",
+    "/cheap-pilot/assets/icons/icon-152x152.png": "e04b39500452266f50c44d3397a82fdafefb1fef",
+    "/cheap-pilot/assets/icons/icon-192x192.png": "aa238efda085ebe1e186ab4e5b9ba62706fa3c80",
+    "/cheap-pilot/assets/icons/icon-310x310.png": "6d21d903ee7811e141be4dfb07bb129f62317459",
+    "/cheap-pilot/assets/icons/icon-72x72.png": "34b572fbd60269aa36f2d8970b48c1d7e4e91ca4",
+    "/cheap-pilot/assets/icons/icon-96x96.png": "580e273099bea741fed0e16dcd04ec4e46921e5c",
+    "/cheap-pilot/assets/layers-2x.png": "152a162333e46d24f9d89f566312fc0c64011dee",
+    "/cheap-pilot/assets/layers.png": "c9e7528e491a39232ba24a2706c6c739d6fb0f06",
+    "/cheap-pilot/assets/marker-icon-2x.png": "cf3a536596b1f58e0ac805404183c8e6d6bdacb5",
+    "/cheap-pilot/assets/marker-icon.png": "60a90bcbb2b42b7ddb4556db94eb7c1084b0e5da",
+    "/cheap-pilot/assets/marker-shadow.png": "7b6a8df63930381e96604e705168d0527d6b82bc",
+    "/cheap-pilot/favicon.ico": "bb20e517a3a06dfd41f78e1e53077fc3c04276b7",
+    "/cheap-pilot/index.html": "78808b460b371cbbada2817935b237ad664b886a",
+    "/cheap-pilot/main-4QYKRAR2.js": "3dbcb834fd7a8ad2e29d51a23728dadb6bc708c0",
+    "/cheap-pilot/manifest.webmanifest": "1c9c7bb9da19b53a8bd22fe659df13c4f208fde0",
+    "/cheap-pilot/polyfills-SCHOHYNV.js": "d45c76c5960bab3ace7fd6d211b9579456241f8a",
+    "/cheap-pilot/styles-VPPP2HBF.css": "a6c2eb367463d68e40218317ba4a80e32b2599c5"
+  },
+  "navigationUrls": [
+    {
+      "positive": true,
+      "regex": "^\\/.*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*\\.[^/]*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*__[^/]*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*__[^/]*\\/.*$"
+    }
+  ],
+  "navigationRequestStrategy": "performance"
+}
