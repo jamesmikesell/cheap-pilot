@@ -119,26 +119,25 @@ export class ControllerRotationRateService implements Controller<number> {
       let timeDeltaSeconds = (filteredHeading.time - this.previousHeading.time) / 1000;
       let rawRotationRate = this.getGetRotationAmount(filteredHeading.heading, this.previousHeading.heading) / timeDeltaSeconds;
 
-      if (!this.enabled && !this.tuner)
-        this._desired = rawRotationRate; //this prevents a buildup of error if the controller isn't enabled
-
       let filteredRotationRate = this.filterRotationRate.process(rawRotationRate, filteredHeading.time);
       let command: number;
-      if (this.tuner) {
-        command = this.tuner.sensorValueUpdated(filteredRotationRate, filteredHeading.time);
-      } else {
-        let maxRotationRate = UnitConverter.ktToMps(this.configService.config.maxTurnRateDegreesPerSecondPerKt) * speedMps;
-        let limitedDesired = Math.min(this._desired, maxRotationRate);
-        limitedDesired = Math.max(limitedDesired, -maxRotationRate);
-        let error = filteredRotationRate - limitedDesired;
+      if (this.enabled || this.tuner) {
+        if (this.tuner) {
+          command = this.tuner.sensorValueUpdated(filteredRotationRate, filteredHeading.time);
+        } else {
+          let maxRotationRate = UnitConverter.ktToMps(this.configService.config.maxTurnRateDegreesPerSecondPerKt) * speedMps;
+          let limitedDesired = Math.min(this._desired, maxRotationRate);
+          limitedDesired = Math.max(limitedDesired, -maxRotationRate);
+          let error = filteredRotationRate - limitedDesired;
 
-        command = this.pidController.update(error, filteredHeading.time);
-        this.pidController.saturationReached = Math.abs(command) >= 1;
-        command = Math.max(command, -1)
-        command = Math.min(command, 1)
+          command = this.pidController.update(error, filteredHeading.time);
+          this.pidController.saturationReached = Math.abs(command) >= 1;
+          command = Math.max(command, -1)
+          command = Math.min(command, 1)
 
-        if (this.enabled)
-          this.motorService.command(command);
+          if (this.enabled)
+            this.motorService.command(command);
+        }
       }
 
       let loggedSetPoint = this.enabled ? this._desired : 0;
