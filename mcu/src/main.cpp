@@ -43,13 +43,14 @@ class MyCallbacks : public BLECharacteristicCallbacks
     std::string value = pCharacteristic->getValue();
     ledcWrite(PMW_LED, value[0]);
 
-    int speedA = 0;
-    int speedB = 0;
+    // setting to 255 means use braking when commanded power is 0%, also means will brake during PWM pulses
+    int speedA = 255;
+    int speedB = 255;
     // Forward vs reverse
     if (value[1] == 1)
-      speedA = value[0];
+      speedB = 255 - value[0];
     else
-      speedB = value[0];
+      speedA = 255 - value[0];
 
     ledcWrite(PMW_A, speedA);
     ledcWrite(PMW_B, speedB);
