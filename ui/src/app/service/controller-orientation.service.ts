@@ -97,27 +97,26 @@ export class ControllerOrientationService implements Controller<number> {
 
 
   private updateReceived(heading: HeadingAndTime): void {
-    if (!this._enabled && !this.tuner)
-      this._desired = heading.heading; //this prevents a buildup of error if the controller isn't enabled
-
     this.currentHeading = heading.heading;
     let errorRaw = this.getError(heading.heading);
 
     const errorFiltered = this.errorFilter.process(errorRaw, heading.time)
 
     let command: number;
-    if (this.tuner) {
-      command = this.tuner.sensorValueUpdated(errorFiltered, heading.time);
-    } else {
-      command = this.pidController.update(errorFiltered, heading.time);
+    if (this.tuner || this._enabled) {
+      if (this.tuner) {
+        command = this.tuner.sensorValueUpdated(errorFiltered, heading.time);
+      } else {
+        command = this.pidController.update(errorFiltered, heading.time);
 
-      const maxRate = this.rotationRateController.maxRotationRate;
-      this.pidController.saturationReached = Math.abs(command) > maxRate;
-      command = Math.max(command, -maxRate)
-      command = Math.min(command, maxRate)
+        const maxRate = this.rotationRateController.maxRotationRate;
+        this.pidController.saturationReached = Math.abs(command) > maxRate;
+        command = Math.max(command, -maxRate)
+        command = Math.min(command, maxRate)
 
-      if (this._enabled)
-        this.rotationRateController.command(command);
+        if (this._enabled)
+          this.rotationRateController.command(command);
+      }
     }
 
 
