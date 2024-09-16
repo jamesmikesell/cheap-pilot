@@ -85,7 +85,7 @@ export class AppConfig {
   orientationTuneDisableNoiseBandCycles = 2;
   orientationConfigs: ControllerConfig[] = [];
 
-  pathDriftAverageMinutes = 6;
+  pathDriftAverageMinutes = 2;
   pathDriftLagMaxSeconds = 30;
 
   waypointProximityMeters = 20;
