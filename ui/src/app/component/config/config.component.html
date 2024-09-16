@@ -103,77 +103,89 @@
           </mat-panel-title>
         </mat-expansion-panel-header>
 
+
+        <strong>Input Sensor Filters</strong>
         <div class="input-list">
-          <mat-form-field>
+          <mat-form-field class="custom-w-6em">
+            <mat-label>Heading Fltr</mat-label>
+            <input matInput type="number" [(ngModel)]="configService.config.rotationPreFilterHeadingLowPassFrequency">
+            <mat-hint>Hz</mat-hint>
+          </mat-form-field>
+
+          <mat-form-field class="custom-w-6em">
+            <mat-label>Rot Rt Fltr</mat-label>
+            <input matInput type="number" [(ngModel)]="configService.config.rotationLowPassFrequency">
+            <mat-hint>Hz</mat-hint>
+          </mat-form-field>
+        </div>
+
+
+        <br>
+        <strong>PID Controller Config</strong>
+        <div class="input-list">
+          <mat-form-field class="custom-w-6em">
             <mat-label>Proportional</mat-label>
             <input matInput type="number" [(ngModel)]="configService.config.rotationKp" step="0.05">
           </mat-form-field>
 
-          <mat-form-field>
+          <mat-form-field class="custom-w-6em">
             <mat-label>Integral</mat-label>
             <input matInput type="number" [(ngModel)]="configService.config.rotationKi" step="0.05">
           </mat-form-field>
 
-          <mat-form-field>
+          <mat-form-field class="custom-w-6em">
             <mat-label>Derivative</mat-label>
             <input matInput type="number" [(ngModel)]="configService.config.rotationKd" step="0.05">
           </mat-form-field>
 
-          <div class="flex-break"></div>
-
-          <mat-form-field>
-            <mat-label>Heading Noise Pre-Filter</mat-label>
-            <input matInput type="number" [(ngModel)]="configService.config.rotationPreFilterHeadingLowPassFrequency">
-            <mat-hint>Low Pass Freq. HZ</mat-hint>
-          </mat-form-field>
-
-          <mat-form-field>
-            <mat-label>Rotation Rate Noise Pre-Filter</mat-label>
-            <input matInput type="number" [(ngModel)]="configService.config.rotationLowPassFrequency">
-            <mat-hint>Low Pass Freq. HZ</mat-hint>
-          </mat-form-field>
-
-          <mat-form-field>
-            <mat-label>PID Ctrl Derivative Noise Filter</mat-label>
-            <input matInput type="number" [(ngModel)]="configService.config.rotationPidDerivativeLowPassFrequency">
-            <mat-hint>Low Pass Freq. HZ</mat-hint>
-          </mat-form-field>
-
-
-          <mat-form-field>
-            <mat-label>Tune Noise Band</mat-label>
-            <input matInput type="number" [(ngModel)]="configService.config.rotationTuneNoiseBand">
-            <mat-hint>Degrees per second</mat-hint>
-          </mat-form-field>
-
-          <mat-form-field>
-            <mat-label>Tune Allowed Variance</mat-label>
-            <input matInput type="number" [(ngModel)]="configService.config.rotationTuneAllowedVariance">
-            <mat-hint>Percent</mat-hint>
-          </mat-form-field>
-
-          <mat-form-field>
-            <mat-label>Disable Noise Band Cycles</mat-label>
-            <input matInput type="number" [(ngModel)]="configService.config.rotationTuneDisableNoiseBandCycles">
-            <mat-hint></mat-hint>
-          </mat-form-field>
-
-          <mat-form-field>
-            <mat-label>Tune Step Amount</mat-label>
-            <input matInput type="number" [(ngModel)]="configService.config.rotationTuneStepPowerPercent">
-            <mat-hint>Motor Power %</mat-hint>
-          </mat-form-field>
-
-          <div class="flex-break"></div>
-
-          <mat-form-field>
+          <mat-form-field class="custom-w-12em">
             <mat-label>Spd. Depd. Max Turning Rt.</mat-label>
             <input matInput type="number" [(ngModel)]="configService.config.maxTurnRateDegreesPerSecondPerKt">
-            <mat-hint>Degrees / Second / KT</mat-hint>
+            <mat-hint>°/sec/KT</mat-hint>
           </mat-form-field>
 
-          <div class="flex-break"></div>
+          <mat-form-field class="custom-w-6em">
+            <mat-label>PID D Fltr</mat-label>
+            <input matInput type="number" [(ngModel)]="configService.config.rotationPidDerivativeLowPassFrequency">
+            <mat-hint>Hz</mat-hint>
+          </mat-form-field>
 
+        </div>
+
+
+        <br>
+        <strong>Auto Tuner Config</strong>
+        <div class="input-list">
+          <mat-form-field class="custom-w-6em">
+            <mat-label>Noise Band</mat-label>
+            <input matInput type="number" [(ngModel)]="configService.config.rotationTuneNoiseBand">
+            <mat-hint>°/sec</mat-hint>
+          </mat-form-field>
+
+          <mat-form-field class="custom-w-6em">
+            <mat-label>Dsbl Ns Bnd</mat-label>
+            <input matInput type="number" [(ngModel)]="configService.config.rotationTuneDisableNoiseBandCycles">
+            <mat-hint>Cycles</mat-hint>
+          </mat-form-field>
+
+          <mat-form-field class="custom-w-7em">
+            <mat-label>Step Amt</mat-label>
+            <input matInput type="number" [(ngModel)]="configService.config.rotationTuneStepPowerPercent">
+            <mat-hint>% Mtr Pwr</mat-hint>
+          </mat-form-field>
+
+          <mat-form-field class="custom-w-6em">
+            <mat-label>Allowed Var</mat-label>
+            <input matInput type="number" [(ngModel)]="configService.config.rotationTuneAllowedVariance">
+            <mat-hint>%</mat-hint>
+          </mat-form-field>
+
+        </div>
+
+
+        <br>
+        <strong>Misc</strong>
+        <div class="input-list">
           <mat-form-field>
             <mat-label>Config</mat-label>
             <mat-select [(value)]="selectedRotationConfig" multiple>
@@ -188,7 +200,8 @@
             Load Selected
           </button>
 
-          <button *ngIf="selectedRotationConfig" mat-raised-button color="primary" (click)="deleteSelectedRotation()">
+          <button *ngIf="selectedRotationConfig && selectedRotationConfig.length" mat-raised-button color="primary"
+            (click)="deleteSelectedRotation()">
             Delete Selected
           </button>
 
@@ -221,65 +234,77 @@
           </mat-panel-title>
         </mat-expansion-panel-header>
 
+
+        <strong>Input Sensor Filters</strong>
         <div class="input-list">
-          <mat-form-field>
+          <mat-form-field class="custom-w-6em">
+            <mat-label>Heading Fltr</mat-label>
+            <input matInput type="number" [(ngModel)]="configService.config.orientationLowPassFrequency">
+            <mat-hint>Hz</mat-hint>
+          </mat-form-field>
+        </div>
+
+
+        <br>
+        <strong>PID Controller Config</strong>
+        <div class="input-list">
+          <mat-form-field class="custom-w-6em">
             <mat-label>Proportional</mat-label>
             <input matInput type="number" [(ngModel)]="configService.config.orientationKp" step="0.05">
           </mat-form-field>
 
-          <mat-form-field>
+          <mat-form-field class="custom-w-6em">
             <mat-label>Integral</mat-label>
             <input matInput type="number" [(ngModel)]="configService.config.orientationKi" step="0.05">
           </mat-form-field>
 
-          <mat-form-field>
+          <mat-form-field class="custom-w-6em">
             <mat-label>Derivative</mat-label>
             <input matInput type="number" [(ngModel)]="configService.config.orientationKd" step="0.05">
           </mat-form-field>
 
-
-
-          <div class="flex-break"></div>
-
-          <mat-form-field>
-            <mat-label>Sensor Noise Pre-Filter</mat-label>
-            <input matInput type="number" [(ngModel)]="configService.config.orientationLowPassFrequency">
-            <mat-hint>Low Pass Freq. HZ</mat-hint>
-          </mat-form-field>
-
-          <mat-form-field>
-            <mat-label>PID Ctrl Derivative Noise Filter</mat-label>
+          <mat-form-field class="custom-w-6em">
+            <mat-label>PID D Fltr</mat-label>
             <input matInput type="number" [(ngModel)]="configService.config.orientationPidDerivativeLowPassFrequency">
-            <mat-hint>Low Pass Freq. HZ</mat-hint>
+            <mat-hint>Hz</mat-hint>
           </mat-form-field>
 
-          <mat-form-field>
-            <mat-label>Tune Noise Band</mat-label>
+        </div>
+
+
+        <br>
+        <strong>Auto Tuner Config</strong>
+        <div class="input-list">
+          <mat-form-field class="custom-w-6em">
+            <mat-label>Noise Band</mat-label>
             <input matInput type="number" [(ngModel)]="configService.config.orientationTuneNoiseBand">
             <mat-hint>Degrees</mat-hint>
           </mat-form-field>
 
-          <mat-form-field>
-            <mat-label>Tune Allowed Variance</mat-label>
-            <input matInput type="number" [(ngModel)]="configService.config.orientationTuneAllowedVariance">
-            <mat-hint>Percent</mat-hint>
-          </mat-form-field>
-
-          <mat-form-field>
-            <mat-label>Disable Noise Band Cycles</mat-label>
+          <mat-form-field class="custom-w-6em">
+            <mat-label>Dsbl Ns Bnd</mat-label>
             <input matInput type="number" [(ngModel)]="configService.config.orientationTuneDisableNoiseBandCycles">
-            <mat-hint></mat-hint>
+            <mat-hint>Cycles</mat-hint>
           </mat-form-field>
 
-
-          <mat-form-field>
-            <mat-label>Tune Step Amount</mat-label>
+          <mat-form-field class="custom-w-6em">
+            <mat-label>Step Amt</mat-label>
             <input matInput type="number" [(ngModel)]="configService.config.orientationTuneStepDegreesPerSecond">
-            <mat-hint>Degrees / Sec</mat-hint>
+            <mat-hint>°/sec</mat-hint>
           </mat-form-field>
 
-          <div class="flex-break"></div>
+          <mat-form-field class="custom-w-6em">
+            <mat-label>Allowed Var</mat-label>
+            <input matInput type="number" [(ngModel)]="configService.config.orientationTuneAllowedVariance">
+            <mat-hint>%</mat-hint>
+          </mat-form-field>
 
+        </div>
+
+
+        <br>
+        <strong>Misc</strong>
+        <div class="input-list">
           <mat-form-field>
             <mat-label>Config</mat-label>
             <mat-select [(value)]="selectedOrientationConfig" multiple>
@@ -294,8 +319,8 @@
             Load Selected
           </button>
 
-          <button *ngIf="selectedOrientationConfig" mat-raised-button color="primary"
-            (click)="deleteSelectedOrientation()">
+          <button *ngIf="selectedOrientationConfig && selectedOrientationConfig.length" mat-raised-button
+            color="primary" (click)="deleteSelectedOrientation()">
             Delete Selected
           </button>
 

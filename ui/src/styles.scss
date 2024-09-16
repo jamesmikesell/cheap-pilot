@@ -189,3 +189,10 @@ body {
 .overscroll:not(:has(.no-overscroll)) {
   margin-bottom: 50vh;
 }
+
+
+@for $i from 1 through 20 {
+  .custom-w-#{$i}em {
+    width: #{$i}em;
+  }
+}
